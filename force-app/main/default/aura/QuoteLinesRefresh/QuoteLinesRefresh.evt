@@ -1,0 +1,2 @@
+<aura:event type="APPLICATION" description="This Event id used to Refresh the QuoteLines in AddProductForQuote">    
+</aura:event>

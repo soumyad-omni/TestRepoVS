@@ -1,0 +1,4 @@
+<design:component>
+	<design:attribute label="Record Type Name" name="recordTypeId"/>
+    <design:attribute label="Quote Id" name="quoteId"/>
+</design:component>

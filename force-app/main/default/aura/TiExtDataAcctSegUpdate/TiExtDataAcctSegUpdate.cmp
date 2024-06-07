@@ -1,0 +1,6 @@
+<aura:component implements="flexipage:availableForRecordHome,force:hasRecordId" access="global" controller="TiExtDataAcctSegController">
+    <div align="Right">
+        <lightning:button name="UpdateAccountSegment" label="Account Segment Update" onclick="{!c.AccountSegmentSync}" class="cls">
+        </lightning:button>
+    </div>    
+</aura:component>

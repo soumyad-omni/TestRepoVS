@@ -1,0 +1,128 @@
+<apex:component controller="InvoiceEmailTemplateCtrl" access="global">
+    <apex:attribute name="InvoiceId" type="Id" description="Id of the account" assignTo="{!Invoice}"/>
+    <style type="text/css">
+
+    
+    body {
+    background-color:#FFFFFF;
+}
+
+th{
+    color: #46B555;
+    font-family: ProximaNovaBold, Arial, Helvetica, sans-serif;
+}
+p{
+    color: #46B555;
+    font-family: ProximaNovaBold, Arial, Helvetica, sans-serif;
+}
+
+</style>
+           <!-- <p><img src="{!$Resource.OmnicellLogo_PDF}"/></p> -->
+               <!--<p><apex:image url="{!$Resource.OmnicellLogo_PDF}"/> </p>-->
+               <p><apex:image id="Headerlogo" value="{!$Label.Omnicell_img_Servlet_URL}"/></p>
+
+            <table style="width:580px; border: 2px solid;">
+            <apex:repeat value="{!OrderList}" var="ord">
+              
+                <tr><th style="text-align: left">Order Number :&nbsp;{!ord.ccrz__CCOrder__r.SAP_Order_Number__c}</th></tr>
+                 </apex:repeat> 
+            </table>
+            <br/>
+            <table style="width:500px;   border: 2px solid;">
+                <tr >
+                    <th style="padding-bottom: 20px; text-align: left;">Billing and Shipping Address</th><th></th>                         
+                </tr>
+                 <tr>
+                    <th style="color:#000;width:100px; text-align: left;font-size: 13px; ">Bill To  </th>
+                    <th style="color:#000;width:100px; text-align: left;font-size: 13px; ">Ship To</th>
+                     
+                </tr>
+                <br/>
+                <apex:repeat value="{!OrderList}" var="ord">
+                <tr>
+                    <td style="color:#000;width:100px; text-align: left;font-size: 13px; ">
+                        <!--{!ord.ccrz__BillTo__r.ccrz__AddressSecondline__c} <br/>
+                        {!ord.ccrz__BillTo__r.ccrz__AddressThirdline__c} <br/>-->
+                        {!ord.ccrz__CCOrder__r.ccrz__BillTo__r.ccrz__FirstName__c}  {!ord.ccrz__CCOrder__r.ccrz__BillTo__r.ccrz__LastName__c}<br/>
+                        {!ord.ccrz__CCOrder__r.ccrz__BillTo__r.ccrz__AddressFirstline__c} <br/>
+                        {!ord.ccrz__CCOrder__r.ccrz__BillTo__r.ccrz__City__c} <br/>
+                        {!ord.ccrz__CCOrder__r.ccrz__BillTo__r.ccrz__StateISOCode__c} <br/>
+                        {!ord.ccrz__CCOrder__r.ccrz__BillTo__r.ccrz__Country__c} <br/>
+                        {!ord.ccrz__CCOrder__r.ccrz__BillTo__r.ccrz__PostalCode__c}
+                    </td>
+                    <td style="color:#000;width:100px;padding-right: 50px;font-size: 13px;text-align: left;">
+                    <!--{!ord.ccrz__ShipTo__r.ccrz__AddressSecondline__c} <br/>
+                    {!ord.ccrz__ShipTo__r.ccrz__AddressThirdline__c} <br/> -->
+                    {!ord.ccrz__CCOrder__r.ccrz__ShipTo__r.ccrz__FirstName__c}  {!ord.ccrz__CCOrder__r.ccrz__ShipTo__r.ccrz__LastName__c}<br/>
+                    {!ord.ccrz__CCOrder__r.ccrz__ShipTo__r.ccrz__AddressFirstline__c} <br/>
+                    {!ord.ccrz__CCOrder__r.ccrz__ShipTo__r.ccrz__City__c} <br/>
+                    {!ord.ccrz__CCOrder__r.ccrz__ShipTo__r.ccrz__StateISOCode__c} <br/>
+                    {!ord.ccrz__CCOrder__r.ccrz__ShipTo__r.ccrz__Country__c} <br/>
+                    {!ord.ccrz__CCOrder__r.ccrz__ShipTo__r.ccrz__PostalCode__c}
+                    </td>
+                </tr>
+                </apex:repeat> 
+            </table>
+            <br/>
+    <table style="width:500px; border: 2px solid;">
+                <tr>
+                    <td style="width:100%; text-align: left;color: #46B555; font-family: ProximaNovaBold, Arial, Helvetica, sans-serif;"><b>Order Items Invoiced</b></td> <th></th> 
+                    <th></th> 
+                    <th></th> 
+                    <th></th> 
+                </tr>
+                <br/>
+                <br/>
+                <tr>
+                    <th style="color:#000;width: 830px;font-size: 13px;text-align: left;">Product</th>        
+                     <th style="color:#000;width:100px;font-size: 13px;padding-right: 10px;text-align: left;">Quantity</th>
+                     </tr>
+        <apex:outputPanel rendered="{!Cart == true}"><!--iba-4361-->
+             <apex:repeat value="{!InvoiceItem}" var="invitem" >
+                                     
+                <tr>
+                    <apex:outputPanel rendered="{!invitem.ccrz__CCOrderItem__r.ccrz__OrderLineType__c == 'Major'}"> 
+                        <td style="padding-left: 0px;width: 830px;text-align: left;font-size: 13px;">{!invitem.Product_Name__c}</td>
+                        <td style="width:100px;padding-right: 10px;text-align: left;font-size: 13px;">{!invitem.Invoice_Item_Quantity__c} </td>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!invitem.ccrz__CCOrderItem__r.ccrz__OrderLineType__c == 'Minor'}"> 
+                        <td style="padding-left: 0px;width: 1000px;text-align: left;font-size: 13px;">{!invitem.Product_Name__c}({!invitem.ccrz__CCOrderItem__r.ccrz__PrimaryAttr__r.ccrz__DisplayName__c} {!invitem.ccrz__CCOrderItem__r.ccrz__SecondaryAttr__r.ccrz__DisplayName__c} {!invitem.ccrz__CCOrderItem__r.ccrz__TertiaryAttr__r.ccrz__DisplayName__c} {!invitem.ccrz__CCOrderItem__r.DrugCodes__r.Brand_Name__c} {!invitem.ccrz__CCOrderItem__r.DrugCodes__r.Drug_Strength__c})</td>
+                        <td style="width:100px;padding-right: 10px;text-align: left;font-size: 13px;">{!invitem.Invoice_Item_Quantity__c} </td>
+                    </apex:outputPanel>
+                 </tr>
+                </apex:repeat>
+        </apex:outputPanel>
+        <apex:outputPanel rendered="{!Cart == false}"><!--iba-4361-->
+             <apex:repeat value="{!CCOrdItem}" var="orditem" >
+                                     
+                <tr>
+                    <apex:outputPanel rendered="{!orditem.ccrz__OrderLineType__c == 'Major'}"> 
+                        <td style="padding-left: 0px;width: 830px;text-align: left;font-size: 13px;">{!orditem.ccrz__Product_Name__c}</td>
+                        <td style="width:100px;padding-right: 10px;text-align: left;font-size: 13px;">{!orditem.ccrz__Quantity__c} </td>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!orditem.ccrz__OrderLineType__c == 'Minor'}"> 
+                        <td style="padding-left: 0px;width: 1000px;text-align: left;font-size: 13px;">{!orditem.ccrz__Product_Name__c}({!orditem.ccrz__PrimaryAttr__r.ccrz__DisplayName__c} {!orditem.ccrz__SecondaryAttr__r.ccrz__DisplayName__c} {!orditem.ccrz__TertiaryAttr__r.ccrz__DisplayName__c} {!orditem.DrugCodes__r.Brand_Name__c} {!orditem.DrugCodes__r.Drug_Strength__c})</td>
+                        <td style="width:100px;padding-right: 10px;text-align: left;font-size: 13px;">{!orditem.ccrz__Quantity__c} </td>
+                    </apex:outputPanel>
+                 </tr>
+                </apex:repeat>
+        </apex:outputPanel>
+                    </table>
+            
+            <br/> 
+            <div style="line-height : 5px;"><!--iba-4519-->
+                <p style="color:red;">Payment in US Dollars should be remitted to:</p>
+                <p style="color:red;">Omnicell, Inc.</p>
+                <p style="color:red;">PO BOX 204650</p>
+                <p style="color:red;">Dallas, TX 75320-4650</p><br/>
+                <p style="color:red;">Payment in Canadian Dollars should be remitted to:</p>
+                <p style="color:red;">Omnicell #12197</p>
+                <p style="color:red;">Toronto Dominion Center</p>
+                <p style="color:red;">66 Wellington St. West, Ste. 4500</p>
+                <p style="color:red;">Toronto, Ontario M5K 1E7</p>
+                <p style="color:red;">Canada</p><br/>
+                <p style="color:red;font-weight: bold;line-height: 20px;">If you need further assistance or need remittance instructions for ACH or wire, please reach out to us at <span style="color:blue;font-weight:bold;">accountsreceivable@omnicell.com</span></p><br/>
+            </div>
+            <p>Thank You!</p>
+            <p><apex:image id="regardslogo" value="{!$Label.Omnicell_img_Servlet_URL}"/></p>
+</apex:component>

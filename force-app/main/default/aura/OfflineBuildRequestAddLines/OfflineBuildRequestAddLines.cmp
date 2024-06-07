@@ -1,0 +1,55 @@
+<aura:component controller="OffineBuildRequestController" implements="force:appHostable,flexipage:availableForAllPageTypes,force:lightningQuickAction,force:hasRecordId" access="global">
+    <!-- attributes -->
+    <aura:attribute name="recordId" type="String" default=""/>
+    <aura:attribute name="data" type="Object"/>
+    <aura:attribute name="columns" type="List"/>
+    <aura:attribute name="selectedRowsCount" type="Integer" default="0"/>
+    <aura:attribute name="selectedLines" type="List" access="private"/>    
+    <aura:attribute name="addLinesClicked" type="Boolean"/>
+    
+    <!-- lightning data service objects -->
+    <aura:attribute name="record" type="Object"/>
+    <aura:attribute name="buildRequest" type="Object"/>
+    <aura:attribute name="recordError" type="String"/>
+    
+    <!-- lightning client side error attributes -->
+    <aura:attribute name="isError" type="boolean" default="false"/>
+    <aura:attribute name="errorMessage" type="Object" default=""/>   
+    
+    <force:recordData aura:id="recordLoader"
+                      fields="Id,Quote__c,Name"
+                      recordId="{!v.recordId}"
+                      targetFields="{!v.buildRequest}"
+                      targetError="{!v.recordError}"
+                      recordUpdated="{!c.handleRecordUpdated}"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+    
+    <!-- the container element determine the height of the datatable -->
+    <div>
+        <lightning:card iconName="standard:quotes" title ="Quote Line Selection Screen" >
+            <aura:if isTrue="{!v.isError}">
+                <lightning:layoutItem size="12" flexibility="auto" padding="around-small">   
+                    <p class="slds-theme--error slds-box slds-align_absolute-center" style="width: fit-content;">
+                        <strong>
+                            Error: {!v.errorMessage.message} <br/>                                    
+                        </strong>                    
+                    </p>                                
+                </lightning:layoutItem>
+            </aura:if>
+            <div class="slds-scrollable" style="height:665px;">
+                <lightning:datatable aura:id="dtable"
+                                     columns="{! v.columns }"
+                                     data="{! v.data }"
+                                     keyField="id"
+                                     onrowselection="{! c.updateSelectedRows }"/>
+            </div>
+            <div class="slds-clearfix" style="margin-top: 20px;margin-right:20px;">                                
+                <div class="slds-float_right">
+                    <lightning:button variant="brand-outline" disabled="{!v.addLinesClicked}" label="Cancel" title="Cancel" onclick="{! c.cancel }" />
+                    <lightning:button variant="brand" disabled="{!or(v.selectedRowsCount == 0,v.addLinesClicked)}" label="{!'Add Lines ('+ v.selectedRowsCount +')'}" title="Add Lines" onclick="{! c.addLines }" />
+                </div>
+            </div>
+        </lightning:card>
+    </div> 
+</aura:component>

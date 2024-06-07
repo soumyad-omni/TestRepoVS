@@ -1,0 +1,93 @@
+<apex:page >
+        <style>
+        table{
+          border: 1px solid green;
+  		  width: 100%; 
+          position:relative;
+        }
+        th, tr {
+          border: 1px solid green;
+          padding: 5px;
+          text-align: center;
+            width: 100%; 
+        }
+        th{
+          padding-top: 12px;
+          padding-bottom: 12px;
+          text-align: center;
+          background-color: #4CAF50;
+          color: white;
+        }
+        tr:nth-child(even){background-color: #f2f2f2;}
+        b{
+            color : green;
+            text-align: center;
+        }
+        </style>
+		<script type="text/javascript" src="../soap/ajax/50.0/connection.js" ></script>
+        <script type="text/javascript">
+    		
+    		window.onload = GenerateTable;
+    		function GenerateTable() {
+                sforce.connection.sessionId = '{!$Api.Session_ID}';
+                var tableData = new Array();
+                tableData.push(["Year", "Total # of customer sites added in calendar year", "Total # customer sites added in preceding calendar years of term", "# total customer sites that apply toward Minimum Purchase Target"]);
+                var query = "Select ECC_Installation_Year__c From Quote_Line__c Where Quote__r.SAP_Sales_Order_Number__c != '' AND Product_Code__c IN ('OCN-SUB-001','OCX-SUB-041','OCN-SUB-011','OCX-SUB-051','OCN-SUB-021','OCX-SUB-061','OCX-SUB-071')";
+                console.log(query);
+                var max = 2020;
+            	var records = sforce.connection.query(query);
+                console.log(records);
+                var records1 = records.getArray('records');
+                for(var i=0;i<records1.length;i++){
+                    if(records1[i].ECC_Installation_Year__c > max){
+                        max = parseInt(records1[i].ECC_Installation_Year__c);
+                    }
+                }
+                if(max < new Date().getFullYear()-1){//IBA-2815
+                    max = new Date().getFullYear()-1;
+                }
+                for(var i=2020;i<= max;i++){
+                	var res20 = sforce.connection.query("Select id From Quote_Line__c Where Quote__r.SAP_Sales_Order_Number__c != '' AND ECC_Installation_Year__c = "+i+" AND Product_Code__c IN ('OCN-SUB-001','OCX-SUB-041','OCN-SUB-011','OCX-SUB-051','OCN-SUB-021','OCX-SUB-061','OCX-SUB-071')");
+                    var count20 = res20.getArray('records');
+                    console.log(count20.length);
+                    
+                    var resless20 = sforce.connection.query("Select id From Quote_Line__c Where Quote__r.SAP_Sales_Order_Number__c != '' AND ECC_Installation_Year__c < "+i+" AND Product_Code__c IN ('OCN-SUB-001','OCX-SUB-041','OCN-SUB-011','OCX-SUB-051','OCN-SUB-021','OCX-SUB-061','OCX-SUB-071')");
+                    var countless20 = resless20.getArray('records');
+                    console.log(countless20.length);
+                    
+                    var total = count20.length + countless20.length;
+                    console.log(total);
+                    tableData.push([i, count20.length, countless20.length, total]);
+                }
+                var table = document.createElement("TABLE");
+                table.setAttribute('style', 'text-align: center; display:block;');
+                table.createCaption();
+                table.innerHTML = "<b>Omnicell One Annual Report</b>";
+                //Get the count of columns.
+                var columnCount = tableData[0].length;
+                //Add the header row.
+                var row = table.insertRow(-1);
+                for (var i = 0; i < columnCount; i++) {
+                    var headerCell = document.createElement("TH");
+                    headerCell.innerHTML = tableData[0][i];
+                    row.appendChild(headerCell);
+                }
+         
+                //Add the data rows.
+                for (var i = 1; i < tableData.length; i++) {
+                    row = table.insertRow(-1);
+                    for (var j = 0; j < columnCount; j++) {
+                        var cell = row.insertCell(-1);
+                        cell.innerHTML = tableData[i][j];
+                    }
+                }
+         
+                var dvTable = document.getElementById("dvTable");
+                dvTable.innerHTML = "";
+                dvTable.appendChild(table);
+    		}
+        </script>
+		<hr/>
+        <div id="dvTable"></div>
+
+</apex:page>

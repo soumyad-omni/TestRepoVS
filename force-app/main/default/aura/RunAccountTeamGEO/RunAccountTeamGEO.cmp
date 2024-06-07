@@ -1,0 +1,4 @@
+<aura:component implements="force:lightningQuickAction,force:hasRecordId" controller = "RunAccountTeamGEOComponentController" >
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <h1>Updating Account Team Geo manually</h1>
+</aura:component>

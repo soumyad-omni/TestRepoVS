@@ -1,0 +1,99 @@
+<aura:component >
+	<aura:attribute name="dealModelWrapper" type="Object" /> 
+    <lightning:layout multipleRows="true">
+        <lightning:layoutItem flexibility="auto" padding="around-small" size="10" smallDeviceSize="10" mediumDeviceSize="4" largeDeviceSize="4" >
+            <table style="width:100%;">  
+                <tr>      
+                    <td style="text-align:left body; font-size:12px; width:50%;"><b>Transaction No:</b></td>
+                    <td style="font-size:12px; width:50%;">&nbsp;&nbsp;<ui:outputNumber value="{!v.dealModelWrapper.data.ES_MARGIN_HDR.ORDER_NUM}" format="#############"/></td>
+                </tr>
+            </table>
+        </lightning:layoutItem>
+        <lightning:layoutItem flexibility="auto" padding="around-small" size="10" smallDeviceSize="10" mediumDeviceSize="4" largeDeviceSize="4" >
+            <table style="width:100%;">  
+                <tr>      
+                    <td style="text-align:left body; font-size:12px; width:50%;"><b>Transaction Type:</b></td>
+                    <td style="font-size:12px; width:50%;">&nbsp;&nbsp;{!v.dealModelWrapper.data.ES_MARGIN_HDR.ORDER_TYPE_DESC}</td>
+                </tr>
+            </table>
+        </lightning:layoutItem>
+        <lightning:layoutItem flexibility="auto" padding="around-small" size="10" smallDeviceSize="10" mediumDeviceSize="4" largeDeviceSize="4s" >
+            <table style="width:100%;">  
+                <tr>      
+                    <td style="text-align:left body; font-size:12px; width:50%;"><b>Description:</b></td>
+                    <td style="font-size:12px; width:50%;">&nbsp;&nbsp;{!v.dealModelWrapper.data.ES_MARGIN_HDR.DESCRIPTION}</td>
+                </tr>
+            </table>
+        </lightning:layoutItem>
+    </lightning:layout>
+    <lightning:layout multipleRows="true">
+        <lightning:layoutItem flexibility="auto" padding="around-small" size="10" smallDeviceSize="10" mediumDeviceSize="4" largeDeviceSize="4" >
+            <table style="width:100%;">  
+                <tr>      
+                    <td style="text-align:left body; font-size:12px; width:50%;"><b>Business Partner:</b></td>
+                    <td style="font-size:12px; width:50%;">&nbsp;&nbsp;{!v.dealModelWrapper.data.ES_MARGIN_HDR.SOLD_TO_PARTY}</td>
+                </tr>
+            </table>
+        </lightning:layoutItem>
+        <lightning:layoutItem flexibility="auto" padding="around-small" size="10" smallDeviceSize="10" mediumDeviceSize="4" largeDeviceSize="4" >
+            <table style="width:100%;">  
+                <tr>      
+                    <td style="text-align:left body; font-size:12px; width:50%;"><b>Employee Resp.:</b></td>
+                    <td style="font-size:12px; width:50%;">&nbsp;&nbsp;{!v.dealModelWrapper.data.ES_MARGIN_HDR.EMP_RESP}</td>
+                </tr>
+            </table> 
+        </lightning:layoutItem>
+        <lightning:layoutItem flexibility="auto" padding="around-small" size="10" smallDeviceSize="10" mediumDeviceSize="4" largeDeviceSize="4s" >
+            <table style="width:100%;">  
+                <tr>      
+                    <td style="text-align:left body; font-size:12px; width:50%;"><b>Status :</b></td>
+                    <td style="font-size:12px; width:50%;">&nbsp;&nbsp;{!v.dealModelWrapper.data.ES_MARGIN_HDR.STATUS}</td>
+                </tr>
+            </table> 
+        </lightning:layoutItem>
+    </lightning:layout>
+    <lightning:layout multipleRows="true">
+        <lightning:layoutItem flexibility="auto" padding="around-small" size="10" smallDeviceSize="10" mediumDeviceSize="4" largeDeviceSize="4" >
+            <table style="width:100%;">  
+                <tr>      
+                    <td style="text-align:left body; font-size:12px; width:50%;"><b>Pricing Date:</b></td>
+                    <td style="font-size:12px; width:50%;">&nbsp;&nbsp;<ui:outputDate value="{!v.dealModelWrapper.data.ES_MARGIN_HDR.PRICING_DATE}" format="MM/DD/YYYY"/></td>
+                </tr>
+            </table> 
+        </lightning:layoutItem>
+        <lightning:layoutItem flexibility="auto" padding="around-small" size="10" smallDeviceSize="10" mediumDeviceSize="4" largeDeviceSize="4" >
+            <table style="width:100%;">  
+                <tr>      
+                    <td style="text-align:left body; font-size:12px; width:50%;"><b>GPO Price List:</b></td>
+                    <td style="font-size:12px; width:50%;">&nbsp;&nbsp;{!v.dealModelWrapper.data.ES_MARGIN_HDR.GPO_PRICE_DESC}</td>
+                </tr>
+            </table>  
+        </lightning:layoutItem>
+        <lightning:layoutItem flexibility="auto" padding="around-small" size="10" smallDeviceSize="10" mediumDeviceSize="4" largeDeviceSize="4s" >
+            <table style="width:100%;">  
+                <tr>      
+                    <td style="text-align:left body; font-size:12px; width:50%;"><b>Service Level:</b></td>
+                    <td style="font-size:12px; width:50%;">&nbsp;&nbsp;{!v.dealModelWrapper.data.ES_MARGIN_HDR.SERVICE_PRICE_DESC}</td>
+                </tr>
+            </table> 
+        </lightning:layoutItem>
+    </lightning:layout>
+    <lightning:layout multipleRows="true">
+        <lightning:layoutItem flexibility="auto" padding="around-small" size="10" smallDeviceSize="10" mediumDeviceSize="4" largeDeviceSize="4" >
+            <table style="width:100%;">  
+                <tr>      
+                    <td style="text-align:left body; font-size:12px; width:50%;"><b>Currency:</b></td>
+                    <td style="font-size:12px; width:50%;">&nbsp;&nbsp;{!v.dealModelWrapper.data.ES_MARGIN_HDR.CURRENCY_x}</td>
+                </tr>
+            </table>  
+        </lightning:layoutItem>
+        <lightning:layoutItem flexibility="auto" padding="around-small" size="10" smallDeviceSize="10" mediumDeviceSize="4" largeDeviceSize="4" >
+            <table style="width:100%;">  
+                <tr>      
+                    <td style="text-align:left body; font-size:12px; width:50%;"><b>IDN Price List</b></td>
+                    <td style="font-size:12px; width:50%;">&nbsp;&nbsp;{!v.dealModelWrapper.data.ES_MARGIN_HDR.IDN_PRICE_DESC}</td>
+                </tr>
+            </table>  
+        </lightning:layoutItem>
+    </lightning:layout>
+</aura:component>

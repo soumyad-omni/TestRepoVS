@@ -1,0 +1,717 @@
+<apex:page id="OCB_MyInvoice" >
+    <script id="MyAccount-MyInvoices-Desktop" type="text/template">
+   <div class="panel panel-default cc_panel cc_myaccount_myinvoices">
+    <div class="panel-heading cc_heading">
+     <h3 class="panel-title cc_title">{{pageLabelMap 'MyAccount_MyInvoices'}}</h3>
+    </div>
+    <div class="panel-body cc_body cc_myaccount_content">
+     <div class="row">
+      <div class="col-xs-12">
+       <div class="messagingSection-invoicehistory-Error" role="alert" style="display: none"></div>
+       <div class="messagingAction-invoicehistory-Info" role="alert" style="display: none">
+        <button type="button" class="close cc_close" data-dismiss="alert" aria-label="{{pageLabelMap 'Modal_Aria_Close'}}"><span aria-hidden="true">&#215;</span></button>
+       </div>
+      </div>
+     </div>
+     {{#ifDisplay 'srch.inv'}}
+      <div class="row">
+       <div class="col-xs-12">
+        <form id="searchInvoiceForm" class="form-inline searchInvoiceForm cc_search_invoice_form cc_form-inline">
+         <div class="form-group form-group-sm ">
+          <label for="searchOrderInput" class="sr-only">Search invoice</label>
+          <input id="searchInvoiceInput" type="text"  name="searchInvoiceInput" value="{{this.searchFormData.searchInvoiceInput}}" class="form-control cc_search_invoice_input searchInvoiceInput invoiceSearch" placeholder="{{pageLabelMap 'MyInvoices_SearchInvoices'}}"/>
+         </div>
+         <div class="form-group form-group-sm">
+          <span class="invoiceSearch statusLabel cc_status_label small">{{pageLabelMap 'MyInvoices_SearchStatus'}}</span>
+          <select name="searchInvoiceStatus" value="{{this.searchFormData.searchInvoiceStatus}}" class="form-control cc_search_invoicer_status invoiceSearch searchInvoiceStatus small">
+           <option value="">{{pageLabelMap 'MyInvoices_AllInvoiceStatus'}}</option>
+           <option value="Open"   {{#ifEquals this.searchFormData.searchInvoiceStatus 'Open'}} selected {{/ifEquals}}>{{pageLabelMap 'MyInvoices_Status_Open'}}</option>
+           <option value="Closed" {{#ifEquals this.searchFormData.searchInvoiceStatus 'Closed'}} selected {{/ifEquals}}>{{pageLabelMap 'MyInvoices_Status_Closed'}}</option>
+          </select>
+         </div>
+         <div class="form-group form-group-sm">
+          <span class="invoiceSearch typeLabel small cc_type_label">{{pageLabelMap 'MyInvoices_SearchType'}}</span>
+          <select name="searchInvoiceType" value="{{this.searchFormData.searchInvoiceType}}" class="form-control cc_search_invoice_type invoiceSearch searchInvoiceType small">
+           <option value="">{{pageLabelMap 'MyInvoices_AllInvoiceType'}}</option>
+           <option value="Credit"  {{#ifEquals this.searchFormData.searchInvoiceType 'Credit'}} selected {{/ifEquals}}>{{pageLabelMap 'MyInvoices_Type_Credit'}}</option>
+           <option value="Debit"   {{#ifEquals this.searchFormData.searchInvoiceType 'Debit'}} selected {{/ifEquals}}>{{pageLabelMap 'MyInvoices_Type_Debit'}}</option>
+           <option value="Summary" {{#ifEquals this.searchFormData.searchInvoiceType 'Summary'}} selected {{/ifEquals}}>{{pageLabelMap 'MyInvoices_Type_Summary'}}</option>
+          </select>
+         </div>
+         <div class="form-group form-group-sm date">
+          <label for="fromDateStr" class="invoiceSearch searchFromLabel small cc_from_date_str">{{pageLabelMap 'MyInvoices_SearchFrom'}}</label>
+          <div class="input-group date">
+           <input type="text" id="fromDateStr" name="fromDateStr" value="{{this.searchFormData.fromDateStr}}" class="form-control requestedDate invoiceSearch fromDate cc_from_date" readonly="true">
+           <div class="input-group-addon">
+            <span class="glyphicon glyphicon-th"></span>
+           </div>
+          </div>
+         </div>
+         <div class="form-group form-group-sm date">
+          <label for="toDateStr" class="invoiceSearch searchToLabel small cc_to_date_str">{{pageLabelMap 'MyInvoices_SearchTo'}}</label>
+          <div class="input-group date">
+           <input type="text" id="toDateStr" class="form-control requestedDate toDate invoiceSearch cc_to_date" name="toDateStr" value="{{this.searchFormData.toDateStr}}" readonly="true">
+           <div class="input-group-addon">
+            <span class="glyphicon glyphicon-th"></span>
+           </div>
+          </div>
+         </div>
+         <input type="hidden" name="sortCriteria" value="{{this.searchFormData.sortCriteria}}"/>
+         <input type="hidden" name="sortDir" value="{{this.searchFormData.sortDir}}" />
+        </form>
+       </div>
+      </div>
+      <div class="row">
+       <div class="col-xs-12">
+        <div class="searchButtons cc_invoice_search_action">
+         <input type="button" class="btn btn-default btn-sm searchInvoice invoiceSearch cc_search_invoice" value="{{pageLabelMap 'MyInvoices_SearchInvoices'}}"/>
+         <input type="button" class="btn btn-default btn-sm resetInvoiceSearch invoiceSearch cc_reset_invoice" value="{{pageLabelMap 'MyInvoices_ResetInvoices'}}"/>
+        </div>
+       </div>
+      </div>
+     {{/ifDisplay}}
+    </div>
+   </div>
+   <div class="orderPaginationSec" ></div>
+   <div class="panel panel-default cc_panel cc_paginator">
+    <div class="table-responsive">
+    <table id="invoiceTable" class="table table-hover shopping_cart invoices cc_table cc_invoice_table">
+     <tr class="cc_table_header_row">
+      <th class="cc_table_header invoiceHeader headerSort name cc_invoice_name" data-sortcriteria="name">
+       <span class="cc_table_header_invoice_label_name">{{pageLabelMap 'MyInvoices_InvoiceName'}}</span>
+       <a href="javascript:void(0);" class="descSort sortControl cc_desc_sort {{#ifEquals this.searchFormData.sortCriteria 'Name'}}{{#ifEquals this.searchFormData.sortDir 'Desc'}}active{{/ifEquals}}{{/ifEquals}}" data-sortcriteria="Name" data-sortdir="Desc"><span class="sr-only">{{pageLabelMap 'CommonElements_DownArrow'}}</span><i class="fa fa-chevron-down" aria-hidden="true"></i></a>
+       <a href="javascript:void(0);" class="ascSort sortControl cc_asc_sort {{#ifEquals this.searchFormData.sortCriteria 'Name'}}{{#ifEquals this.searchFormData.sortDir 'Asc'}}active{{/ifEquals}}{{/ifEquals}}" data-sortcriteria="Name" data-sortdir="Asc"><span class="sr-only">{{pageLabelMap 'CommonElements_UpArrow'}}</span><i class="fa fa-chevron-up" aria-hidden="true"></i></a>
+      </th>
+      <th class="cc_table_header invoiceHeader headerSort name cc_invoice_name" data-sortcriteria="CCOrder">
+       <span class="cc_table_header_invoice_label_name">CC Order</span>
+       <a href="javascript:void(0);" class="descSort sortControl cc_desc_sort {{#ifEquals this.searchFormData.sortCriteria 'CCOrder'}}{{#ifEquals this.searchFormData.sortDir 'Desc'}}active{{/ifEquals}}{{/ifEquals}}" data-sortcriteria="CCOrder" data-sortdir="Desc"><span class="sr-only">{{pageLabelMap 'CommonElements_DownArrow'}}</span><i class="fa fa-chevron-down" aria-hidden="true"></i></a>
+       <a href="javascript:void(0);" class="ascSort sortControl cc_asc_sort {{#ifEquals this.searchFormData.sortCriteria 'CCOrder'}}{{#ifEquals this.searchFormData.sortDir 'Asc'}}active{{/ifEquals}}{{/ifEquals}}" data-sortcriteria="CCOrder" data-sortdir="Asc"><span class="sr-only">{{pageLabelMap 'CommonElements_UpArrow'}}</span><i class="fa fa-chevron-up" aria-hidden="true"></i></a>
+      </th>
+    <!--  <th class="cc_table_header invoiceId headerSort name cc_invoice_id" data-sortcriteria="InvoiceId">
+       <span class="cc_table_header_invoice_label_id">{{pageLabelMap 'MyInvoices_InvoiceId'}}</span>
+       <a href="javascript:void(0);" class="descSort sortControl cc_desc_sort {{#ifEquals this.searchFormData.sortCriteria 'InvoiceId'}}{{#ifEquals this.searchFormData.sortDir 'Desc'}}active{{/ifEquals}}{{/ifEquals}}" data-sortcriteria="InvoiceId" data-sortdir="Desc"><span class="sr-only">{{pageLabelMap 'CommonElements_DownArrow'}}</span><i class="fa fa-chevron-down" aria-hidden="true"></i></a>
+       <a href="javascript:void(0);" class="ascSort sortControl cc_asc_sort {{#ifEquals this.searchFormData.sortCriteria 'InvoiceId'}}{{#ifEquals this.searchFormData.sortDir 'Asc'}}active{{/ifEquals}}{{/ifEquals}}" data-sortcriteria="InvoiceId" data-sortdir="Asc"><span class="sr-only">{{pageLabelMap 'CommonElements_UpArrow'}}</span><i class="fa fa-chevron-up" aria-hidden="true"></i></a>
+      </th>-->
+      
+      <th class="cc_table_header dateIssued headerSort name cc_date_issued" data-sortcriteria="DateIssued">
+       <span class="cc_table_header_invoice_date_issued">{{pageLabelMap 'MyInvoices_Date'}}</span>
+       <a href="javascript:void(0);" class="descSort sortControl cc_desc_sort {{#ifEquals this.searchFormData.sortCriteria 'DateIssued'}}{{#ifEquals this.searchFormData.sortDir 'Desc'}}active{{/ifEquals}}{{/ifEquals}}" data-sortcriteria="DateIssued" data-sortdir="Desc"><span class="sr-only">{{pageLabelMap 'CommonElements_DownArrow'}}</span><i class="fa fa-chevron-down" aria-hidden="true"></i></a>
+       <a href="javascript:void(0);" class="ascSort sortControl cc_asc_sort {{#ifEquals this.searchFormData.sortCriteria 'DateIssued'}}{{#ifEquals this.searchFormData.sortDir 'Asc'}}active{{/ifEquals}}{{/ifEquals}}" data-sortcriteria="DateIssued" data-sortdir="Asc"><span class="sr-only">{{pageLabelMap 'CommonElements_UpArrow'}}</span><i class="fa fa-chevron-up" aria-hidden="true"></i></a>
+      </th>
+    <!--  <th class="cc_table_header dueDate headerSort name cc_due_date" data-sortcriteria="DueDate">
+       <span class="cc_table_header_invoice_due_date">{{pageLabelMap 'MyInvoices_DueDate'}}</span>
+       <a href="javascript:void(0);" class="descSort sortControl cc_desc_sort {{#ifEquals this.searchFormData.sortCriteria 'DueDate'}}{{#ifEquals this.searchFormData.sortDir 'Desc'}}active{{/ifEquals}}{{/ifEquals}}" data-sortcriteria="DueDate" data-sortdir="Desc"><span class="sr-only">{{pageLabelMap 'CommonElements_DownArrow'}}</span><i class="fa fa-chevron-down" aria-hidden="true"></i></a>
+       <a href="javascript:void(0);" class="ascSort sortControl cc_asc_sort {{#ifEquals this.searchFormData.sortCriteria 'DueDate'}}{{#ifEquals this.searchFormData.sortDir 'Asc'}}active{{/ifEquals}}{{/ifEquals}}" data-sortcriteria="DueDate" data-sortdir="Asc"><span class="sr-only">{{pageLabelMap 'CommonElements_UpArrow'}}</span><i class="fa fa-chevron-up" aria-hidden="true"></i></a>
+      </th>-->
+      <th class="cc_table_header amount headerSort name cc_amount" data-sortcriteria="Amount">
+       <span class="cc_table_header_invoice_amount">{{pageLabelMap 'MyInvoices_Amount'}}</span>
+       <a href="javascript:void(0);" class="descSort sortControl cc_desc_sort {{#ifEquals this.searchFormData.sortCriteria 'Amount'}}{{#ifEquals this.searchFormData.sortDir 'Desc'}}active{{/ifEquals}}{{/ifEquals}}" data-sortcriteria="Amount" data-sortdir="Desc"><span class="sr-only">{{pageLabelMap 'CommonElements_DownArrow'}}</span><i class="fa fa-chevron-down" aria-hidden="true"></i></a>
+       <a href="javascript:void(0);" class="ascSort sortControl cc_asc_sort {{#ifEquals this.searchFormData.sortCriteria 'Amount'}}{{#ifEquals this.searchFormData.sortDir 'Asc'}}active{{/ifEquals}}{{/ifEquals}}" data-sortcriteria="Amount" data-sortdir="Asc"><span class="sr-only">{{pageLabelMap 'CommonElements_UpArrow'}}</span><i class="fa fa-chevron-up" aria-hidden="true"></i></a>
+      </th>
+      <th class="cc_table_header paidAmount headerSort name cc_paid_amount" data-sortcriteria="PaidAmount">
+       <span class="cc_table_header_invoice_paid_amount">{{pageLabelMap 'MyInvoices_PaidAmount'}}</span>
+       <a href="javascript:void(0);" class="descSort sortControl cc_desc_sort {{#ifEquals this.searchFormData.sortCriteria 'PaidAmount'}}{{#ifEquals this.searchFormData.sortDir 'Desc'}}active{{/ifEquals}}{{/ifEquals}}" data-sortcriteria="PaidAmount" data-sortdir="Desc"><span class="sr-only">{{pageLabelMap 'CommonElements_DownArrow'}}</span><i class="fa fa-chevron-down" aria-hidden="true"></i></a>
+       <a href="javascript:void(0);" class="ascSort sortControl cc_asc_sort {{#ifEquals this.searchFormData.sortCriteria 'PaidAmount'}}{{#ifEquals this.searchFormData.sortDir 'Asc'}}active{{/ifEquals}}{{/ifEquals}}" data-sortcriteria="PaidAmount" data-sortdir="Asc"><span class="sr-only">{{pageLabelMap 'CommonElements_UpArrow'}}</span><i class="fa fa-chevron-up" aria-hidden="true"></i></a>
+      </th>
+      <th class="cc_table_header type headerSort name cc_type" data-sortcriteria="Type">
+       <span class="cc_table_header_type">{{pageLabelMap 'MyInvoices_Type'}}</span>
+       <a href="javascript:void(0);" class="descSort sortControl cc_desc_sort {{#ifEquals this.searchFormData.sortCriteria 'Type'}}{{#ifEquals this.searchFormData.sortDir 'Desc'}}active{{/ifEquals}}{{/ifEquals}}" data-sortcriteria="Type" data-sortdir="Desc"><span class="sr-only">{{pageLabelMap 'CommonElements_DownArrow'}}</span><i class="fa fa-chevron-down" aria-hidden="true"></i></a>
+       <a href="javascript:void(0);" class="ascSort sortControl cc_asc_sort {{#ifEquals this.searchFormData.sortCriteria 'Type'}}{{#ifEquals this.searchFormData.sortDir 'Asc'}}active{{/ifEquals}}{{/ifEquals}}" data-sortcriteria="Type" data-sortdir="Asc"><span class="sr-only">{{pageLabelMap 'CommonElements_UpArrow'}}</span><i class="fa fa-chevron-up" aria-hidden="true"></i></a>
+      </th>
+      <th class="cc_table_header status headerSort name cc_status" data-sortcriteria="Status">
+       <span class="cc_table_header_status">{{pageLabelMap 'MyInvoices_Status'}}</span>
+       <a href="javascript:void(0);" class="descSort sortControl cc_desc_sort {{#ifEquals this.searchFormData.sortCriteria 'Status'}}{{#ifEquals this.searchFormData.sortDir 'Desc'}}active{{/ifEquals}}{{/ifEquals}}" data-sortcriteria="Status" data-sortdir="Desc"><span class="sr-only">{{pageLabelMap 'CommonElements_DownArrow'}}</span><i class="fa fa-chevron-down" aria-hidden="true"></i></a>
+       <a href="javascript:void(0);" class="ascSort sortControl cc_asc_sort {{#ifEquals this.searchFormData.sortCriteria 'Status'}}{{#ifEquals this.searchFormData.sortDir 'Asc'}}active{{/ifEquals}}{{/ifEquals}}" data-sortcriteria="Status" data-sortdir="Asc"><span class="sr-only">{{pageLabelMap 'CommonElements_UpArrow'}}</span><i class="fa fa-chevron-up" aria-hidden="true"></i></a>
+      </th>
+     <!-- <th class="cc_table_header actions headerSort name cc_actions" data-sortcriteria="Status">
+       <span class="cc_table_header_actions">{{pageLabelMap 'MyInvoices_Actions'}}</span>
+      </th>-->
+     </tr>
+     {{#each this.invoiceList}}
+      <tr class="myAccInvoiceRows {{this.status}} {{this.type}} {{this.sfid}} cc_my_acc_invoice_rows">
+        <td class="cc_table_col">
+        <span class="cc_col_name"><a href="javascript:void(0);" data-id="{{this.sfid}}" class="gotoInvoiceDetails cc_goto_invoice_details">{{this.name}}</a></span>
+       </td>
+      <!-- <td class="cc_table_col">
+        <span class="cc_col_invoice_id">{{this.invoiceId}}</span>
+       </td>-->
+       <td class="cc_table_col">
+         <span class="cc_col_name"><a href="javascript:void(0);" data-id="{{this.ccOrder.encryptedId}}" class="gotoOrderDetails cc_goto_order_details">{{this.paidAmount}}</a></span>
+       </td>
+       <td class="cc_table_col">
+        <span class="cc_col_date_issued">{{this.dateIssuedStr}}</span>
+       </td>
+      <!-- <td class="cc_table_col">
+        <span class="cc_col_due_date">{{this.dueDateStr}}</span>
+       </td>-->
+       <td class="cc_table_col">
+        <span class="cc_col_amount">{{price this.amount this.currencyIsoCode}}</span>
+       </td>
+       <td class="cc_table_col">
+        <span class="cc_col_paid_amount">{{price this.paidAmount this.currencyIsoCode}}</span>
+       </td>
+       <td class="cc_table_col">
+        <!--<span class="cc_col_type">{{pageLabelMapMultiString 'MyInvoices_Type_' this.type}}</span><br/>-->
+        <span class="cc_col_type">{{this.type}}</span><br/>
+        {{#ifEquals type 'Summary'}}
+         <a href="javascript:void(0);" class="seeChildrenLink openCloseLink {{this.sfid}} cc_see_children_link" data-id="{{this.sfid}}">{{pageLabelMap 'MyInvoices_ShowChildren'}}</a>
+         <a href="javascript:void(0);" class="hideChildrenLink openCloseLink hidden {{this.sfid}} cc_hide_children_link" data-id="{{this.sfid}}">{{pageLabelMap 'MyInvoices_HideChildren'}}</a>
+        {{/ifEquals}}
+       </td>
+       <td class="cc_table_col">
+        <!--<span class="cc_col_status">{{pageLabelMapMultiString 'MyInvoices_Status_' this.status}}</span>-->
+        <span class="cc_col_status">{{this.status}}</span>
+       </td>
+      <!-- <td class="cc_table_col">
+        <span class="cc_col_actions">
+         {{#ifEquals status 'Open'}}
+          {{#ifNotEquals type 'Credit'}}
+           <a href="javascript:void(0);" class="payLink cc_pay_link" data-id="{{this.sfid}}">{{pageLabelMap 'MyInvoices_Pay'}}</a>
+          {{/ifNotEquals}}
+         {{/ifEquals}}
+        </span>
+       </td>-->
+      </tr>
+      {{#each this.childInvoices}}
+       <tr class="myAccInvoiceRows childRow hidden active {{../sfid}} {{this.status}} {{this.type}} cc_my_acc_invoice_rows cc_child_row">
+         <td class="cc_table_col">
+         <span class="cc_col_name"><a href="javascript:void(0);" data-id="{{this.sfid}}" class="gotoInvoiceDetails cc_goto_invoice_details">{{this.name}}</a></span>
+        </td>
+        <td class="cc_table_col">
+         <span class="cc_col_name"><a href="javascript:void(0);" data-id="{{this.ccOrder.encryptedId}}" class="gotoOrderDetails cc_goto_order_details">{{this.ccOrder.name}}</a></span>
+        </td>
+      <!--  <td class="cc_table_col">
+         <span class="cc_col_invoice_id">{{this.invoiceId}}</span>
+        </td>-->
+        <td class="cc_table_col">
+         <span class="cc_col_date_issued">{{this.dateIssuedStr}}</span>
+        </td>
+       <!-- <td class="cc_table_col">
+         <span class="cc_col_due_date">{{this.dueDateStr}}</span>
+        </td>-->
+        <td class="cc_table_col">
+         <span class="cc_col_amount">{{price this.amount this.currencyIsoCode}}</span>
+        </td>
+        <td class="cc_table_col">
+         <span class="cc_col_paid_amount">{{price this.paidAmount this.currencyIsoCode}}</span>
+        </td>
+        <td class="cc_table_col">
+         <!--<span class="cc_col_type">{{pageLabelMapMultiString 'MyInvoices_Type_' this.type}}</span>-->
+         <span class="cc_col_type">{{this.type}}</span>
+        </td>
+        <td class="cc_table_col">
+         <!--<span class="cc_col_status">{{pageLabelMapMultiString 'MyInvoices_Status_' this.status}}</span>-->
+         <span class="cc_col_status">{{this.status}}</span>
+        </td>
+       <!-- <td class="cc_table_col">
+         <span class="cc_col_actions">
+          {{#ifEquals status 'Open'}}
+           {{#ifEquals type 'Debit'}}
+            <a href="javascript:void(0);" class="payLink cc_pay_link" data-id="{{this.sfid}}">{{pageLabelMap 'MyInvoices_Pay'}}</a>
+           {{/ifEquals}}
+          {{/ifEquals}}
+         </span>
+        </td>-->
+       </tr>
+      {{/each}}
+     {{/each}}
+    </table>
+   <!-- {{#if this.canPay}}
+     <div class="invoiceContainer cc_invoice_container">
+      <div class="panel-body cc_action_button">
+       <button type="button" class="btn btn-default btn-sm makePayment cc_make_payment">{{pageLabelMap 'MyInvoices_MakePaymentBtn'}}</button>
+      </div>
+     </div>
+    {{/if}}-->
+    <div id="modalSec"></div>
+   </div>
+   </div>
+  </script>
+
+    <script id="InvoiceDetail-Desktop" type="text/template">
+   <div class="panel panel-default cc_panel cc_panel_invoice_detail">
+    <div class="panel-body cc_body container-fluid">
+     <div class="row">
+      <div class="col-xs-12">
+       <div class="messagingSection-invoice-Error" style="display: none"></div>
+       <div class="messagingSection-invoice-Warning" style="display: none"></div>
+       <div class="messagingSection-invoice-Info" style="display: none">
+        <button type="button" class="close cc_close" data-dismiss="alert" aria-label="{{pageLabelMap 'Modal_Aria_Close'}}"><span aria-hidden="true">&#215;</span></button>
+       </div>
+      </div>
+     </div>
+     {{#if this.loaded}}
+      <div class="row">
+       <div class="col-xs-6">
+        <div class="invoiceContainer cc_invoice_action_container">
+         {{#ifEquals this.status 'Open'}}
+          {{#ifNotEquals this.type 'Credit'}}
+           <p class="panel-body pull-left cc_body cc_action_buttons">
+           <!-- <button type="button" class="btn btn-default btn-sm makePayment cc_make_payment">{{pageLabelMap 'MyInvoices_MakePaymentBtn'}}</button>-->
+           </p>
+          {{/ifNotEquals}}
+         {{/ifEquals}}
+        </div>
+       </div>
+       <div class="col-xs-6">
+        <div class="invoiceContainer cc_invoice_action_container">
+         <p class="panel-body pull-right cc_action_buttons">
+          <a href="javascript:void(0);" class="myInvoices cc_myinvoices">{{pageLabelMap 'MyInvoices_MyInvoicesBtn'}}</a>
+         </p>
+        </div>
+       </div>
+      </div>
+      <div class="row cc_title_row">
+       <div class="col-xs-12">
+        <h2 class="title cc_title">{{pageLabelMap 'MyInvoices_HeaderDetailHdr'}}</h2>
+       </div>
+      </div>
+      <div class="invoiceHeaderContainer row cc_invoice_header_container">
+       <div class="col-sm-6 cc_invoice_header_col">
+        <!--<div class="row">
+         <div class="col-xs-6">
+          <div class="pull-right cc_header_label_name">{{pageLabelMap 'MyInvoices_InvoiceNameLabel'}}</div>
+         </div>
+         <div class="col-xs-6">
+          <div class="pull-left cc_header_value_name">{{this.name}}</div>
+         </div>
+        </div>-->
+        {{#if this.parent}}
+         <div class="row">
+          <div class="col-xs-6">
+           <div class="pull-right cc_header_label_parent">{{pageLabelMap 'MyInvoices_ParentInvoiceLabel'}}</div>
+          </div>
+          <div class="col-xs-6">
+           <div class="pull-left cc_header_value_parent"><a href="javascript:void(0);" data-id="{{this.parent.sfid}}" class="gotoInvoiceDetails cc_goto_invoice_details">{{this.parent.name}}</a></div>
+          </div>
+         </div>
+        {{/if}}
+        {{#if this.invoiceId}}
+         <div class="row">
+          <div class="col-xs-6">
+           <div class="pull-right cc_header_label_invoice_id">{{pageLabelMap 'MyInvoices_InvoiceNameLabel'}}</div>
+          </div>
+          <div class="col-xs-6">
+           <div class="pull-left cc_header_value_invoice_id">{{this.invoiceId}}</div>
+          </div>
+        </div>
+        {{/if}}
+        {{#if this.dateIssuedStr}}
+         <div class="row">
+          <div class="col-xs-6">
+           <div class="pull-right cc_header_label_date_issued">{{pageLabelMap 'MyInvoices_DateLabel'}}</div>
+          </div>
+          <div class="col-xs-6">
+           <div class="pull-left cc_header_value_date_issued">{{this.dateIssuedStr}}</div>
+          </div>
+         </div>
+        {{/if}}
+        {{#if this.dueDateStr}}
+         <div class="row">
+          <div class="col-xs-6">
+           <div class="pull-right cc_header_label_due_date">{{pageLabelMap 'MyInvoices_DueDateLabel'}}</div>
+          </div>
+          <div class="col-xs-6">
+           <div class="pull-left cc_header_value_due_date">{{this.dueDateStr}}</div>
+          </div>
+         </div>
+        {{/if}}
+        {{#if this.amount}}
+         <div class="row">
+          <div class="col-xs-6">
+           <div class="pull-right cc_header_label_amount">{{pageLabelMap 'MyInvoices_AmountLabel'}}</div>
+          </div>
+          <div class="col-xs-6">
+           <div class="pull-left cc_header_value_amount">{{price this.amount this.currencyIsoCode}}</div>
+          </div>
+         </div>
+        {{/if}}
+        {{#if this.paidAmount}}
+         <div class="row">
+          <div class="col-xs-6">
+           <div class="pull-right cc_header_label_paid_amount">{{pageLabelMap 'MyInvoices_PaidAmountLabel'}}</div>
+          </div>
+          <div class="col-xs-6">
+           <div class="pull-left cc_header_value_paid_amount">{{price this.paidAmount this.currencyIsoCode}}</div>
+          </div>
+         </div>
+        {{/if}}
+       <!--{{#if this.remainingAmount}}
+         <div class="row">
+          <div class="col-xs-6">
+           <div class="pull-right cc_header_label_remaining_amount">{{pageLabelMap 'MyInvoices_RemainingAmountLabel'}}</div>
+          </div>
+          <div class="col-xs-6">
+           <div class="pull-left cc_header_value_remaining_amount">{{price this.remainingAmount this.currencyIsoCode}}</div>
+          </div>
+         </div>
+        {{/if}} -->
+        {{#if this.type}}
+         <div class="row">
+          <div class="col-xs-6">
+           <div class="pull-right cc_header_label_type">{{pageLabelMap 'MyInvoices_TypeLabel'}}</div>
+          </div>
+          <div class="col-xs-6">
+           <!--<div class="pull-left cc_header_value_type">{{pageLabelMapMultiString 'MyInvoices_Type_' this.type}}</div>-->
+           <div class="pull-left cc_header_value_type">{{this.type}}</div>
+          </div>
+         </div>
+        {{/if}}
+        {{#if this.status}}
+         <div class="row">
+          <div class="col-xs-6">
+           <div class="pull-right cc_header_label_status">{{pageLabelMap 'MyInvoices_StatusLabel'}}</div>
+          </div>
+          <div class="col-xs-6">
+           <!--<div class="pull-left cc_header_value_status">{{pageLabelMapMultiString 'MyInvoices_Status_' this.status}}</div>-->
+           <div class="pull-left cc_header_value_status">{{this.status}}</div>
+          </div>
+         </div>
+        {{/if}}
+        {{#if this.terms}}
+         <div class="row">
+          <div class="col-xs-6">
+           <div class="pull-right cc_header_label_terms">{{pageLabelMap 'MyInvoices_TermsLabel'}}</div>
+          </div>
+          <div class="col-xs-6">
+           <div class="pull-left cc_header_value_terms">{{this.terms}}</div>
+          </div>
+         </div>
+        {{/if}}
+        {{#if this.ccOrder}}
+         <div class="row">
+          <div class="col-xs-6">
+           <div class="pull-right cc_header_label_ccorder">{{pageLabelMap 'OCB_SAPNumber'}}:</div>
+          </div>
+          <div class="col-xs-6">
+           <div class="pull-left cc_header_value_ccorder"><a href="javascript:void(0);" data-id="{{this.ccOrder.encryptedId}}" class="gotoOrderDetails cc_goto_order_details">{{this.SAPOrderNumber}}</a></div>
+          </div>
+         </div>
+        {{/if}}
+       </div>
+       <div class="col-sm-6 cc_invoice_header_col">
+        {{#if this.billTo}}
+         <div class="row">
+          <div class="col-xs-6">
+           <div class="pull-right cc_header_label_bill_to">{{pageLabelMap 'MyInvoices_BillToLabel'}}</div>
+          </div>
+          <div class="col-xs-6">
+           <div class="pull-left cc_header_value_bill_to">{{this.billTo.name}}</div>
+          </div>
+         </div>
+        {{/if}}
+        {{#if this.soldTo}}
+         <div class="row">
+          <div class="col-xs-6">
+           <div class="pull-right cc_header_label_sold_to">{{pageLabelMap 'MyInvoices_SoldToLabel'}}</div>
+          </div>
+          <div class="col-xs-6">
+           <div class="pull-left cc_header_value_sold_to">{{this.soldTo.name}}</div>
+          </div>
+         </div>
+        {{/if}}
+        {{#if this.billAddr}}
+         <div class="row">
+          <div class="col-xs-6">
+           <div class="pull-right cc_header_label_bill_to_address">{{pageLabelMap 'MyInvoices_BillToAddressLabel'}}</div>
+          </div>
+          <div class="col-xs-6">
+           <div class="pull-left cc_header_value_bill_to_address">{{> addressDisplay this.billAddr}}</div>
+          </div>
+         </div>
+        {{/if}}
+        {{#if this.comments}}
+         <div class="row">
+          <div class="col-xs-6">
+           <div class="pull-right cc_header_label_comments">{{pageLabelMap 'MyInvoices_CommentsLabel'}}</div>
+          </div>
+          <div class="col-xs-6">
+           <div class="pull-left cc_header_value_comments">{{this.comments}}</div>
+          </div>
+         </div>
+        {{/if}}
+       </div>
+      </div>
+      {{#if this.childInvoices}}
+       <div class="childInvoicesContainer cc_child_invoice_container">
+        <div class="row">
+         <div class="col-xs-12">
+          <h4 class="title cc_title">{{pageLabelMap 'MyInvoices_ChildInvoicesHdr'}}</h4>
+         </div>
+        </div>
+        <div class="row">
+         <div class="col-xs-12">
+          <div class="table-responsive">
+           <table id="invoiceTable" class="table table-hover shopping_cart invoices cc_table cc_invoices_table">
+            <tr class="cc_table_header_row">
+             <th class="cc_table_header">
+              <span class="cc_table_header_name">{{pageLabelMap 'MyInvoices_InvoiceName'}}</span>
+             </th>
+             <th class="cc_table_header">
+              <span class="cc_table_header_invoice_id">{{pageLabelMap 'MyInvoices_InvoiceId'}}</span>
+             </th>
+             <th class="cc_table_header">
+              <span class="cc_table_header_date">{{pageLabelMap 'MyInvoices_Date'}}</span>
+             </th>
+             <th class="cc_table_header">
+              <span class="cc_table_header_date">{{pageLabelMap 'MyInvoices_DueDate'}}</span>
+             </th>
+             <th class="cc_table_header">
+              <span class="cc_table_header_amount">{{pageLabelMap 'MyInvoices_Amount'}}</span>
+             </th>
+             <th class="cc_table_header">
+              <span class="cc_table_header_paid_amount">{{pageLabelMap 'MyInvoices_PaidAmount'}}</span>
+             </th>
+             <th class="cc_table_header">
+              <span class="cc_table_header_type">{{pageLabelMap 'MyInvoices_Type'}}</span>
+             </th>
+             <th class="cc_table_header">
+              <span class="cc_table_header_status">{{pageLabelMap 'MyInvoices_Status'}}</span>
+             </th>
+             <th class="cc_table_header">
+              <span class="cc_table_header_paid_actions">{{pageLabelMap 'MyInvoices_Actions'}}</span>
+             </th>
+            </tr>
+            {{#each this.childInvoices}}
+             <tr class="myAccInvoiceRows invoiceItemRows {{this.status}} {{this.type}} {{this.sfid}} cc_my_acc_invoice_rows cc_invoice_item_row">
+              <td class="cc_table_col">
+               <span class="cc_col_name"><a href="javascript:void(0);" data-id="{{this.sfid}}" class="gotoInvoiceDetails cc_goto_invoice_details">{{this.name}}</a></span>
+              </td>
+              <td class="cc_table_col">
+               <span class="cc_col_invoice_id">{{this.invoiceId}}</span>
+              </td>
+              <td class="cc_table_col">
+               <span class="cc_col_date_issued">{{this.dateIssuedStr}}</span>
+              </td>
+              <td class="cc_table_col">
+               <span class="cc_col_due_date">{{this.dueDateStr}}</span>
+              </td>
+              <td class="cc_table_col">
+               <span class="cc_col_amount {{this.currencyIsoCode}}">{{price this.amount this.currencyIsoCode}}</span>
+              </td>
+              <td class="cc_table_col">
+               <span class="cc_col_paid_amount {{this.currencyIsoCode}}">{{price this.paidAmount this.currencyIsoCode}}</span>
+              </td>
+              <td class="cc_table_col">
+               <!--<span class="cc_col_type">{{pageLabelMapMultiString 'MyInvoices_Type_' this.type}}</span>-->
+               <span class="cc_col_type">{{this.type}}</span>
+              </td>
+              <td class="cc_table_col">
+               <!--<span class="cc_col_status">{{pageLabelMapMultiString 'MyInvoices_Status_' this.status}}</span>-->
+               <span class="cc_col_status">{{this.status}}</span>
+              </td>
+              <td class="cc_table_col">
+               <span class="cc_col_actions form-inline">
+                {{#ifEquals this.status 'Open'}}
+                 {{#ifNotEquals this.type 'Credit'}}
+                  <a href="javascript:void(0);" class="payLink cc_pay_link" data-id="{{this.sfid}}">{{pageLabelMap 'MyInvoices_MakePayment'}}</a>
+                 {{/ifNotEquals}}
+                {{/ifEquals}}
+               </span>
+              </td>
+             </tr>
+            {{/each}}
+           </table>
+          </div>
+         </div>
+        </div>
+       </div>
+      {{/if}}
+      {{#if this.invoiceItems}}
+       <div class="invoiceContainer invoiceItemsContainer cc_invoice_items_container">
+        <div class="row">
+         <div class="col-xs-12">
+          <h4 class="title cc_title">{{pageLabelMap 'MyInvoices_InvoiceItemsHdr'}}</h4>
+         </div>
+        </div>
+        <div class="row">
+         <div class="col-xs-12">
+          <div class="table-responsive">
+           <table id="invoiceTable" class="table table-hover shopping_cart invoiceItems cc_table cc_invoice_items_table">
+            <tr class="cc_table_header_row">
+             <th class="cc_table_header">
+              <span class="cc_table_header_item_name">{{pageLabelMap 'MyInvoices_InvoiceItemName'}}</span>
+             </th>
+           
+             <th class="cc_table_header">
+              <span class="cc_table_header_item_amount">{{pageLabelMap 'MyInvoices_ItemAmount'}}</span>
+             </th>
+             <th class="cc_table_header">
+              <span class="cc_table_header_type">{{pageLabelMap 'MyInvoices_ItemType'}}</span>
+             </th>
+             <th class="cc_table_header">
+              <span class="cc_table_header_status">{{pageLabelMap 'MyInvoices_ItemStatus'}}</span>
+             </th>
+             <th class="cc_table_header">
+              <span class="cc_table_header_item">{{pageLabelMap 'MyInvoices_ItemItem'}}</span>
+             </th>
+            <!-- <th class="cc_table_header">
+              <span class="cc_table_header_comments">{{pageLabelMap 'MyInvoices_Comments'}}</span>
+             </th>-->
+            </tr>
+            {{#each this.invoiceItems}}
+             <tr class="myAccInvoiceRows {{this.status}} {{this.type}} {{this.sfid}} cc_my_acc_invoice_rows">
+              <!--<td class="cc_table_col">
+               <span class="cc_col_name">{{this.name}}</span>
+              </td>-->
+              <td class="cc_table_col">
+               <span class="cc_col_invoice_item_id">{{this.invoiceItemId}}</span>
+              </td>
+              <td class="cc_table_col">
+               <span class="cc_col_amount {{this.currencyIsoCode}}">{{price this.amount this.currencyIsoCode}}</span>
+              </td>
+              <td class="cc_table_col">
+               <span class="cc_col_type">{{pageLabelMapMultiString 'MyInvoices_ItemType_' this.type}}</span><br/>
+              </td>
+              <td class="cc_table_col">
+               <span class="cc_col_status">{{pageLabelMapMultiString 'MyInvoices_ItemStatus_' this.status}}</span>
+              </td>
+              <td class="cc_table_col">
+               <span class="cc_col_item">
+                {{#if this.ccOrderItem}}
+                 {{productLink this.ccOrderItem.product 'cc_invoice_product_link' text=this.ccOrderItem.product.sku}}
+                {{/if}}
+               </span>
+              </td>
+            <!--  <td class="cc_table_col">
+               <span class="cc_col_comments">{{this.comments}}</span>
+              </td>-->
+             </tr>
+            {{/each}}
+           </table>
+          </div>
+         </div>
+        </div>
+       </div>
+      {{/if}}
+      {{#ifEquals this.type 'Summary'}}
+       {{#if this.invoicePaymentsFor}}
+        <div class="invoiceContainer cc_invoice_payments_for_container">
+         <div class="row">
+          <div class="col-xs-12">
+           <h4 class="title cc_title">{{pageLabelMap 'MyInvoices_InvoicePaymentsForHdr'}}</h4>
+          </div>
+         </div>
+         <div class="row">
+          <div class="col-xs-12">
+           <div class="table-responsive">
+            <table id="invoiceTable" class="table table-hover shopping_cart invoicePayments cc_table cc_invoice_payments_table">
+             <tr class="cc_table_header_row">
+              <th class="cc_table_header">
+               <span class="cc_table_header_payment_name">{{pageLabelMap 'MyInvoices_PaymentName'}}</span>
+              </th>
+              <th class="cc_table_header">
+               <span class="cc_table_header_payment_account_number">{{pageLabelMap 'MyInvoices_PaymentAccount'}}</span>
+              </th>
+              <th class="cc_table_header">
+               <span class="cc_table_header_payment_amount">{{pageLabelMap 'MyInvoices_PaymentAmount'}}</span>
+              </th>
+              <th class="cc_table_header">
+               <span class="cc_table_header_payment_ts">{{pageLabelMap 'MyInvoices_PaymentTS'}}</span>
+              </th>
+              <th class="cc_table_header">
+               <span class="cc_table_header_payment_against">{{pageLabelMap 'MyInvoices_PaymentAgainst'}}</span>
+              </th>
+             </tr>
+             {{#each this.invoicePaymentsFor}}
+              <tr class="myAccInvoiceRows invoicePaymentRows {{this.sfid}} cc_my_acc_invoice_rows cc_invoice_payment_rows">
+               <td class="cc_table_col">
+                <span class="cc_col_name"><a href="javascript:void(0);" data-id="{{this.sfid}}" class="gotoPaymentDetails cc_goto_payment_details">{{this.name}}</a></span>
+               </td>
+               <td class="cc_table_col">
+                <span class="cc_col_account_number">{{pageLabelMapMultiString 'PaymentDisplay_' this.accountType this.accountType this.accountNumber this.subAccountNumber (pageLabelMapMultiString 'PaymentType_' this.paymentType) (pageLabelMapMultiString 'PaymentExpMonth_' this.expirationMonth) (pageLabelMap this.expirationYear)}}</span>
+               </td>
+               <td class="cc_table_col">
+                <span class="cc_col_amount {{this.currencyIsoCode}}">{{price this.amount this.currencyIsoCode}}</span>
+               </td>
+               <td class="cc_table_col">
+                <span class="cc_col_payment_ts">{{this.paymentTSStr}}</span>
+               </td>
+               <td class="cc_table_col">
+                <span class="cc_col_against">
+                 <a href="javascript:void(0);" data-id="{{this.invoiceAppliedTo.sfid}}" class="gotoInvoiceDetails cc_goto_invoice_details">{{this.invoiceAppliedTo.name}}</a>
+                </span>
+               </td>
+              </tr>
+             {{/each}}
+            </table>
+           </div>
+          </div>
+         </div>
+        </div>
+       {{/if}}
+      {{/ifEquals}}
+      {{#ifNotEquals this.type 'Summary'}}
+       {{#if this.invoicePaymentsTo}}
+        <div class="invoiceContainer cc_invoice_payments_to_container">
+         <div class="row">
+          <div class="col-xs-12">
+           <h4 class="title cc_title">{{pageLabelMap 'MyInvoices_InvoicePaymentsToHdr'}}</h4>
+          </div>
+         </div>
+         <div class="row">
+          <div class="col-xs-12">
+           <div class="table-responsive">
+            <table id="invoiceTable" class="table table-hover shopping_cart invoicePayments cc_table cc_invoice_payments_table">
+             <tr class="cc_table_header_row">
+              <th class="cc_table_header">
+               <span class="cc_table_header_payment_name">{{pageLabelMap 'MyInvoices_PaymentName'}}</span>
+              </th>
+              <th class="cc_table_header">
+               <span class="cc_table_header_payment_account_number">{{pageLabelMap 'MyInvoices_PaymentAccount'}}</span>
+              </th>
+              <th class="cc_table_header">
+               <span class="cc_table_header_payment_amount">{{pageLabelMap 'MyInvoices_PaymentAmount'}}</span>
+              </th>
+              <th class="cc_table_header">
+               <span class="cc_table_header_payment_ts">{{pageLabelMap 'MyInvoices_PaymentTS'}}</span>
+              </th>
+             </tr>
+             {{#each this.invoicePaymentsTo}}
+              <tr class="myAccInvoiceRows invoicePaymentRows {{this.sfid}} cc_my_acc_invoice_rows cc_invoice_payment_rows">
+               <td class="cc_table_col">
+                <span class="cc_col_name"><a href="javascript:void(0);" data-id="{{this.sfid}}" class="gotoPaymentDetails cc_goto_payment_details">{{this.name}}</a></span>
+               </td>
+               <td class="cc_table_col">
+                <span class="cc_col_account_number">{{pageLabelMapMultiString 'PaymentDisplay_' this.accountType this.accountType this.accountNumber this.subAccountNumber (pageLabelMapMultiString 'PaymentType_' this.paymentType) (pageLabelMapMultiString 'PaymentExpMonth_' this.expirationMonth) (pageLabelMap this.expirationYear)}}</span>
+               </td>
+               <td class="cc_table_col">
+                <span class="cc_col_amount {{this.currencyIsoCode}}">{{price this.amount this.currencyIsoCode}}</span>
+               </td>
+               <td class="cc_table_col">
+                <span class="cc_col_payment_ts">{{this.paymentTSStr}}</span>
+               </td>
+              </tr>
+             {{/each}}
+            </table>
+           </div>
+          </div>
+         </div>
+        </div>
+       {{/if}}
+      {{/ifNotEquals}}
+      <div class="row">
+       <div class="col-xs-6">
+        <div class="invoiceContainer cc_invoice_action_container">
+         {{#ifEquals this.status 'Open'}}
+          {{#ifNotEquals this.type 'Credit'}}
+           <p class="panel-body pull-left cc_action_buttons">
+           <!-- <button type="button" class="btn btn-default btn-sm makePayment cc_make_payment">{{pageLabelMap 'MyInvoices_MakePaymentBtn'}}</button>-->
+           </p>
+          {{/ifNotEquals}}
+         {{/ifEquals}}
+        </div>
+       </div>
+       <div class="col-xs-6">
+        <div class="invoiceContainer cc_invoice_action_container">
+         <p class="panel-body pull-right cc_action_buttons">
+          <a href="javascript:void(0);" class="myInvoices cc_my_invoices">{{pageLabelMap 'MyInvoices_MyInvoicesBtn'}}</a>
+         </p>
+        </div>
+       </div>
+      </div>
+     {{/if}}
+    </div>
+   </div>
+  </script>
+</apex:page>

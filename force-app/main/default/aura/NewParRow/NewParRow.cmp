@@ -1,0 +1,22 @@
+<aura:component >
+    
+    <aura:attribute name="rowData" type="string"/>
+    <aura:attribute name="rowIndex" type="String"/>
+    <aura:attribute name="showDelete" type="Boolean"/>
+    <aura:registerEvent name="DeleteRowEvt" type="c:RemovePar"/>
+    <tr class="slds-text-title_caps">
+        <td> 
+            {!v.rowIndex + 1}
+        </td>
+        <td>
+            <ui:inputText aura:id="connectionName" class="slds-input" value="{!v.rowData}"/>
+        </td>
+        <td>
+            <aura:if isTrue="{!v.showDelete}">
+                <lightning:buttonIcon iconName="utility:delete" iconClass="dark" 
+                                      size="medium" onclick="{! c.removeRow }" 
+                                      alternativeText="delete" />
+            </aura:if>
+        </td> 
+    </tr>	
+</aura:component>

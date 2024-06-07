@@ -1,0 +1,74 @@
+<apex:component controller="SCP_CartEmailController">
+        <script id="emailModalTemplate" type="text/template">
+            <div id="emailModal" class="modal fade cc_modal cc_cart_additional_info_modal" tabindex="-1" role="dialog" aria-labelledby="CartEmailLabel">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content cc_modal_content">
+                        <div class="modal-header cc_modal_header">
+                            <button type="button" class="close cc_close" data-dismiss="modal" aria-label="{{pageLabelMap 'Modal_Aria_Close'}}"><span aria-hidden="true">&#215;</span></button>
+                            <h4 class="modal-title cc_modal_title" id="CartEmailLabel">{{pageLabelMap 'CartOrderEmailer_Header'}}</h4>
+                        </div>
+                        <div class="modal-body cc_modal_body">
+                            <form id="emailForm" class="cc_cart_email_form">
+                                <div class="form-group">
+                                    <label for="email_to">{{pageLabelMap 'CartOrderEmailer_ToEmail'}}</label>
+                                    <input id="email_to" type="email" class="form-control cc_email_to" name="toEmailAddress">
+                                </div>
+                                <div class="form-group">
+                                    <label for="email_cc">{{pageLabelMap 'CartOrderEmailer_CcEmail'}}</label>
+                                    <input id="email_cc" type="email" class="form-control cc_email_cc" name="ccEmailAddress">
+                                </div>
+                                <div class="form-group">
+                                    <label for="subject">{{pageLabelMap 'CartOrderEmailer_Subject'}}</label>
+                                    <input id="subject" type="text" class="form-control cc_subject" name="subject">
+                                </div>
+                                <div class="form-group">
+                                    <label for="description">{{pageLabelMap 'CartOrderEmailer_Description'}}</label>
+                                    <textarea id="description" rows="10" type="text" class="form-control cc_description" name="description"></textarea>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer cc_modal_footer">
+                            <!--<input id="sendEmailBtn" type="button" class="btn btn-default btn-sm cc_send_email" value="{{pageLabelMap 'Send'}}"/>-->
+                            <input id="sendEmailBtnCustom" type="button" class="btn btn-default btn-sm sendCartEmail" value="{{pageLabelMap 'Send'}}"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </script>
+    <script>
+      CCRZ.pubSub.once("view:CartDetailView:refresh", function (view) {
+            debugger;
+            var viewPrototype = Object.getPrototypeOf(view);       
+            if (viewPrototype != null) {
+               var _view = view;
+                viewPrototype.events = _.extend(viewPrototype.events, {
+                    "click .sendCartEmail": "sendCartEmail"
+                });
+                viewPrototype.sendCartEmail = function (event) {
+                        loading($(event.currentTarget));
+                        var emailForm = {};
+                        emailForm.email_to = $("#email_to").val();
+                        emailForm.email_cc = $("#email_cc").val() ? $("#email_cc").val() : '';
+                        emailForm.subject = $("#subject").val() ? $("#subject").val() : '';
+                        emailForm.description = $("#description").val() ? $("#description").val()  : '';
+                        SCP_CartEmailController.sendEmail(
+                            CCRZ.pagevars.remoteContext,JSON.stringify(emailForm),
+                            function (response) {
+                                debugger;
+                                doneLoading($(event.currentTarget));
+                                $(".cc_close").click();
+                                if (response) {
+                                    if(response.success) {
+                                     }
+                                    
+                                } 
+                            }
+                        );
+                    }; 
+                    view.delegateEvents();
+                    view.render();
+            }         
+    });
+
+    </script>
+</apex:component>

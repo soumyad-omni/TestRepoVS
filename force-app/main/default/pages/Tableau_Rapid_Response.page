@@ -1,0 +1,4 @@
+<apex:page sidebar="false" showHeader="false">
+<apex:iframe src="https://tableau.omnicell.com/t/RapidResponse/views/RapidResponseReport/RapidResponseDashboard?:showAppBanner=false&:embed=y&:toolbar=top&:display_count=n&:showVizHome=n&:origin=viz_share_link" frameborder="0" height="2400px" width="100%" scrolling="true">
+  </apex:iframe>    
+</apex:page>

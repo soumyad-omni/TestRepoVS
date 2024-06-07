@@ -1,0 +1,5 @@
+<apex:page standardController="Contracts__c">
+<h1><I> 
+
+<apex:outputText value="{!$Label.Redlined_Pagelayout_Help_Text}" escape="false" /> </I></h1>
+</apex:page>

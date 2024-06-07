@@ -1,0 +1,68 @@
+<aura:component controller="CopyConfigFromQuoteCtrl">
+    <aura:attribute name="sourceQuoteId" type="string" required="true"/>
+    <aura:attribute name="matchingQuoteId" type="string"/>
+    <aura:attribute name="isCopyConfigModalOpen" type="Boolean" default="false"/>
+    <aura:attribute name="isSearching" type="Boolean" required="false"/>
+    <aura:attribute name="searchKey" type="string"/>
+    <aura:attribute name="matchQuoteLines" type="list"/>
+    <aura:attribute name="columns" type="List"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <aura:if isTrue="{!v.isCopyConfigModalOpen}">
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading" aria-modal="true" 
+                 aria-describedby="modal-content" class="slds-modal slds-modal_medium slds-fade-in-open">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close"
+                                          onclick="{!c.closeModal}"
+                                          alternativeText="close"
+                                          variant="bare-inverse"
+                                          class="slds-modal__close"/>
+                    <h2 id="modal-heading" class="slds-text-heading_medium slds-hyphenate">
+                        Copy Configuration From Quote
+                    </h2>
+                </header>
+                <!--###### MODAL BOX BODY Part Start######-->
+                <div class="slds-modal__content slds-scrollable_none" id="modal-content" style="min-height:200px;">
+                    <!-- Content go here -->
+                    <!--<aura:if isTrue="{!empty(v.matchingQuoteId)}"> -->
+                        <lightning:layout horizontalAlign="stretch" class="slds-p-around_small">
+                            <lightning:layoutItem size="11">
+                                <lightning:input aura:id="quote-search" name="quote-search"
+                                                 label="Search Quote With Quote Number"
+                                                 placeholder="Search Quote With Quote Number"
+                                                 isLoading="{!v.isSearching}"
+                                                 variant="label-hidden"
+                                                 type="search"
+                                                 value="{!v.searchKey}"/>
+                            </lightning:layoutItem>
+                            <lightning:layoutItem size="1">
+                                <lightning:button variant="brand" label="Search" title="Search" 
+                                                  onclick="{!c.handleSearch}" />
+                            </lightning:layoutItem>
+                        </lightning:layout>
+                    <!--</aura:if>-->
+                    <aura:if isTrue="{!v.matchQuoteLines.length>0}">
+                        <lightning:datatable
+                                             columns="{!v.columns}"
+                                             data="{!v.matchQuoteLines}"
+                                             keyField="Id"
+                                             aura:id="matchingQuoteLineTable"/>
+                    </aura:if>
+                </div>
+                <footer class="slds-modal__footer">
+                    <lightning:button variant="brand" 
+                                      label="Copy All"
+                                      title="Copy All"
+                                      onclick="{!c.copyAll}"/>
+                    <lightning:button variant="brand" 
+                                      label="Copy Selected"
+                                      title="Copy Selected"
+                                      onclick="{!c.copySelected}"/>                
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div> 
+    </aura:if>
+</aura:component>

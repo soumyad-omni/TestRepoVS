@@ -1,0 +1,18 @@
+.form_Item {
+    width: 50%;
+}
+
+.view_form_section {
+    color: white;
+    background: #2e6834;
+    font-weight: bold;
+}
+
+.dashboard {
+    width: 100%;
+}
+
+.csheader.slds-accordion__summary {
+    background-color: #2e6834;
+    color: white;
+}

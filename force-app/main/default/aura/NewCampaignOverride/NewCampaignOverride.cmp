@@ -1,0 +1,22 @@
+<aura:component implements="lightning:actionOverride,force:hasRecordId,force:hasSObjectName,lightning:isUrlAddressable,force:appHostable" access="global" controller="NewCampaignOverrideController">
+    <aura:attribute name="greeting" type="String" default="World"/>
+    <aura:handler name="init" value="this" action="{!c.doInit}"/>
+  	<aura:attribute name="userInfo" type="user"/> 
+    <aura:attribute name = "marketingservreq" type="String"/>
+    <p>{!v.marketingservreq}</p>
+    <aura:if isTrue="{! and(v.userInfo.Name != 'System Administrator',v.userInfo.Name != 'Business Administrator')}" >
+    	<div class="slds-card" >
+        	<div class="slds-card__body slds-card__body_inner slds-p-top_medium">
+            	Please create a new Campaign by selecting the "_Templates for Campaigns" list view under the campaign tab, 
+                clicking one of the campaign templates and clicking the Clone button.          
+        	</div>
+    	</div>
+	</aura:if>
+    <aura:if isTrue="{! or(v.userInfo.Name == 'System Administrator',v.userInfo.Name == 'Business Administrator')}" >
+    	<div class="slds-card" >
+        	<div class="slds-card__body slds-card__body_inner slds-p-top_medium">
+            	 <lightning:button variant="base" label="Create New Campaign" title="Create Campaign" onclick="{! c.createRecord }"/>          
+        	</div>
+    	</div>
+	</aura:if>
+</aura:component>

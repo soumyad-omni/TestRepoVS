@@ -1,0 +1,5 @@
+<apex:page standardController="Quote_Approval__c" extensions="AdditionalAppMsgController"  showHeader="false">
+    <div style="color:Orange;font-weight: bold;font-size:15px;">
+            {! showMessage}     
+    </div>
+</apex:page>

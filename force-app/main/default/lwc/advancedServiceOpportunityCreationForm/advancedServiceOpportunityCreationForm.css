@@ -1,0 +1,46 @@
+.form_Item {
+    width: 50%;;
+}
+
+.button-gap {
+    padding: 2px; /* Adjust the width of the gap as needed */
+}
+
+.focus_red :focus {
+    border-color: #ba0517; /* Set the border color to red when the input field is focused */
+    border: 1px solid #ba0517;
+}
+
+.slds-dueling-list__option {
+    color: #ba0517; /* Example: Set the color of the options to red */
+    background-color: #f0f0f0; /* Example: Set the background color of the options */
+    padding: 8px 16px; /* Example: Add padding to the options */
+}
+
+/* toast.css */
+.toast {
+    position: fixed;
+    top: 90px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #ba0517;
+    color: white;
+    z-index: 9999; /* Ensure toast is on top of other elements */
+    width: auto;
+    border-radius: 5px;
+}
+
+.errorIcon{
+    fill:white;
+    cursor: pointer;
+}
+
+.THIS.errorIcon svg{
+    fill:white;
+}
+
+.CustomtoastContent {
+    padding: 10px 10px 10px 10px;
+    width: auto;
+    min-width: 200px;
+}

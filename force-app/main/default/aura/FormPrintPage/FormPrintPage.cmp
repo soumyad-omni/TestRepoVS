@@ -1,0 +1,52 @@
+<aura:component controller="FormPrintPageController"
+                implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" 
+                access="global" >
+    
+    <aura:attribute name="PageHeading" type="String" default="Select Form to Print"/>
+    <aura:attribute name="mydata" type="Object"/>
+    <aura:attribute name="mycolumns" type="List"/>
+    <aura:attribute name="pageNumber" type="Integer" default="1"/>
+    <aura:attribute name="pageSize" type="Integer" default="100"/>
+    <aura:attribute name="isLastPage" type="Boolean" default="false"/>
+    <aura:attribute name="saveIds" type="List"/>
+    <aura:attribute name="dataSize" type="Integer" default="0"/>
+    <aura:attribute name="printDisabled" type="Boolean" default="false"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.init}" />
+    <aura:handler event="force:refreshView" action="{!c.init}" />
+    
+    <div class="slds-m-top--xx-large">
+        <div class="slds-page-header">
+            <div class="slds-align--absolute-center">
+                <div class="slds-text-heading_medium">       
+                    {!v.PageHeading}
+                </div>
+            </div>
+        </div>
+	 <br/>
+    <div>
+    <lightning:datatable data="{! v.mydata }" 
+                         columns="{! v.mycolumns }" 
+                         keyField="Id"
+                         onrowselection="{! c.handleRowAction }" />
+    </div>
+    <div class="slds-grid slds-grid--align-end" style="padding:10px;"> 
+         <lightning:button variant="brand" label="Print" onclick="{!c.printFrm}" disabled="{!v.printDisabled}" /><br/>
+    </div>
+
+    <div class="slds-clearfix">
+            <div class="slds-page-header" role="banner">
+                <div style="padding-bottom:3px;"></div>
+                <div class="slds-float_right">  
+                    <lightning:button label="Prev" iconName="utility:chevronleft" iconPosition="left"
+                                      onclick="{!c.handlePrev}" disabled="{! v.pageNumber == 1}"/>
+                    <lightning:button label="Next" iconName="utility:chevronright" iconPosition="right"
+                                      disabled="{! v.isLastPage}" onclick="{!c.handleNext}"/>
+                </div>
+
+                <p class="slds-p-around_small">Page {!v.pageNumber} | Showing records from {! ((v.pageNumber-1)*(v.pageSize)+1)+' to '+((v.pageNumber-1)*v.pageSize+v.dataSize)}</p>
+                <p class="slds-p-around_small slds-text-color_success">Note: Showing 100 Records per page!</p>
+            </div>
+        </div>
+    </div>
+</aura:component>

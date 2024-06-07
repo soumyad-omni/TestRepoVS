@@ -1,0 +1,76 @@
+<apex:page Standardcontroller="AccountTeamMember" tabStyle="AccountTeamMember" id="page1" extensions="NewAccountTeamMemberCreateController" lightningStylesheets="true" >
+	
+    <apex:form id="formid">
+        <apex:pageBlock title="New Account Team Member" id="block1">
+             <apex:pageBlockButtons location="top" rendered="true">
+                <apex:commandButton id="saveBtn" value="Save" action="{!save}" />
+                <apex:commandButton id="cancelBtn" value="Cancel" action="{!cancel}" />
+            </apex:pageBlockButtons>
+            <apex:outputPanel styleClass="grey" layout="block">
+                <apex:pageBlockSection title="New Account Team Member" id="sec2">
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Account"/>
+                        
+                        <apex:outputPanel >
+                            <apex:outputText value="{!accountName}"/> 
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="User"/>
+                        
+                        <apex:outputPanel >
+                            <apex:inputField id="user" value="{!AccountTeamMember.userid}"/>
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                
+                <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Team Member Role"/>
+                        
+                        <apex:outputPanel >
+                            <apex:inputField id="TeamMemberRole" value="{!AccountTeamMember.TeamMemberRole}"/>
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Account Access Level"/>
+                        
+                        <apex:outputPanel >
+                            <apex:inputField id="AccountAccessLevel" value="{!AccountTeamMember.AccountAccessLevel}"/>
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                
+                <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Opportunity Access Level"/>
+                        
+                        <apex:outputPanel >
+                            <apex:inputField id="OpportunityAccessLevel" value="{!AccountTeamMember.OpportunityAccessLevel}"/>
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                
+                <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Contact Access Level"/>
+                        
+                        <apex:outputPanel >
+                            <apex:inputField id="ContactAccessLevel" value="{!AccountTeamMember.ContactAccessLevel}"/>
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                
+                </apex:pageBlockSection>
+            </apex:outputPanel>
+        </apex:pageBlock>
+    </apex:form>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</apex:page>

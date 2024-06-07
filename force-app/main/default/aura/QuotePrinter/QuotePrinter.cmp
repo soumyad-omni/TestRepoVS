@@ -1,0 +1,119 @@
+<aura:component controller="QuotePrintController" implements="flexipage:availableForAllPageTypes"  access="global">
+    <aura:attribute name="listOptions" type="List" default="[]"/>
+    <aura:attribute name="defaultOptions" type="List" default="[]"/>
+    <aura:attribute name="requiredOptions" type="List" default="[]"/>
+    <aura:attribute name="selectedArray" type="List" default="[]"/>
+    <h1>Printing Options</h1>
+
+    <lightning:select name="select1" label="Print Layout" required="true">
+        <option value="Omnicell">Omnicell</option>
+        <option value="Aesynt">Aesynt</option>
+        <option value="Omnicell Change Order">Change Order</option>
+        <option value="Aesynt Change Order">Change Order</option>
+    </lightning:select>
+
+    <lightning:select name="select2" label="Print Language" required="true">
+        <option value="English">English</option>
+        <option value="French">French</option>
+        <option value="German">German</option>
+    </lightning:select>    
+    
+    <lightning:select name="select3" label="Base Template" required="true">
+        <option value="Summary by Product">Summary by Product</option>
+        <option value="Pictures only">Pictures only</option>
+    </lightning:select>     
+ <!--   
+    <aura:handler name="init" value="{! this }" action="{! c.doInit }"/>
+    <aura:attribute name="min" type="Integer" default="1"/>
+    <aura:attribute name="max" type="Integer" default="10"/>
+    <lightning:dualListbox aura:id="selectOptions" name="Select Print Options"  label="Select Options" 
+                           sourceLabel="Available Sections" 
+                           selectedLabel="Selected Sections and Order" 
+                           options="{! v.listOptions }"
+                           value="{! v.defaultOptions }"
+                           requiredOptions="{! v.requiredOptions }"
+                           onchange="{! c.handleChange }"
+                           min="{!v.min}"
+                           max="{!v.max}"
+                           
+                           />
+   
+    
+    
+    Selected Sections and order to print: 
+    
+    <aura:iteration items="{!v.selectedArray}" var="val" indexVar="indvar">
+        <li>
+            {!val}
+        </li>
+    </aura:iteration>
+ -->
+        <aura:attribute name="Soptions" type="List" default="[
+        { label: 'Summary Product Only', value: '1' },
+        { label: 'Summary Service Only', value: '2' },
+        { label: 'Summary by Par Location', value: '3' },
+        { label: 'Detail by Par Location', value: '4' },
+        { label: 'Print Config Pictures', value: '5' },
+        { label: 'Detail by Par Location with Pictures', value: '6' }]"/>
+    <aura:attribute name="CLoptions" type="List" default="[
+        { label: 'OMCL Cap Program', value: '1' },
+        { label: 'Generally Available (OMCL)', value: '2' },
+        { label: 'Aesynt SS', value: '3' },
+        { label: 'Replacement (OMCL)', value: '4' },
+        { label: 'Virtual Server Requirement', value: '5' },
+        { label: 'RXI/RXP Bundle', value: '6' }]"/>    
+    <aura:attribute name="Eoptions" type="List" default="[
+        { label: 'Terms and Contidions', value: '1' },
+        { label: 'Lease Terms', value: '2' },
+        { label: 'Special Pricing', value: '3' },
+        { label: 'Government Entity', value: '4' },
+        { label: 'In-House Lease', value: '5' },
+        { label: 'Marketing Compliance', value: '6' }]"/>
+
+    <lightning:dualListbox name="Sections"  
+                           sourceLabel="Available Sections" 
+                           selectedLabel="Selected Sections and Order"                            
+                           label= "Select Sections" 
+                           fieldLevelHelp="Select the Sectionss which will appear at the bottom of the quote." 
+                           options="{!v.Soptions}" 
+                           onchange="{! c.handleChange }"/>    
+    
+    <lightning:dualListbox name="Canned Language"  
+                           sourceLabel="Available Canned Language" 
+                           selectedLabel="Selected Canned Language and Order"                            
+                           label= "Select Canned Language" 
+                           fieldLevelHelp="Select the Canned Languaage which will appear at the bottom of the quote." 
+                           options="{!v.CLoptions}" 
+                           onchange="{! c.handleChange }"/>    
+    
+    <lightning:dualListbox name="exhibits"  
+                           sourceLabel="Available Exhibits" 
+                           selectedLabel="Selected Exhibits and Order"                            
+                           label= "Select Exhibits" 
+                           fieldLevelHelp="Select the Exhibits which will appear at the bottom of the quote." 
+                           options="{!v.Eoptions}" 
+                           onchange="{! c.handleChange }"/>
+    
+    
+    <aura:attribute name="options" type="List" default="[
+    {'label': 'Display USA List', 'value': 'Display USA List'},
+	{'label': 'Display Zero Dollar Items', 'value': 'Display Zero Dollar Items'},
+    {'label': 'Display Generic Drawers', 'value': 'Display Generic Drawers'},
+    {'label': 'Display Products Unbundled', 'value': 'Display Products Unbundled'}
+    ]"/>
+    <aura:attribute name="value" type="List" default="option1"/>
+
+    <lightning:checkboxGroup name="Checkbox Group"
+                             label="Print Options"
+                             options="{! v.options }"
+                             value="{! v.value }"
+                             onchange="{! c.handleChange }"/>    
+    
+    <lightning:select name="select4" label="Number of Pictures per Page" required="true">
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+    </lightning:select> 
+    
+</aura:component>

@@ -1,0 +1,142 @@
+<aura:component controller = "AccountCreditController" implements="flexipage:availableForRecordHome,force:hasRecordId" access="global" >
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="artId" type="String" default="{!v.recordId}" access="global" />	
+    <aura:attribute name="wrapperList" type="object"/>
+    <aura:attribute name="AccountDetails" type="Account"/>
+    <aura:attribute name="columns" type="List"/>
+    <div class="slds-section">
+        <lightning:layout>
+            <lightning:layoutItem size="8">
+                <h3 class="slds-section__title" style="font-weight: bold;">SAP Credit Status</h3>
+            </lightning:layoutItem>
+        </lightning:layout>
+        </div>
+    <!--Credit Overview Section-->
+    <section class="slds-accordion__section" aura:id="section-1">
+        <div class="slds-accordion__summary">
+            <h3 class="slds-text-heading_small slds-accordion__summary-heading" style="font-size:14px;color:black;">
+                <lightning:icon aura:id="section-1-icon-1" id="section-1" onclick="{!c.toggleSection}" iconName="utility:chevronright" size="xx-small" />
+                <lightning:icon aura:id="section-1-icon-2" id="section-1" onclick="{!c.toggleSection}" iconName="utility:chevrondown" size="xx-small" class="slds-hide"/>
+                <span class="slds-truncate slds-p-left_medium" title="Credit Overview"><u><b>Credit Overview</b></u></span>
+            </h3>
+        </div>
+        <div aria-hidden="false" class="slds-accordion__content">
+            
+            <!--ROW 1-->
+            <lightning:layout multipleRows="true">
+                <lightning:layoutItem padding="around-small" size="10" smallDeviceSize="10" mediumDeviceSize="5" largeDeviceSize="4" >
+                    <table style="width:100%;">  
+                        <tr>      
+                            <td style="text-align:right body; font-size:12px; width:70%;"><b>Credit Limit:</b></td>
+ 							<lightning:formattedNumber style="currency" currencyCode="{!v.wrapperList.wrapper.ZISM_BAPI_CR_ACC_GETDETAIL.exports.PS_CREDIT_ACCOUNT_DETAIL_ALL.CURRENCIES}" currencyDisplayAs="symbol" value="{!v.wrapperList.wrapper.ZISM_BAPI_CR_ACC_GETDETAIL.exports.PS_CREDIT_ACCOUNT_DETAIL_ALL.CRED_LIMIT}"/>
+                        </tr>
+                    </table>
+                </lightning:layoutItem>
+                <lightning:layoutItem padding="around-small" size="10" smallDeviceSize="10" mediumDeviceSize="5" largeDeviceSize="4" >
+                    <table style="width:100%;">  
+                        <tr>      
+                            <td style="text-align:right body; font-size:12px; width:70%;"><b>&emsp;</b></td>
+                       		<td style="text-align:right body; font-size:12px; width:70%;"><b>&emsp;</b></td>
+                       		
+                        </tr>
+                    </table>
+                </lightning:layoutItem>
+                
+            </lightning:layout>
+            
+        </div>
+    </section>
+    <!--Additional Details Section-->
+    <section class="slds-accordion__section" aura:id="section-2">
+        <div class="slds-accordion__summary">
+            <h3 class="slds-text-heading_small slds-accordion__summary-heading" style="font-size:14px;color:black;">
+                <lightning:icon aura:id="section-2-icon-1" id="section-2" onclick="{!c.toggleSection}" iconName="utility:chevronright" size="xx-small" />
+                <lightning:icon aura:id="section-2-icon-2" id="section-2" onclick="{!c.toggleSection}" iconName="utility:chevrondown" size="xx-small" class="slds-hide"/>
+                <span class="slds-truncate slds-p-left_medium" title="Primary Liablilities"><u><b>Primary Liablilities</b></u></span>
+            </h3>
+        </div>
+        <div aria-hidden="false" class="slds-accordion__content">
+            
+            <!--ROW 1-->
+            <lightning:layout multipleRows="true">
+                <lightning:layoutItem flexibility="auto" padding="around-small" size="10" smallDeviceSize="10" mediumDeviceSize="5" largeDeviceSize="4" >
+                    <table style="width:100%;">  
+                        <tr>      
+                            <td style="text-align:left body; font-size:12px; width:50%;"><b>Order Values:</b></td>
+                        	<lightning:formattedNumber style="currency" currencyCode="{!v.wrapperList.wrapper.ZISM_BAPI_CR_ACC_GETDETAIL.exports.PS_CREDIT_ACCOUNT_DETAIL_ALL.CURRENCIES}" currencyDisplayAs="symbol" value="{!v.wrapperList.wrapper.ZISM_BAPI_CR_ACC_GETDETAIL.exports.PS_CREDIT_ACCOUNT_DETAIL_ALL.ORDER_VALS}"/>
+                        </tr>
+                    </table>
+                </lightning:layoutItem>
+                <lightning:layoutItem flexibility="auto" padding="around-small" size="10" smallDeviceSize="10" mediumDeviceSize="5" largeDeviceSize="4" >
+                    <table style="width:100%;">  
+                        <tr>      
+                            <td style="text-align:left body; font-size:12px; width:50%;"><b>Receivables:</b></td>
+                        	<lightning:formattedNumber style="currency" currencyCode="{!v.wrapperList.wrapper.ZISM_BAPI_CR_ACC_GETDETAIL.exports.PS_CREDIT_ACCOUNT_DETAIL_ALL.CURRENCIES}" currencyDisplayAs="symbol" value="{!v.wrapperList.wrapper.ZISM_BAPI_CR_ACC_GETDETAIL.exports.PS_CREDIT_ACCOUNT_DETAIL_ALL.RCVBL_VALS}"/>
+                        </tr>
+                    </table>
+                </lightning:layoutItem>
+                <lightning:layoutItem flexibility="auto" padding="around-small" size="10" smallDeviceSize="10" mediumDeviceSize="5" largeDeviceSize="4" >
+                    <table style="width:100%;">  
+                        <tr>      
+                            <td style="text-align:left body; font-size:12px; width:50%;"><b>Credit Liabilities:</b></td>
+                        	<lightning:formattedNumber style="currency" currencyCode="{!v.wrapperList.wrapper.ZISM_BAPI_CR_ACC_GETDETAIL.exports.PS_CREDIT_ACCOUNT_DETAIL_ALL.CURRENCIES}" currencyDisplayAs="symbol" value="{!v.wrapperList.wrapper.ZISM_BAPI_CR_ACC_GETDETAIL.exports.PS_CREDIT_ACCOUNT_DETAIL_ALL.CRED_LIAB}"/>
+                        </tr>
+                    </table>
+                </lightning:layoutItem>
+            </lightning:layout>
+            
+            <!--ROW 2-->
+            <lightning:layout multipleRows="true">
+                <lightning:layoutItem flexibility="auto" padding="around-small" size="10" smallDeviceSize="10" mediumDeviceSize="5" largeDeviceSize="4" >
+                    <table style="width:100%;">  
+                        <tr>      
+                            <td style="text-align:left body; font-size:12px; width:50%;"><b>Secured Items:</b></td>
+                        	<lightning:formattedNumber style="currency" currencyCode="{!v.wrapperList.wrapper.ZISM_BAPI_CR_ACC_GETDETAIL.exports.PS_CREDIT_ACCOUNT_DETAIL_ALL.CURRENCIES}" currencyDisplayAs="symbol" value="{!v.wrapperList.wrapper.ZISM_BAPI_CR_ACC_GETDETAIL.exports.PS_CREDIT_ACCOUNT_DETAIL_ALL.SECURED_ITEMS}"/>
+                        </tr>
+                    </table>
+                </lightning:layoutItem>
+                <lightning:layoutItem flexibility="auto" padding="around-small" size="10" smallDeviceSize="10" mediumDeviceSize="5" largeDeviceSize="4" >
+                    <table style="width:100%;">  
+                        <tr>      
+                            <td style="text-align:left body; font-size:12px; width:50%;"><b>Risk Category:</b></td>
+                            <td style="font-size:12px; width:50%;">&nbsp;&nbsp;{!v.wrapperList.wrapper.ZISM_BAPI_CR_ACC_GETDETAIL.exports.PS_CREDIT_ACCOUNT_DETAIL_ALL.RISK_CATEG}</td>
+                        </tr>
+                    </table>
+                </lightning:layoutItem>
+                <lightning:layoutItem flexibility="auto" padding="around-small" size="10" smallDeviceSize="10" mediumDeviceSize="5" largeDeviceSize="4" >
+                    <table style="width:100%;">  
+                        <tr>      
+                            <td style="text-align:left body; font-size:12px; width:50%;"><b>Blocked:</b></td>
+                            <td style="font-size:12px; width:50%;">&nbsp;&nbsp;{!v.wrapperList.wrapper.ZISM_BAPI_CR_ACC_GETDETAIL.exports.PS_CREDIT_ACCOUNT_DETAIL_ALL.BLOCKED}</td>
+                        </tr>
+                    </table>
+                </lightning:layoutItem>
+            </lightning:layout>
+            
+            <!--ROW 3-->
+            <lightning:layout multipleRows="true">
+                <lightning:layoutItem flexibility="auto" padding="around-small" size="10" smallDeviceSize="10" mediumDeviceSize="5" largeDeviceSize="4" >
+                    <table style="width:100%;">  
+                        <tr>      
+                            <td style="text-align:left body; font-size:12px; width:50%;"><b>Next Review:</b></td>
+							<td style="font-size:12px; width:50%;">&nbsp;&nbsp;<ui:outputDate value="{!v.wrapperList.wrapper.ZISM_BAPI_CR_ACC_GETDETAIL.exports.PS_CREDIT_ACCOUNT_DETAIL_ALL.NXT_REVIEW}"/></td> 							                      
+                        </tr>
+                    </table>
+                </lightning:layoutItem>
+            </lightning:layout>
+            
+        </div>
+    </section>
+    <section class="slds-accordion__section" aura:id="section-5">
+            <div class="slds-accordion__summary">
+                <h3 class="slds-text-heading_small slds-accordion__summary-heading" style="font-size:14px;color:black;">
+                    <lightning:icon aura:id="section-5-icon-1" id="section-5" onclick="{!c.toggleSection}" iconName="utility:chevronright" size="xx-small" />
+                    <lightning:icon aura:id="section-5-icon-2" id="section-5" onclick="{!c.toggleSection}" iconName="utility:chevrondown" size="xx-small" class="slds-hide"/>
+                    <span class="slds-truncate slds-p-left_medium" title="Comments"><u><b>Comments</b></u></span>
+                </h3>
+            </div>
+            <div aria-hidden="false" class="slds-accordion__content">
+                 <lightning:textarea name="input5" readonly="true" value="{!v.wrapperList.wrapper.ZISM_BAPI_CR_ACC_GETDETAIL.exports.EV_CREDIT_OVERVIEW.NOTES}" />
+            </div>
+        </section>    
+</aura:component>

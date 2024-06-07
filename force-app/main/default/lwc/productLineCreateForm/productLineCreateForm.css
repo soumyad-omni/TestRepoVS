@@ -1,0 +1,28 @@
+.formContent {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.formStyle {
+    margin: 0 auto;
+    width: 70%;
+}
+
+.form_first_Item {
+    width: 39%;
+}
+
+.form_middle_Item {
+    width: 35%;
+}
+
+.form_last_Item {
+    width: 10%;
+    padding-top: 22px;
+    padding-left: 10px;
+}
+
+.button-gap {
+    padding: 2px; /* Adjust the width of the gap as needed */
+}

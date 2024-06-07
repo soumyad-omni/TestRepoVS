@@ -1,0 +1,378 @@
+<apex:component controller="OCB_MyOrdersComponentController"> <!-- Controller Added for SCP-825 -->
+    <style><!-- Added for SCP-825 -->
+        input[type=search] {
+          width: 100%;
+          padding: 5px 10px;
+          margin: 8px 0;
+          display: inline-block;
+          border: 1px solid #ccc;
+          border-radius: 4px;
+          box-sizing: border-box;
+        }
+        .box {
+          width: 100%;
+          padding: 5px 10px 20px;
+          margin: 8px 0;
+          display: inline-block;
+          border-radius: 4px;
+          box-sizing: border-box;
+        }
+        
+        .paginate_button {
+          padding-right: 4px;
+        }
+        
+        .current {
+          color: black;
+          font-weight: normal;
+          font-size:13px;
+        }
+        
+        table.dataTable thead tr th {font-weight: normal;width: 160px;}
+        table.dataTable tbody tr td {padding: 10px 5px 10px 1px;}
+        .sorting_1{
+        padding-right: 4px;
+        }
+        .paginate_button:hover:not(.active) {background-color: #ddd;}
+    </style>
+    
+    <script src="{!$Resource.dataTableJs}"></script>
+    <script id="MyAccount-MyOrders-Desktop" type="text/template">
+    	<div><!-- Added for SCP-825 Start -->
+          <button class="btn btn-default" onclick="openOrder('MyOrder')">My Orders</button>
+          <button class="btn btn-default" onclick="openOrder('AllOrder')">All Orders</button>
+		</div>
+        <div id="AllOrder" class="w3-container orderView" style="display:none">  <!-- All Order Block Start-->
+            <h2>All Orders</h2>
+            <table id="AllorderTable" class="display" width="125%">
+                <colgroup>
+                    <col style="width: 12%;padding-right:5px;">
+                    <col style="width: 10%;padding-right:5px;">
+                    <col style="width: 10%;padding-right:5px;">
+                    <col style="width: 10%;padding-right:5px;">
+                    <col style="width: 7%;padding-right:5px;">
+                    <col style="width: 11%;padding-right:5px;">
+                    <col style="width: 6%;padding-right:5px;">
+                    <col style="width: 12%;padding-right:5px;">
+                    <col style="width: 8%;padding-right:5px;">
+                    <col style="width: 25%;padding-right:5px;">
+                </colgroup>
+            </table>
+        </div>                                                <!-- All Order Block End -->
+        
+        <div id="MyOrder" class="w3-container orderView" ><!-- My Order Block Start --><!-- Added for SCP-825 End -->
+          
+           <div class="panel panel-default cc_panel cc_myaccount_myorders">
+            <div class="panel-heading cc_heading">
+             <h3 class="panel-title cc_title">{{pageLabelMap 'MyAccount_MyOrders'}}</h3>
+            </div>
+            <div class="panel-body cc_body cc_myaccount_content">
+             <div class="messagingSection-orderhistory-Error" role="alert" style="display: none"></div>
+             <div class="messagingSection-orderhistory-Info" role="alert" style="display: none">
+              <button type="button" class="close cc_close" data-dismiss="alert" aria-label="{{pageLabelMap 'Modal_Aria_Close'}}"><span aria-hidden="true">&#215;</span></button>
+             </div>
+             {{#ifDisplay 'srch.ord'}}
+              <form id="searchOrderForm" class="form-inline searchOrderForm cc_search_order_form cc_form-inline">
+               <div class="form-group form-group-sm ">
+                <label for="searchOrderInput" class="sr-only">Search order</label>
+                <input id="searchOrderInput" type="text" class="form-control searchOrderInput input-text cc_search_order_input" name="searchOrderInput" value="{{searchOrder}}" placeholder="{{pageLabelMap 'MyOrdersInc_SearchOrders'}}"/>
+               </div>
+               <div class="form-group form-group-sm">
+                <select name="searchOrderStatus" value="{{searchOrderStatus}}" class="form-control cc_search_order_status">
+                 <option value="">{{pageLabelMap 'MyOrdersInc_AllOrderStatus'}}</option>
+                 {{#each this.orderStatusOpts}}
+                 <option value="{{this.value}}" {{#ifEquals ../searchOrderStatus this.value}} selected {{/ifEquals}}>{{this.label}}</option>
+                 {{/each}}
+                </select>
+               </div>
+               <div class="form-group form-group-sm date">
+                <label for="fromDateStr" class="cc_from_date_str">{{pageLabelMap 'MyOrdersInc_SearchFrom'}}</label>
+                <div class="input-group date">
+                 <input type="text" id="fromDateStr" name="fromDateStr" value="{{this.fromDateStr}}" class="form-control requestedDate fromDate cc_from_date" readonly="true">
+                 <div class="input-group-addon">
+                  <span class="glyphicon glyphicon-th"></span>
+                 </div>
+                </div>
+               </div>
+               <div class="form-group form-group-sm date">
+                <label for="toDateStr" class="cc_to_date_str">{{pageLabelMap 'MyOrdersInc_SearchTo'}}</label>
+                <div class="input-group date">
+                 <input type="text" id="toDateStr" class="form-control requestedDate toDate cc_to_date" name="toDateStr" value="{{this.toDateStr}}" readonly="true">
+                 <div class="input-group-addon">
+                  <span class="glyphicon glyphicon-th"></span>
+                 </div>
+                </div>
+               </div>
+              </form>
+              <div class="cc_order_search_action">
+               <input type="button" class="btn btn-default btn-sm searchOrder cc_search_order" value="{{pageLabelMap 'MyOrdersButton_SearchOrders'}}"/>
+               <input type="button" class="btn btn-default btn-sm resetOrder cc_reset_order" value="{{pageLabelMap 'MyOrdersButton_ResetOrders'}}"/>
+              </div>
+             {{/ifDisplay}}
+            </div>
+           </div>
+           <div class="orderPaginationSec" ></div>
+           <div class="panel panel-default cc_panel cc_paginator">
+            <div class="table-responsive">
+             <table id="orderTable" class="table table-hover shopping_cart cc_table cc_order_search_table">
+              <tr class="cc_table_header_row">
+               <th class="cc_table_header">
+                <span class="cc_table_header_order_number">{{pageLabelMap 'MyOrdersInc_OrderNumber'}}</span>
+               </th>
+                <!--<th class="cc_table_header">
+                    <span class="cc_table_header_order_number">{{pageLabelMap 'OCB_SAPNumber'}}</span>
+               </th>-->
+               {{#ifDisplay 'MO.DsplExtOrderNumber'}}
+                <th class="cc_table_header">
+                 <span class="cc_table_header_external_order_id">{{pageLabelMap 'ExternalOrderID'}}</span>
+                </th>
+               {{/ifDisplay}}
+               {{#ifDisplay 'MO.DsplPONumber'}}
+                <th class="cc_table_header">
+                 <span class="cc_table_header_po_number">{{pageLabelMap 'PO Number'}}</span>
+                </th>
+               {{/ifDisplay}}
+                 <!-- Added  PO coloum as part of SCP-93-->
+                <th class="cc_table_header">
+                <span class="cc_table_header_order_po">{{pageLabelMap 'PO Number'}}</span>
+               </th>
+               <th class="cc_table_header">
+                <span class="cc_table_header_order_date">{{pageLabelMap 'MyOrdersInc_OrderDate'}}</span>
+               </th>
+               <th class="cc_table_header">
+                <span class="cc_table_header_order_amount">{{pageLabelMap 'MyOrdersInc_OrderAmount'}}</span>
+               </th>
+               <th class="cc_table_header">
+                <span class="cc_table_header_order_status">{{pageLabelMap 'MyOrdersInc_Status'}}</span>
+               </th>
+               {{#ifStoreSetting 'Filter_Orders_Based_on_Owner__c'}}
+                &#160;
+               {{else}}
+                <th class="cc_table_header">
+                 <span class="cc_table_header_order_owner ord_owner_hdr">{{pageLabelMap 'MyOrdersInc_Owner'}}</span>
+                </th>
+               {{/ifStoreSetting}}
+               {{#ifDisplay 'MO.ShActOnOrd'}}
+                <th class="cc_table_header">
+                 <span class="cc_table_header_order_actions">{{pageLabelMap 'MyCartsInc_Actions'}}</span>
+                </th>
+                <th class="cc_table_header"></th>
+                <th class="cc_table_header"></th>
+                <th class="cc_table_header">Invoice</th> <!-- IBA-4972 changes -->
+               {{/ifDisplay}}
+        
+              </tr>
+              {{#each this.orderList}}
+               <tr class="myAccOrderRows cc_table_row">
+                <!--<td class="cc_table_col">
+                 <span class="cc_col_order_number"><a href="#" data-id="{{encryptedId}}" class="gotoOrderDetails cc_goto_order_detailss">{{name}}</a></span>
+                </td>-->
+                 {{#if extrinsic.SAPOrderNumber}}
+                     <td class="cc_table_col">
+                        <span class="cc_col_order_number"><a href="#" data-id="{{encryptedId}}" class="gotoOrderDetails cc_goto_order_detailss">{{extrinsic.SAPOrderNumber}}</a></span>
+                    </td>
+                 {{else}}
+                    <td class="cc_table_col"> 
+                        <span class="cc_col_order_number"><a href="#" data-id="{{encryptedId}}" class="gotoOrderDetails cc_goto_order_detailss">{{name}}</a></span>
+                    </td>   
+                  {{/if}}
+                {{#ifDisplay 'MO.DsplExtOrderNumber'}}
+                 <td class="cc_table_col">
+                  <span class="cc_col_external_order_id">{{externalOrderId}}</span>
+                 </td>
+                {{/ifDisplay}}
+                {{#ifDisplay 'MO.DsplPONumber'}}
+                 <td class="cc_table_col">
+                  <span class="cc_col_po_number">{{poNumber}}</span>
+                 </td>
+                {{/ifDisplay}}
+                  <!-- Added  PO coloum as part of SCP-93-->
+                <td class="cc_table_col">
+                 <span class="cc_col_order_PONumber">{{extrinsic.PONumber}}</span>
+                </td>
+                <td class="cc_table_col">
+                 <span class="cc_col_order_date">{{orderDateStr}}</span>
+                </td>
+                <td class="cc_table_col">
+                 <span class="cc_col_order_amount">{{price totalAmount currencyIsoCode}}</span>
+                </td>
+                
+                <td class="cc_table_col">
+                 {{#ifContains this.status 'Invoiced'}}
+                     <span class="cc_col_order_statust">Shipped & Invoiced</span>
+                 {{else}}
+                   <span class="cc_col_order_statust">{{pageLabelMap status}}</span>
+                {{/ifContains}}
+                </td>
+              
+                {{#ifStoreSetting 'Filter_Orders_Based_on_Owner__c'}}
+                 &#160;
+                {{else}}
+                 <td class="cc_table_col">
+                  <span class="cc_col_order_owner ord_owner">{{ownerName}}</span>
+                 </td>
+                {{/ifStoreSetting}}
+                {{#ifDisplay 'MO.ShActOnOrd'}}
+                 <!-- added as part of SCP -787 -->
+				<td style="display:{!ShowCuserAccess}" class="cc_table_col">
+				  {{#ifDisplay 'MO.ShReOrdBt'}}
+				   {{#if this.canReOrder}}
+					<input type="button" class="btn btn-default btn-sm reorder cc_col_reorder" data-id="{{sfid}}" value="{{pageLabelMap 'MyOrdersInc_Reorder'}}"/>&#160;
+				   {{/if}}
+				  {{/ifDisplay}}
+				 </td>
+				 <!-- added as part of SCP -787 -->
+				   <td style="display:{!HideCuserAccess}" class="cc_table_col">
+                  {{#ifDisplay 'MO.ShReOrdBt'}}
+                   {{#if this.canReOrder}}
+                    <input disabled="disabled" type="button" class="btn btn-default btn-sm reorder cc_col_reorder" data-id="{{sfid}}" value="{{pageLabelMap 'MyOrdersInc_Reorder'}}"/>&#160;
+                   {{/if}}
+                  {{/ifDisplay}}
+                 </td>
+                 <td class="cc_table_col">
+                  {{#if this.canCancel}}
+                   {{#ifDisplay 'MO.ShAmdBt'}}
+                    {{#if this.canAmend}}
+                     <input type="button" class="btn btn-default btn-sm promptCancel promptAmend cc_col_prompt_amend" data-id="{{sfid}}" data-mode="Edit" value="{{pageLabelMap 'Amend'}}"/>&#160;
+                    {{/if}}
+                   {{/ifDisplay}}
+                  {{/if}}
+                 </td>
+                 <td class="cc_table_col">
+                  {{#if this.canCancel}}
+                   {{#ifDisplay 'MO.ShCanBt'}}
+                    <input type="button" class="btn btn-default btn-sm promptCancel cc_col_prompt_cancel" data-id="{{sfid}}" data-mode="Cancel" value="{{pageLabelMap 'Cancel'}}"/>
+                   {{/ifDisplay}}
+                  {{/if}}
+                 </td>
+                <!-- Added as part of IBA-4972 -->
+                <td class="cc_table_col">
+                	<span id="Invoice-link{{extrinsic.SAPOrderNumber}}" style="color:#F3F3F3;"></span>
+                </td>
+                {{/ifDisplay}}
+               </tr>
+              {{/each}}
+             </table>
+            </div>
+            <div id="modalSec"></div>
+           </div>
+       </div><!-- My Order Block End--><!--Div closed Added for SCP-825 -->
+    </script>
+    <!-- Added for SCP-825 Start -->
+    <script type="text/javascript">
+    
+	
+        function openOrder(orderlist) {
+          var i;
+          var x = document.getElementsByClassName("orderView");
+          for (i = 0; i < x.length; i++) {
+            x[i].style.display = "none";  
+          }
+          document.getElementById(orderlist).style.display = "block";
+        }
+    CCRZ.pubSub.on('view:myOrdersView:refresh',function(){
+				var dataSet = [];       		
+                OCB_MyOrdersComponentController.getAllOrder(
+                    CCRZ.pagevars.remoteContext,
+                    function (response) {
+                        debugger;
+                        if (response) {
+                            if(response.success) {
+                                debugger;
+                                if(typeof response.data.orderList !== 'undefined'){
+                                    var invPdf = '';
+                                    console.log('Link:', response.data.invoicePdfUrl.length, response.data.invoicePdfUrl);
+                                    for(i = 0; i < response.data.orderList.length; i++){
+                                        var arrData = [];
+                                        var orderNum = '';
+                                        var poNum = ''; 
+                                        var statusOrd = '';
+                                        if(response.data.orderList[i].SAP_Order_Number__c != null ){
+                                            orderNum = response.data.orderList[i].SAP_Order_Number__c;
+                                        }
+                                        else{
+                                            orderNum = response.data.orderList[i].Name;
+                                        }
+                                        if(response.data.orderList[i].PO_Number__c == null){
+                                            poNum = ' ';
+                                        }
+                                        else{
+                                            poNum = response.data.orderList[i].PO_Number__c;
+                                        }
+                                        
+                                        if(response.data.orderList[i].ccrz__OrderStatus__c == null){
+                                            statusOrd = ' ';
+                                        }
+                                        else{
+                                            statusOrd = response.data.orderList[i].ccrz__OrderStatus__c;
+                                        }
+                                        var ord = new Date(response.data.orderList[i].ccrz__OrderDate__c);
+                                        
+                                        //Start of IBA-4972 changes
+                                        invPdf='';
+                                       	for(j = 0; j < response.data.invoicePdfUrl.length; j++){
+                                            if(response.data.invoicePdfUrl[j].ordNum == orderNum){
+                                                invPdf='<div style="display: inline-block;">';
+                                                for(k = 0; k < response.data.invoicePdfUrl[j].invUrls.length; k++){
+                                                    invPdf+= '<a href="' + response.data.invoicePdfUrl[j].invUrls[k] + '" target=_blank style="font-size: small;">INV'+ [k+1] +' </a> ';
+                                                    invPdf+= '<a href="/sfc/servlet.shepherd/document/download/'+response.data.invoicePdfUrl[j].docId[k] +'" target=_blank>&#8595; </a> ';
+                                                }
+                                                invPdf+='</div>';
+                                            }
+                                    	}
+                                        if(invPdf != '' && document.getElementById("Invoice-link"+orderNum)){
+                                            document.getElementById("Invoice-link"+orderNum).innerHTML=invPdf;
+                                        }
+                                        //End of IBA-4972 changes
+                                        
+                                        arrData.push('<a href="#" data-id="' + response.data.orderList[i].ccrz__EncryptedId__c + '" class="gotoOrderDetails cc_goto_order_detailss">'+ orderNum +' </a>'); 
+                                        arrData.push(poNum); 
+                                        arrData.push(ord.toLocaleDateString()); 
+                                        arrData.push(response.data.orderList[i].ccrz__TotalAmount__c); 
+                                        arrData.push(statusOrd);
+                                        arrData.push(response.data.orderList[i].ccrz__BuyerFirstName__c+' '+response.data.orderList[i].ccrz__BuyerLastName__c);
+                                        arrData.push(response.data.orderList[i].Account_CSN__c);
+                                        arrData.push(response.data.orderList[i].ccrz__Account__r.Name);
+                                        arrData.push('<input type="button" class="btn btn-default btn-sm reorder cc_col_reorder" data-id="'+response.data.orderList[i].Id+'" value="Reorder"/>');
+                                        arrData.push(invPdf); 	// IBA-4972
+                                        dataSet.push(arrData);
+                                    }
+                                }
+                                getTable(dataSet);
+                                
+                             } 
+                        } 
+                    }
+                    
+                );
+        	
+            });
+    </script>
+    <script>
+        function getTable(dataSet){
+            $('#AllorderTable').DataTable( {
+                     data: dataSet,
+                	 "aaSorting": [],
+                     "pagingType": "simple_numbers",
+                     dom: "<'row'<'col-xs-4'f>>"+ 
+                     "<'row box'<'col-sm-4'i><'col-sm-5'p><'col-sm-3'l>>" +
+                	 "<'row'<'col-sm-12'>>"+
+                     "<'row'<'col-sm-12'tr>>",
+                             
+                     retrieve: true,
+                     columns: [
+                            { title: "Order Number" },
+                            { title: "PO Number" },
+                            { title: "Order Date" },
+                            { title: "Amount" },
+                            { title: "Status" },
+                         	{ title: "Buyer Name"},
+                         	{ title: "Account CSN"},
+                         	{ title: "Account Name"},
+                         	{ title: "Actions"},
+                         	{ title: "Invoice"}		//IBA-4972 changes
+                     ]
+            } );
+        }
+    </script><!-- Added for SCP-825 End -->
+</apex:component>

@@ -1,0 +1,7 @@
+<apex:page standardController="Opportunity" extensions="OppDuplicateManagement"  showHeader="false">
+    <div style="color:RED">
+        <b>
+            {! showMessage1}
+        </b>
+    </div>
+</apex:page>

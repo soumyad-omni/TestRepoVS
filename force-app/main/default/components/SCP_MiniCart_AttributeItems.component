@@ -1,0 +1,229 @@
+<apex:component >
+    <script id="MiniCart-AttributeItems" type="text/template">
+       <div id="minicart_attribute_items{{itemID}}" class="modal fade cc_modal cc_cart_attribute_items_modal gp_cart_attribute_items_modal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+         <div class="modal-content cc_modal_content">
+          <div class="modal-header">
+           <button type="button" class="close cc_close" data-dismiss="modal" aria-label="{{pageLabelMap 'Modal_Aria_Close'}}"><span aria-hidden="true">&#215;</span></button>
+           {{#ifEquals this.pricingType 'external'}}
+            {{#if extName}}
+             <h3 id="myModalLabel">{{this.extName}}&#58;&#160;{{pageLabelMap 'Cart_AttributeItems'}}</h3>
+            {{else}}
+             <h3 id="myModalLabel">{{this.mockProduct.name}}&#58;&#160;{{pageLabelMap 'Cart_AttributeItems'}}</h3>
+            {{/if}}
+           {{else}}
+            <h3 id="myModalLabel">{{this.mockProduct.name}}&#58;&#160;{{pageLabelMap 'Cart_AttributeItems'}}</h3>
+           {{/ifEquals}}
+          </div>
+          <div class="modal-body cc_modal-body">
+           <div class="table-responsive">
+            <table class="cart_figures table table-striped table-condensed cc_table cc_included_items">
+             <thead class="cc_table_header">
+              <th class="cc_name">Operation</th><!--{{pageLabelMap 'CartInc_SKU'}}-->
+              <th>Material</th>
+              {{#each this.topAttributes}}
+               <th class="cc_attribute_name">{{{this.displayName}}}</th>
+              {{/each}}
+              <th>Brand</th>
+              <th>Generic Name</th>
+              <th>Manufacturer</th>
+              <th>Strength</th>
+              
+              <th class="" Style="width:55px;">{{pageLabelMap 'CartInc_AttributeQuantity'}}</th><!--cc_attribute_qty-->
+              <th class="cc_price">{{pageLabelMap 'CartInc_Price'}}</th>
+              <th class="cc_total">{{pageLabelMap 'CartInc_Total'}}</th>
+              <th class="cc_remove"></th>
+             </thead>
+             <tbody>
+              {{#each this.minorLines}}
+               <tr>
+                <td class="text-nowrap">
+                 {{#if extSKU}}
+                  {{extSKU}}
+                 {{else}}
+                  {{mockProduct.sku}}
+                 {{/if}}
+                </td>
+                <td><span class="cc_attr_display">{{this.material}}</span></td>
+                {{#if primaryAttr}}<td><span class="cc_attr_display" ><output id="machineX">{{this.machinesR.machineName}}</output></span></td>{{/if}}<!-- {{{primaryAttr.displayName}}}-->
+                {{#if secondaryAttr}}<td><span class="cc_attr_display" ><output id="typeX">{{this.machineType}}</output></span></td>{{/if}}<!-- {{{secondaryAttr.displayName}}}-->
+                {{#if tertiaryAttr}}<td ><span class="cc_attr_display" ><outout id="drugCodeX">{{this.drugCodesR.drugCodes}}</output></span></td>{{/if}}<!-- {{{tertiaryAttr.displayName}}}-->
+                
+                <td><span class="cc_attr_display">{{this.drugCodesR.brandName}}</span></td><!--{{#if brandName}}{{/if}}{{#if genericDrugName}}{{/if}}{{#if manufacturerName}}{{/if}}-->
+                <td><span class="cc_attr_display">{{this.drugCodesR.genericDrugName}}</span></td>
+                <td><span class="cc_attr_display">{{this.drugCodesR.manufacturerName}}</span></td>
+                <td><span class="cc_attr_display">{{this.drugCodesR.drugStrength}}</span></td>
+                
+                {{#ifEquals pricingType 'external'}}
+                 <td><span class="cc_attr_qty"><input id="qtyInput_{{this.itemID}}" Style="width:55px;" type="text" name="qty" class="form-control input-sm input-text entry cc_input_sm" data-id= "{{this.itemID}}" data-parentID="{{this.parentCartItem}}" value="{{this.quantity}}" maxlength="7" readonly/></span></td>
+                {{else}}
+                 <td><span class="cc_attr_qty" ><input id="qtyInput_{{this.itemID}}" onChange="test('{{this.itemID}}')"  Style="width:55px;" type="text" name="qty" class="form-control input-sm input-text entry cc_input_sm" data-id= "{{this.itemID}}" data-parentID="{{this.parentCartItem}}" value="{{this.quantity}}" maxlength="7" /></span></td><!--qtyInput_{{this.itemID}}-->
+                {{/ifEquals}}
+                <td><span class="cc_attr_price">{{price this.price this.currencyCode}}</span></td>
+                <td><span class="cc_attr_line_total">{{price this.SubAmount this.currencyCode}}</span></td>
+               </tr>
+              {{/each}}
+             </tbody>
+            </table>
+           </div>
+           <hr>
+           <div class="row">
+            <div class="col-md-12">
+            <span class="pull-right">
+         <!--<button class="btn btn-default btn-sm cc_update_cart_button updateCartButton" type="button" >{{pageLabelMap 'MiniCart_Update'}}</button>
+          --><button class="btn btn-default btn-sm cc_update_cart_button" type="button" onclick="upsertItemX()">{{pageLabelMap 'MiniCart_Update'}}</button><!-- New button -->
+            </span>
+            </div>
+           </div>
+           <div class="row">
+            <div class="col-md-12">
+             <span class="pull-right">{{pageLabelMap 'CartInc_Total'}}&#58;&#160;{{price this.SubAmount}}</span>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+       </div>
+    </script>
+    <script>
+    	const a = new Map();
+    	const minorItemMap = new Map();
+    	const itemToUpdate = new Set()
+    //var product = CCRZ.productDetailModel.get('product');
+    	jQuery(function($){
+            
+            CCRZ.pubSub.on('view:cartView:refresh',function(){
+                var cartItems = CCRZ.cartView.cartmodel.get('cartItems')
+                // var minorList = cartItems[0].get('minorLines');
+                console.log(cartItems);
+                if(cartItems != null){
+                     for (var i = 0; i < cartItems.length; i++){
+                         if(cartItems[i].minorLines != null){
+                             var minorList = cartItems[i].minorLines;
+                             for(var j = 0;j < minorList.length; j++){
+                                 minorItemMap.set(minorList[j].itemID,minorList[j]);
+                                 var id = minorList[j].itemID;
+                                 a.set(id,minorList[j].quantity);
+                                 //var a[id] = minorList[j].quantity;
+                             }
+                         }
+                     }
+                 }
+            });
+            
+        });
+    	function test(id){
+            var qtyId = '#qtyInput_'+id;
+            var checkId = '#checkFlag_'+id;
+            if($(qtyId).val() != a.get(id)){
+                //alert($(qtyId).val());
+                itemToUpdate.add(id);
+            }
+            else{   
+                if(itemToUpdate.has(id))
+					itemToUpdate.delete(id);
+            }
+        }
+    	
+    	function upsertItemX(){
+            console.log(itemToUpdate);
+            console.log(minorItemMap);
+            var flag = false;
+            var count = 0;
+            var setCount = itemToUpdate.size;
+            for (const k of itemToUpdate){
+                var prodAttribute = {};
+                console.log(minorItemMap.get(k));
+                var minorItem = minorItemMap.get(k);
+                // var product = CCRZ.productDetailModel.get('product');
+                console.log(minorItem.product.ccrz__SKU__c);
+                console.log(minorItem.machine);
+                prodAttribute.machine = minorItem.machine; 
+                prodAttribute.type = minorItem.machineType;
+                prodAttribute.drugCode = minorItem.drugCodesR.drugCodes;                
+                prodAttribute.SKU = minorItem.product.ccrz__SKU__c;
+                prodAttribute.quantity = minorItem.quantity - a.get(k);
+                if(minorItem.quantity - a.get(k) > 0){
+                    OmnicellProductDetailController.upsertCartItem(
+                    CCRZ.pagevars.remoteContext,JSON.stringify(prodAttribute),
+                    function(response) {
+                       console.log('outside response');
+                       count = count + 1;
+                       if (response) {
+                           console.log('Inside response');
+                            if(response.success) {
+                               console.log('Inside success');
+                               if(typeof response.data.status !== 'undefined'){
+                                   console.log('Inside status');
+                                   flag = true;
+                                   
+                               }
+                               else{
+                                	flag = false;
+                                    console.log('Inside status else');
+                               }
+                            }
+                           	else{
+                            	flag = false;
+                                console.log('Inside success else');
+                            }
+                        }
+                        console.log(count);
+                        console.log(setCount);
+                       if(count === setCount){
+                           //alert(count);
+                            console.log(count);
+                           //	var x = document.getElementById("toastmsg");
+                           // x.className = "show";
+                           //setTimeout(function(){ x.className = x.className.replace("show", ""); }, 2000);
+                            var cartId = CCRZ.pagevars.currentCartID;
+             				CCRZ.pubSub.trigger('cartChange', cartId);
+                            $('.buttondisabled').prop("disabled", false);
+                            $(".gp_cart_attribute_items_modal").modal('hide');
+                       }
+                    });
+                }
+                else if(minorItem.quantity - a.get(k) < 0){
+                    //alert(minorItem.quantity - a.get(k));
+                    OmnicellProductDetailController.deleteCartItem(
+                    CCRZ.pagevars.remoteContext,JSON.stringify(prodAttribute),
+                    function(response) {
+                       console.log('outside response');
+                       count = count + 1;
+                       if (response) {
+                           console.log('Inside response');
+                            if(response.success) {
+                               console.log('Inside success');
+                               if(typeof response.data.status !== 'undefined'){
+                                   console.log('Inside status');
+                                   flag = true;
+                               }
+                               else{
+                                	flag = false;
+                                    console.log('Inside status else');
+                               }
+                            }
+                           	else{
+                            	flag = false;
+                                console.log('Inside success else');
+                            }
+                        }
+                        console.log(count);
+                        console.log(setCount);
+                       if(count === setCount){
+                            console.log(count);
+                            var cartId = CCRZ.pagevars.currentCartID;
+             				CCRZ.pubSub.trigger('cartChange', cartId);
+                            $('.buttondisabled').prop("disabled", false);
+                            $(".gp_cart_attribute_items_modal").modal('hide');
+                       }
+                    });
+                }
+                else{
+                    alert(minorItem.quantity - a.get(k));
+                }
+            }
+            itemToUpdate.clear();
+        }
+    </script>
+</apex:component>

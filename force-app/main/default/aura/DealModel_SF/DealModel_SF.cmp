@@ -1,0 +1,220 @@
+<!-- Components Involved
+  QuoteDetail
+  ProductDetail
+  ServiceDetail
+  ItemDetails -->
+
+
+
+  <aura:component controller="DealModelingController_SF" implements="lightning:isUrlAddressable,force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    <aura:attribute name="showDealCalculator" type="Boolean" default="false" />
+    <aura:attribute name="spinner" type="Boolean" default="false" />
+    <aura:attribute name="disableCalculateButton" type="Boolean" default="false" />
+    <aura:attribute name="dealModelWrapper" type="Object" />
+    <aura:attribute name="disableSave" type="Boolean" default="true" />
+    <aura:attribute name="disablePDF" type="Boolean" default="true" />    
+    <aura:attribute name="pdfRecordId" type="String" default="" />
+    <aura:attribute name="reset" type="Boolean" default="false"/>
+    <!--Added by sravan for SF-BUG-590 START-->
+    <aura:attribute name="itemdetailscomponent" type="Boolean" default="false"/>
+    <aura:attribute name="itemdetailscomponentfalse" type="Boolean" default="false"/>
+    <!--Added by sravan for SF-BUG-590 END-->
+    <!-- <aura:handler name="init" value="{!this}" action="{!c.onInit}"/>--> <!--Mobile Enable Functionality--> 
+    <lightning:button variant="brand" label="Deal Calculator (Beta)" onclick="{! c.openDealCalculator }" />
+    
+    <aura:handler name="resetEvent" event="c:resetParentEvent" action="{!c.handleResetEvent}"/>
+    <aura:handler name="calculateDiscountEvent" event="c:calculateDiscountEvent" action="{!c.handleDiscountEvent}"/>  
+    <aura:renderIf isTrue="{!v.spinner}">
+        <lightning:spinner alternativeText="Loading" size="large" variant="brand"/>
+    </aura:renderIf>
+    <aura:renderIf isTrue="{!and(v.showDealCalculator, v.dealModelWrapper)}">
+        <div class="demo-only slds-scrollable_none Body">
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open slds-modal_large">
+                <div class="slds-modal__container" >
+                    <header class="slds-modal__header">
+                        <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick="{!c.closeDealCalculator}">
+                            <lightning:icon iconName="utility:close" variant="container"/>
+                        </button>
+                        
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate body"><b>Deal Modeling(Quote #:<ui:outputNumber value="{!v.dealModelWrapper.data.ES_MARGIN_HDR.ORDER_NUM}" format="#############"/>) (Beta)</b></h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium" style="font-size: 10px; overflow:visible!important; overflow-y:visible!important;">
+                        <div class="mainWrap" style="margin-left:30px;">
+                            <ui:scrollerWrapper class="sWrap">
+                                <ul class="slds-accordion">
+                                    <li class="slds-accordion__list-item">
+                                        <section class="slds-accordion__section" aura:id="section-1">
+                                            <div class="slds-accordion__summary">
+                                                <h3 class="slds-text-heading_small slds-accordion__summary-heading" style="font-size:14px;color:blue;">
+                                                    <lightning:icon aura:id="section-1-icon-1" id="section-1" onclick="{!c.toggleSection}" iconName="utility:chevronright" size="xx-small" />
+                                                    <lightning:icon aura:id="section-1-icon-2" id="section-1" onclick="{!c.toggleSection}" iconName="utility:chevrondown" size="xx-small" class="slds-hide"/>
+                                                    <span class="slds-truncate slds-p-left_medium" title="Quote Details"><u><b>Quote Details</b></u></span>
+                                                </h3>
+                                            </div>
+                                            <div aria-hidden="false" class="slds-accordion__content">
+                                                <c:QuoteDetail dealModelWrapper="{!v.dealModelWrapper}"/> 
+                                            </div>
+                                        </section>
+                                    </li>
+                                    
+                                    <li class="slds-accordion__list-item">
+                                        <section class="slds-accordion__section slds-is-open" aura:id="section-3">
+                                            <div class="slds-accordion__summary">
+                                                <h3 class="slds-text-heading_small slds-accordion__summary-heading" style="font-size:14px;color:blue;">
+                                                    <lightning:icon aura:id="section-3-icon-1" id="section-3" onclick="{!c.toggleSection}" iconName="utility:chevronright" size="xx-small" class="slds-hide"/>
+                                                    <lightning:icon aura:id="section-3-icon-2" id="section-3" onclick="{!c.toggleSection}" iconName="utility:chevrondown" size="xx-small" />
+                                                    <!-- soumyad sf-bug-1018 start -->
+                                                    <aura:renderIf isTrue="{!!v.dealModelWrapper.isQuoteOmnicellServiceOrderType}">
+                                                    <span class="slds-truncate slds-p-left_medium" title="Product Details"><u><b>Product Details</b></u></span>
+                                                    </aura:renderIf>
+                                                    <aura:renderIf isTrue="{!v.dealModelWrapper.isQuoteOmnicellServiceOrderType}">
+                                                    <span class="slds-truncate slds-p-left_medium" title="Product Details"><u><b>As-a-service Deal Details</b></u></span>
+                                                    </aura:renderIf>
+                                                    <!-- soumyad sf-bug-1018 start -->
+                                                    <!--Added BY JAY CR-18666 Start-->
+                                                    <aura:renderIf isTrue="{!!v.dealModelWrapper.isQuoteOmnicellServiceOrderType}">
+                                                         <span  style ="color:black;">&nbsp;&nbsp;{<b>Lease Term:</b>&nbsp;{!v.dealModelWrapper.data.ES_MARGIN_HDR.LEASE_TERM} &amp; <b>Free Lease Term:</b>&nbsp;{!v.dealModelWrapper.data.ES_MARGIN_HDR.FREE_LEASE}}</span>                                                     
+                                                    </aura:renderIf>
+                                                    <aura:renderIf isTrue="{!v.dealModelWrapper.isQuoteOmnicellServiceOrderType}">
+                                                        <span  style ="color:black;">&nbsp;&nbsp;{<b>Subscription Term:</b>&nbsp;{!v.dealModelWrapper.subscriptionTerm}} </span>
+                                                     </aura:renderIf>
+                                                    <!--Added BY JAY CR-18666 End-->
+                                                </h3>
+                                            </div>
+                                            <div aria-hidden="false" class="slds-accordion__content">
+                                                <aura:renderIf isTrue="{!!v.dealModelWrapper.isQuoteOmnicellServiceOrderType}">
+                                                   <c:ProductDetail dealModelWrapper="{!v.dealModelWrapper}"/>
+                                                </aura:renderIf>
+                                                 <aura:renderIf isTrue="{!v.dealModelWrapper.isQuoteOmnicellServiceOrderType}">
+                                                    <c:ProductXRDetail dealModelWrapper="{!v.dealModelWrapper}"/>
+                                                </aura:renderIf>
+                                            </div>
+                                        </section>
+                                        <Section>                                            
+                                            <aura:renderIf isTrue="{!!v.dealModelWrapper.isQuoteOmnicellServiceOrderType}"> <!-- soumyad sf-bug-1018 -->
+                                            <aura:renderIf isTrue="{!!$Browser.isPhone}">
+                                                <div class="slds-box">
+                                                    <section> <h1>&nbsp;<b><u>GSA Calculation</u></b></h1></section>
+                                                    <c:GSACalculation dealModelWrapper="{!v.dealModelWrapper}" />
+                                                </div>
+                                            </aura:renderIf>
+                                            </aura:renderIf> <!-- soumyad sf-bug-1018 -->
+                                        </Section>
+                                    </li>
+                                    <!--Added by sravan for SF-BUG-590 START-->
+                                    <aura:renderIf isTrue="{!$Browser.isPhone}">
+                                        <li class="slds-accordion__list-item">
+                                            <section class="slds-accordion__section slds-is-open" aura:id="section-4">
+                                                <div class="slds-accordion__summary">
+                                                    <h3 class="slds-text-heading_small slds-accordion__summary-heading" style="font-size:14px;color:blue;">
+                                                        <lightning:icon aura:id="section-4-icon-1" id="section-4" onclick="{!c.toggleSection}" iconName="utility:chevronright" size="xx-small" class="slds-hide"/>
+                                                        <lightning:icon aura:id="section-4-icon-2" id="section-4" onclick="{!c.toggleSection}" iconName="utility:chevrondown" size="xx-small" />
+                                                        <span class="slds-truncate slds-p-left_medium" title="GSA Calculation"><u><b>GSA Calculation</b></u></span>
+                                                    </h3>
+                                                </div>
+                                                <div aria-hidden="false" class="slds-accordion__content">
+                                                    <c:GSACalculation dealModelWrapper="{!v.dealModelWrapper}" style="font-size:12px;"/>
+                                                </div>
+                                            </section>
+                                        </li>
+                                    </aura:renderIf>
+                                    <!--Added by sravan for SF-BUG-590 END-->
+                                    <li class="slds-accordion__list-item">
+                                        <lightning:layout multipleRows="true">
+                                            <lightning:layoutItem flexibility="auto" padding="around-small" size="12" smallDeviceSize="12" mediumDeviceSize="6" largeDeviceSize="6" >
+                                                <div class="slds-box">
+                                                    <section> <h1><b><u>Discount Calculation </u>({!v.dealModelWrapper.data.ES_MARGIN_HDR.CURRENCY_x})</b></h1></section>
+                                                    <table style="width:100%;">
+                                                        <tbody>
+                                                            <tr>
+                                                                <td> <b>Additional Discount:</b> <lightning:helptext content="Discount on top of the discount amount."/></td>
+                                                                <td style="padding: 2px;"><ui:inputcheckbox class="slds-checkbox" value="{!v.dealModelWrapper.additionalDiscount}"/></td>
+                                                            </tr>
+                                                            
+                                                            <tr>
+                                                                <td> <b>Discount Amt.:</b> </td>
+                                                                <td style="padding: 2px;">
+                                                                    <lightning:input id="disAmtId" onkeyup="{!c.onKeyUp}" onfocus="{!c.isNumberKey}" type="text" value="{!v.dealModelWrapper.discountAmount}" variant = "label-hidden" />
+                                                                    <!--<ui:inputNumber class="slds-input" label="" value="{!v.dealModelWrapper.discountAmount}" updateOn="keyup"/>-->
+                                                                </td>
+                                                            </tr>
+                                                            
+                                                            <tr>
+                                                                <td> <b>Discount %:</b> </td>
+                                                                <td style="padding: 2px;">
+                                                                    <lightning:input id="disPerId" onkeyup="{!c.onKeyUp}" onfocus="{!c.isNumberKey}" type="text" value="{!v.dealModelWrapper.discountPercentage}" variant = "label-hidden" /> 
+                                                                    <!--<ui:inputNumber class="slds-input" value="{!v.dealModelWrapper.discountPercentage}" updateOn="keyup"/>-->
+                                                                </td>
+                                                            </tr>
+                                                            
+                                                        </tbody>
+                                                    </table>
+                                                    <div style="text-align:center;margin-top: 5px;">
+                                                        <lightning:button class="s-btn" variant="brand" label="Calculate" title="Calculate" onclick="{!c.calculateDiscount}" disabled="{!v.disableCalculateButton}"/>
+                                                        <lightning:button class="s-btn" variant="brand" label="Reset" title="Reset" onclick="{!c.reset}"/>
+                                                    </div>
+                                                </div>
+                                            </lightning:layoutItem>
+                                            <!--<aura:renderIf isTrue="{!!$Browser.isPhone}">
+                                                <lightning:layoutItem flexibility="auto" padding="around-small" size="12" smallDeviceSize="12" mediumDeviceSize="6" largeDeviceSize="6" >
+                                                    <div class="slds-box">
+                                                        <section> <h1>&nbsp;<b><u>GSA Calculation</u></b></h1></section>
+                                                        <c:GSACalculation dealModelWrapper="{!v.dealModelWrapper}" />
+                                                    </div>
+                                                </lightning:layoutItem>
+                                            </aura:renderIf>--><!--Commented by Sravan for SF-BUG-590 -->
+                                            <!--Added by sravan for SF-BUG-590 START-->
+                                            <lightning:layoutItem flexibility="auto" padding="around-small" size="12" smallDeviceSize="12" mediumDeviceSize="6" largeDeviceSize="6" >
+                                                <div class="slds-box">
+                                                    <section class="slds-text-title_caps"> <h1>&nbsp;<b><u>Product Discount</u></b></h1></section>&nbsp;
+                                                    <c:ItemDetails_SF aura:id="childComp" dealModelWrapper="{!v.dealModelWrapper}" reset="{!v.reset}" itemdetailscomponent="false" recordid ="{!v.recordId}"/><!--Added by Sravan for SF-BUG-590 -->
+                                                </div>
+                                            </lightning:layoutItem>
+                                            <!--Added by sravan for SF-BUG-590 END-->
+                                        </lightning:layout>
+                                    </li>
+                                    <li class="slds-accordion__list-item">
+                                        <section class="slds-accordion__section" aura:id="section-2">
+                                            <div class="slds-accordion__summary">
+                                                <h3 class="slds-text-heading_small slds-accordion__summary-heading" style="font-size:14px;color:blue;">
+                                                    <lightning:icon aura:id="section-2-icon-1" id="section-2" onclick="{!c.toggleSection}" iconName="utility:chevronright" size="xx-small" />
+                                                    <lightning:icon aura:id="section-2-icon-2" id="section-2" onclick="{!c.toggleSection}" iconName="utility:chevrondown" size="xx-small" class="slds-hide"/>
+                                                    <span class="slds-truncate slds-p-left_medium" title="Service Details"><u><b>Service Details</b></u></span>
+                                                    <span class="" style ="color:black;">&nbsp;&nbsp;{<b>Service Duration:</b>&nbsp;{!v.dealModelWrapper.data.ES_MARGIN_HDR.SERVICE_TERM} &amp; <b>Free Months-Service:</b>&nbsp;{!v.dealModelWrapper.data.ES_MARGIN_HDR.FREE_SERVICE}}</span>
+                                                </h3>
+                                            </div>
+                                            <div aria-hidden="false" class="slds-accordion__content">
+                                                <c:ServiceDetail dealModelWrapper="{!v.dealModelWrapper}"/>
+                                            </div>
+                                        </section>
+                                    </li>
+                                    <li class="slds-accordion__list-item">
+                                        <section class="slds-accordion__section" aura:id="section-5">
+                                            <div class="slds-accordion__summary">
+                                                <h3 class="slds-text-heading_small slds-accordion__summary-heading" style="font-size:14px;color:blue;">
+                                                    <lightning:icon aura:id="section-5-icon-1" id="section-5" onclick="{!c.toggleSection}" iconName="utility:chevronright" size="xx-small" />
+                                                    <lightning:icon aura:id="section-5-icon-2" id="section-5" onclick="{!c.toggleSection}" iconName="utility:chevrondown" size="xx-small" class="slds-hide"/>
+                                                    <span class="slds-truncate slds-p-left_medium" title="Service Details"><u><b>Item Details</b></u></span>
+                                                </h3>
+                                            </div>
+                                            <div aria-hidden="false" class="slds-accordion__content">
+                                                <!--Updated by sravan for SF-BUG-590-->
+                                                <c:ItemDetails_SF dealModelWrapper="{!v.dealModelWrapper}" reset="{!v.reset}" itemdetailscomponent="true" recordid ="{!v.recordId}"/>
+                                            </div>
+                                        </section>
+                                    </li>
+                                </ul>
+                            </ui:scrollerWrapper>
+                        </div>
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <lightning:button variant="brand" label="Cancel" title="Brand action" onclick="{!c.closeDealCalculator }" />
+                        <!--<lightning:button label="Save" title="Brand action" onclick="{!c.save}" disabled="{!v.disableSave}"/>-->
+                        <lightning:button label="PDF" title="Save as PDF" onclick="{!c.save}" disabled="{!v.disablePDF}"/>
+                    </footer>
+                </div>            
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </div>    
+    </aura:renderIf>
+</aura:component>

@@ -1,0 +1,66 @@
+<apex:component controller="NewCanisterSampleRequestCtrl" access="global">
+    <apex:attribute name="OrdId" type="Id" description="Id of the account" assignTo="{!OrderId}"/>
+    <style type="text/css">
+
+    
+    body {
+    background-color:#FFFFFF;
+}
+
+
+
+th{
+    color: #46B555;
+    font-family: ProximaNovaBold, Arial, Helvetica, sans-serif;
+}
+p{
+    color: #46B555;
+    font-family: ProximaNovaBold, Arial, Helvetica, sans-serif;
+}
+
+</style>
+           <!-- <p><img src="{!$Resource.OmnicellLogo_PDF}"/></p> -->
+               <!--<p><apex:image url="{!$Resource.OmnicellLogo_PDF}"/> </p>-->
+               <p><apex:image id="Headerlogo" value="{!$Label.Omnicell_img_Servlet_URL}"/></p>
+
+            <table style="width:580px; border: 2px solid;">
+            <apex:repeat value="{!OrderList}" var="ord">
+                <tr>
+                    <th style="text-align: left">{!ord.Owner.Name} placed an order. Current order status is: {!ord.ccrz__OrderStatus__c}</th>    
+                </tr>
+                <tr><th style="text-align: left">Order Number :&nbsp;{!ord.SAP_Order_Number__c}</th></tr>
+            </apex:repeat> 
+                <tr><th style="text-align: left">Please send 5 or more samples of each med listed below in order for us to design a canister and ensure it works properly.</th></tr>
+                <tr><th></th></tr>
+                <tr><th style="text-align: left">Cheryl Clements</th></tr>
+                <tr><th style="text-align: left">PACMED Canister Department</th></tr>
+                <tr><th style="text-align: left">51 Pennwood Place, Suite 400</th></tr>
+                <tr><th style="text-align: left">Warrendale, PA 15086</th></tr>
+            </table>
+            <br/>
+            <br/>
+                  
+            <table style="width:1300px; border: 2px solid;">
+                <tr>
+                    <th style="color:#000;width:100px;font-size: 13px;padding-right: 10px;text-align: left;">Drug Code</th>
+                    <th style="color:#000;width:100px;font-size: 13px;padding-right: 10px;text-align: left;">Drug Name</th>
+                    <th style="color:#000;width:100px;font-size: 13px;padding-right: 10px;text-align: left;">Brand Name</th>
+                    <th style="color:#000;width:100px;font-size: 13px;padding-right: 10px;text-align: left;">Strength</th>
+                    <th style="color:#000;width:100px;font-size: 13px;padding-right: 10px;text-align: left;">Manufacturer</th>
+               </tr>
+               
+             <apex:repeat value="{!OrderItemsList}" var="orditem">
+                 <tr>
+                   	<td style="width:200px;padding-right: 10px;text-align: left;font-size: 13px;">{!orditem.DrugCodes__r.DrugCodes__c}</td>
+                    <td style="width:100px;padding-right: 10px;text-align: left;font-size: 13px;">{!orditem.DrugCodes__r.Long_Generic_Name__c} </td>
+                    <td style="width:100px;padding-right: 15px;text-align: left;font-size: 13px;">{!orditem.DrugCodes__r.Brand_Name__c} </td>
+                    <td style="width:100px;padding-right: 15px;text-align: left;font-size: 13px;">{!orditem.DrugCodes__r.Drug_Strength__c} </td>
+                    <td style="width:100px;padding-right: 15px;text-align: left;font-size: 13px;">{!orditem.DrugCodes__r.Manufacturer_Name__c} </td>
+                  </tr>
+            </apex:repeat>
+            </table>
+            <br/>
+    
+            <p>Thank You!</p>
+            <p><apex:image id="regardslogo" value="{!$Label.Omnicell_img_Servlet_URL}"/></p>
+</apex:component>

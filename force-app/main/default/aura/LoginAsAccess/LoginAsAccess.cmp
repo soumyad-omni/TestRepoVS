@@ -1,0 +1,10 @@
+<aura:component controller="LoginAsAccessController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global">   
+    <aura:attribute name="isButtonShow" type="boolean" default="false"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:if isTrue="{!v.isButtonShow}">
+    <lightning:button variant="brand"
+                          label="Grant Login As Access"
+                          title="Grant Login As Access"
+                          onclick="{! c.loginAsAccess}" />
+    </aura:if>   
+</aura:component>

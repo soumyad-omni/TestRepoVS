@@ -1,0 +1,102 @@
+<apex:page Standardcontroller="UserTerritory2Association" extensions="importDataFromCSVController" title="Accounts Uploader" sidebar="false" docType="html-5.0">
+  <style>
+        .controlPanel td{
+            width:200px;
+        }
+        .controlPanel{
+            margin-top:20px;
+        }
+      .pgcolor {
+    background-color: antiquewhite;
+}
+      
+    </style>    
+    <apex:form > 
+        <script type="text/javascript">
+            function validate() {
+                // validate code here
+                savePost();
+            }
+        var newWin=null;
+   		function openLookupPopup(name, id){
+            //var inid =document.getElementById("{!$Component.controlPanel.idSec.idSecItem.targetId}").value;
+            //console.log('inid : '+inid);
+            var inname =document.getElementById("{!$Component.controlPanel.idSec.idSecItem.targetName}").value;
+            console.log('inname : '+inname);
+            //var url="/apex/LookUpPage?namefield=" + name +"\&idfield\="+id+"\&parentid\="+inid6+"\&parentname\="+inname6+"\&accid\="+accid+"\&lookuptype\=clinicalconsultant";
+            var url="/apex/LookUpPageUser?namefield=" + name + "&idfield=" + id + "\&parentname\=" + inname;
+            //"/apex/LookUpPageUser?namefield=j_id0:j_id2:controlPanel:idSec:idSecItem:targetName&idfield=j_id0:j_id2:controlPanel:idSec:idSecItem:targetId"
+            newWin=window.open(url, 'Popup','height=500,width=600,left=100,top=100,resizable=no,scrollbars=yes,toolbar=no,status=no');
+            if (window.focus){
+                newWin.focus();
+            }
+            return false;
+        }
+        function closeLookupPopup(){
+            if (null!=newWin){
+                newWin.close();
+            }
+        }
+        </script>
+        <apex:pageBlock id="controlPanel" title="Upload a CSV file of Account CSN">
+            <!--<apex:messages id="messages" rendered="{!rendermessages}"/>-->
+            <apex:pageMessages />
+            <apex:pageblocksection columns="2" id="idSec">
+            		<apex:pageBlockSectionItem >
+                        Upload CSV file&nbsp;&nbsp;<apex:inputFile value="{!csvFileBody}" accept="csv" contentType="text/csv" />
+                	</apex:pageBlockSectionItem>
+                	<apex:pageBlockSectionItem id="idSecItem">
+                        <apex:outputLabel value="User">
+                        </apex:outputLabel>
+                        <apex:outputPanel >
+                            <apex:inputHidden value="{!user}" id="targetId" />
+                            <apex:inputText value="{!userName}" id="targetName"/>
+                            <a href="#" onclick="openLookupPopup('{!$Component.targetName}', '{!$Component.targetId}'); return false"><apex:image style="vertical-align:middle;width:21px; height:21px" value="{!$Label.search_icon_url}" /></a>
+                        </apex:outputPanel>
+                	</apex:pageBlockSectionItem>
+            </apex:pageblocksection>
+            <apex:pageblocksection columns="2" >
+                	<apex:pageBlockSectionItem >
+                        Start Date&nbsp;&nbsp;<apex:input type="date" value="{!startDate}" />
+                	</apex:pageBlockSectionItem>
+                   <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Role in Territory"/>
+                        
+                        <apex:outputPanel >
+                            <apex:inputField value="{!UserTerritory2Association.RoleInTerritory2}"/>
+                            
+                        </apex:outputPanel>
+                	</apex:pageBlockSectionItem>
+                	<apex:pageBlockSectionItem >
+                        End Date&nbsp;&nbsp;<apex:input type="date" value="{!endDate}"/>
+                	</apex:pageBlockSectionItem>
+                    <!--<apex:pageBlockSectionItem id="item6">
+                        <apex:outputLabel value="User" >
+                        </apex:outputLabel>
+                        <apex:outputPanel >
+                            <apex:inputHidden value="{!user}" id="targetId" />
+                            <apex:inputText size="20" value="{!user}" id="targetName" onFocus="this.blur()"/>
+                            <a href="#" onclick="openLookupPopup('{!$Component.targetName}', '{!$Component.targetId}'); return false"><apex:image style="vertical-align:middle;width:21px; height:21px" value="{!$Label.search_icon_url}" /></a>
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Role"/>
+                        
+                        <apex:outputPanel >
+                            <apex:inputField value="{!UserTerritory2Association.RoleInTerritory2}"/>
+                            
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>-->
+                	<apex:pageBlockSectionItem >
+                        <apex:commandButton value="Update Opportunity Team" action="{!readFromFile}" rendered="{!disabled}"/>
+                		
+                        <apex:commandButton value="Redirect to Home" action="{!redirectToHome}" rendered="{!readSuccess}" />
+                	</apex:pageBlockSectionItem>
+                	<!--<apex:pageBlockSectionItem >
+						<apex:commandButton value="Update Opportunity Team" action="{!saveData}"/>
+                	</apex:pageBlockSectionItem>-->
+                	
+            </apex:pageblocksection>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

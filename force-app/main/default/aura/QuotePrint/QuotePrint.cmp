@@ -1,0 +1,357 @@
+<!--
+  @File Name          : QuotePrint.cmp
+  @Description        : 
+  @Author             : ChangeMeIn@UserSettingsUnder.SFDoc
+  @Group              : 
+  @Last Modified By   : ChangeMeIn@UserSettingsUnder.SFDoc
+  @Last Modified On   : 27/12/2019, 6:53:33 pm
+  @Modification Log   : 
+  Ver       Date            Author      		    Modification
+  1.0    27/12/2019   ChangeMeIn@UserSettingsUnder.SFDoc     Initial Version
+-->
+<aura:component controller="QuotePrintController" implements="flexipage:availableForAllPageTypes,force:hasRecordId"  access="global">
+    
+    <aura:attribute name="options" type="List" default="[]"/>
+    <aura:attribute name="values" type="List" default="[]"/>
+
+    
+  
+    
+    
+    
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <!-- IBA-1736 : Pabitra --> 
+    <aura:attribute name= "isModalOpen" type= "boolean" default= "false"/>
+    <aura:attribute name= "title" type= "string" default="Quote Print Error"/>
+    <aura:attribute name= "bodytxt" type= "string" default= "Do you want to continue with quote printout error?"/>
+    <aura:attribute name= "closeButtonLabel" type= "string" default= "Cancel"/>
+    <aura:attribute name= "submitButtonLabel" type="string" default= "OK"/>
+    <aura:attribute name= "isDraftPrint" type="boolean" default= "false"/>
+    <aura:attribute name= "isPrint" type="boolean" default= "false"/>
+    <!-- end IBA-1736 : Pabitra --> 
+    <aura:attribute name = "isNotServiceOrderType" type = "boolean" default = "true"/>
+    <aura:attribute name = "hasPulsarHeroProd" type = "boolean" default = "true"/><!-- IBA-3242-->
+    <aura:attribute name = "isSupplement" type = "boolean" default = "false"/>
+    <aura:attribute name = "ismaSupplement" type = "boolean" default = "false"/>
+    <!--SF-BUG-747 Changes Start-->
+    <aura:attribute name = "isEditButtonClicked" type = "boolean" default = "false"/>
+    <!--SF-BUG-747 Changes End-->
+    <aura:attribute name = "compexecute" type = "boolean" default = "false"/> <!-- soumyad 1632-->
+    <aura:attribute name="selectedArray" type="List" default="[]"/>
+    <aura:attribute name="selectedDocsList" type="String[]"/>
+    <!--followoing two attributes (prevselectedDocsList, cannedlansel) added for SF-BUG-628 (SOW fixes - CG)-->
+    <aura:attribute name="prevselectedDocsList" type="String[]"/>
+    <aura:attribute name = "cannedlansel" type = "boolean" default = "false"/>
+    <aura:attribute name="selectedDocsListPrevious" type="String[]"/>
+    <aura:attribute name="selectedCannedLan" type="String[]"/>
+    <aura:attribute name = "layoutoptions" type = "String[]"/>
+    <aura:attribute name = "selectedlayout" type = "String"/>
+    <aura:attribute name = "selectedlayoutchange" type = "String"/>
+    <aura:attribute name="selectedexhibitsList" type="String[]"/>
+    <aura:attribute name="selectedSectionsList" type="String[]"/>
+    <aura:attribute name = "usalist" type = "boolean" default = "false"/>
+    <aura:attribute name = "zerodollars" type = "boolean" default = "false"/>
+    <aura:attribute name = "genericdrawers" type = "boolean" default = "true"/>
+    <aura:attribute name = "productsunbundled" type = "boolean" default = "false"/>
+    <aura:attribute name = "serviceonly" type = "boolean" default = "false"/>
+    <aura:attribute name = "quoteprintname" type = "String"/>
+    <aura:attribute name = "omnicelllayout" type = "boolean" default = "true"/>
+    <aura:attribute name = "aesyntlayout" type = "boolean" default = "false"/>
+    <aura:attribute name = "checkUser" type = "boolean" default = "false"/>
+    <!--Below attribute checkChnCan is added for SF-BUG-287-->
+    <aura:attribute name = "checkChnCan" type = "boolean" default = "true"/>
+    
+    
+    <aura:attribute name = "iframerender" type = "boolean" default = "false"/>
+    <aura:attribute name = "resettrue" type = "boolean" default = "false"/>
+    <aura:attribute name = "terms" type = "String"/>
+    <aura:attribute name = "resetterms" type = "String"/>
+    <aura:attribute name = "cannedlanguage" type = "List"/>
+    <aura:attribute name = "cannedlanaesynt" type = "List"/>
+    <aura:attribute name = "pastselected" type = "List"/>
+    <aura:attribute name = "selectedurl" type = "String"/>
+    <aura:attribute name = "selectedbutton" type = "String"/>
+    <aura:attribute name = "disabled" type = "boolean" default = "false"/>
+    <aura:attribute name = "buttonsdisabled" type = "boolean" default = "false"/>
+    <!--IBA-3867/4625 Changes Start -->
+    <aura:attribute name="quoteSAPSalesOrg" type="Boolean" default="false"/>
+    <aura:attribute name="sections" type="List"/>
+    <!--IBA-3867/4625 Changes End -->
+    <!--Commented below code for SF-BUG-564 by rajat-->
+    <!--IBA-3867/4625 commenting this section for now <aura:attribute name="sections" type="List" default="[
+        { label: 'Summary Product Only', value: 'Summary Product Only' },
+        { label: 'Summary Service Only', value: 'Summary Service Only' },
+        { label: 'Summary by Par Location', value: 'Summary by Par Location' },                                                 
+        { label: 'Detail by Par Location', value: 'Detail by Par Location' },
+        { label: 'Print Config Pictures (1 pic default option)', value: 'Print Config Pictures (1 pic default option)' },
+        { label: 'Detail by Par Location with Pictures', value: 'Detail by Par Location with Pictures' },
+        { label: 'Detail by Par Location with pictures and signoff', value: 'Detail by Par Location with pictures and signoff' },
+        { label: 'Summary by Par Location with pictures', value: 'Summary by Par Location with pictures' }]"/> -->
+
+        <!--Added Below code for SF-BUG-564 by rajat-->
+    	<!--<aura:attribute name="sections" type="List" default="[
+        { label: 'Summary Product Only', value: 'Summary Product Only' },
+        { label: 'Summary Service Only', value: 'Summary Service Only' },
+        { label: 'Summary by Par Location', value: 'Summary by Par Location' },                                                 
+        { label: 'Detail by Par Location', value: 'Detail by Par Location' },
+        { label: 'Print Config Pictures (1 pic default option)', value: 'Print Config Pictures (1 pic default option)' },
+        { label: 'Summary by Par Location with pictures', value: 'Summary by Par Location with pictures' }]"/>-->
+        
+       
+    
+      
+  <!--  <aura:attribute name="cannedlanguage" type="List" default="[
+        { label: 'Classic Hardware EOL –Lease', value: 'Classic Hardware EOL –Lease' },                                                       
+        { label: 'Development Product(Omnicell)', value: 'Development Product(Omnicell)' },
+		{ label: 'Extended Support Term', value: 'Extended Support Term' },
+        { label: 'Omnicell Capital Program', value: 'Omnicell Capital Program' },
+        { label: 'Payment Terms 70%', value: 'Payment Terms 70%' },
+       	{ label: 'Payment Terms 80%', value: 'Payment Terms 80%' },
+        { label: 'RXI/RXP Bundle', value: 'RXI/RXP Bundle' },
+        { label: 'Virtual Server Requirement', value: 'Virtual Server Requirement' },
+        { label: 'Windows 7 to XP Downgrade', value: 'Windows 7 to XP Downgrade' },                                                       
+        { label: 'Replacement Products(Omnicell)', value: 'Replacement Products(Omnicell)' }]"/> -->
+    
+    
+    
+    
+	<aura:attribute name="cannedlanguageaesynt" type="List" default="[
+        { label: 'Definitions', value: 'Definitions' },
+        { label: 'Payment Terms – Product Fees (Connect-Rx Upgrade)', value: 'Payment Terms – Product Fees (Connect-Rx Upgrade)' },
+        { label: 'Fee Increase', value: 'Fee Increase' },
+        { label: 'Connect-RX Upgrade', value: 'Connect-RX Upgrade' },
+        { label: 'Payment Terms – Product Fees (Purchase)', value: 'Payment Terms – Product Fees (Purchase)' },  
+    	{ label: 'Replacement Products(Aesynt)', value: 'Replacement Products(Aesynt)'}, 
+        { label: 'Development Product(Aesynt)', value: 'Development Product(Aesynt)' },
+        { label: 'ServiceNow', value: 'ServiceNow' },
+        { label: 'Virtualization Considerations', value: 'Virtualization Considerations' },
+        { label: 'Maintenance Extension', value: 'Maintenance Extension' },                                                             
+    	{ label: 'Buyout Products', value: 'Buyout Products' }]"/>     	
+    <aura:attribute name="exhibits" type="List" default="[
+        { label:'IVX', value:'IVX'},
+        { label:'Performance Center (w. EMM)', value:'Performance Center (w. EMM)' },
+        { label:'Performance Center (PSOG only)', value:'Performance Center (PSOG only)' },
+        { label:'CRx Upgrade', value:'CRx Upgrade' },
+        { label:'ServiceNow', value:'ServiceNow' },
+        { label:'Simplifi 797', value:'Simplifi 797' },
+        { label:'Omnicell One', value:'Omnicell One' },
+        { label:'Professional Services', value:'Professional Services' },
+        {label:'Govt IV', value:'Govt IV'},
+    	{label:'Cloud-Based Services', value:'Cloud-Based Services'}]"/><!--IBA-1527 new Exhibit added-->
+    
+    
+    <aura:handler event="aura:waiting" action="{!c.showSpinner}"/>
+    <aura:handler event="aura:doneWaiting" action="{!c.hideSpinner}"/>
+  <!--create a component attributs -->
+    <aura:attribute name="Spinner" type="boolean" default="false"/>
+    <aura:attribute name="ListOfContact" type="contact[]" />
+    
+  <!--loading spinner start... style=Brand Medium (blue dots)-->
+ <aura:if isTrue="{!v.Spinner}">
+    <div aura:id="spinnerId" class="slds-spinner_container">
+       <div class="slds-spinner--brand  slds-spinner slds-spinner--large slds-is-relative" role="alert">
+         <span class="slds-assistive-text">Loading Please Wait preparing data</span>
+         <div class="slds-spinner__dot-a"></div>
+         <div class="slds-spinner__dot-b"></div>
+       </div>
+    </div>
+ </aura:if>
+    <lightning:select name="select1" label="Print Layout" required="true" aura:id="layout" value="{!v.selectedlayout}" onchange="{!c.layoutchange}" disabled="{!v.isNotServiceOrderType ? v.disabled :true}">
+        <option value="Omnicell">Omnicell</option>
+        <!--<option value="Aesynt">Aesynt</option>  commented soumyad SF-Bug-761-->
+        <option value="Change Order Omnicell">Change Order Omnicell</option>
+        <!--<option value="Change Order Aesynt">Change Order Aesynt</option>  commented soumyad SF-Bug-761-->
+        <!--<aura:iteration items="{!v.layoutoptions}" var="opt">
+            <option value="{!opt}">{!opt}</option>
+        </aura:iteration>-->
+    </lightning:select>
+    <lightning:select name="select2" label="Print Language" required="true" aura:id="lang" disabled="{!v.disabled}">
+        <option value="English">English</option>
+        <option value="French">French</option>
+        <option value="German">German</option>
+    </lightning:select>    
+    
+    <lightning:select name="select3" label="Base Template" required="true" aura:id="template" disabled="{!v.hasPulsarHeroProd ? v.disabled : true}"><!--IBA-3242-->
+        <option value="Summary by Product">Summary by Product</option>
+        <option value="Pictures only">Pictures only</option>
+    </lightning:select> 
+   <!--   <aura:if isTrue="{!v.isSupplement}">
+         <lightning:select name="sel3" label="Agreement" required="false" aura:id="agreementId"  disabled="{!v.disabled}">
+            <option value="Autonomous Pharmacy Solutions Agreement">Autonomous Pharmacy Solutions Agreement</option>
+            <option value="Statement of Work">Statement of Work</option>
+        </lightning:select> 
+    </aura:if> --> 
+    <!--IBA-2290 starts -->
+    <aura:if isTrue="{!and(v.isSupplement, v.ismaSupplement)}">
+   <lightning:select name="sel3" label="Agreement" required="false" aura:id="agreementId2"  disabled="{!v.disabled}">
+       		<option value="Please Select">Please Select</option><!--IBA-3242-->
+       		<option value="Statement of Work">Statement of Work for ASA</option><!--IBA-3681--><!-- as part of IBA-4020 changed Statement of Work/Supplement to Statement of Work for ASA -->
+       		<option value="Autonomous Pharmacy Solutions Agreement">Advanced Service Agreement + SOW</option><!--IBA-3777--><!-- as part of IBA-4020 changed 'Autonomous Pharmacy Solutions Agreement' to 'Advanced Service Agreement + SOW' -->
+    		<option value="Advanced Service Agreement Services">Advanced Service Agreement + SOW Services Only</option> <!--IBA-4020-->
+       		<option value="Statement of Work Services">Statement of Work Services Only for ASA</option> <!--IBA-4020-->
+            <option value="Statement of Work for CMA MA">Statement of Work for CMA / MA</option> <!--IBA-4201-->
+            <option value="Statement of Work Services Only for CMA MA">Statement of Work Services Only for CMA / MA</option> <!--IBA-4201-->
+    </lightning:select> 
+    <aura:set attribute="else">
+        <aura:if isTrue="{!v.isSupplement}">
+         <lightning:select name="sel3" label="Agreement" required="false" aura:id="agreementId"  disabled="{!v.disabled}">
+             	<option value="Please Select">Please Select</option><!--IBA-3242-->
+                <option value="Autonomous Pharmacy Solutions Agreement">Advanced Service Agreement + SOW</option><!-- as part of IBA-4020 changed 'Autonomous Pharmacy Solutions Agreement' to 'Advanced Service Agreement + SOW' -->
+             	<option value="Statement of Work">Statement of Work for ASA</option><!--IBA-3681--><!-- as part of IBA-4020 changed Statement of Work/Supplement to Statement of Work for ASA -->
+             	<option value="Advanced Service Agreement Services">Advanced Service Agreement + SOW Services Only</option> <!--IBA-4020-->
+       			<option value="Statement of Work Services">Statement of Work Services Only for ASA</option> <!--IBA-4020-->
+                <option value="Statement of Work for CMA MA">Statement of Work for CMA / MA</option> <!--IBA-4201-->
+                <option value="Statement of Work Services Only for CMA MA">Statement of Work Services Only for CMA / MA</option> <!--IBA-4201-->
+         </lightning:select> 
+       </aura:if> 
+    </aura:set>
+    </aura:if>  
+ <!--IBA-2290 Ends -->
+    <lightning:select name="select4" label="Print Output Format" required="true" aura:id="output" onChange = "{!c.formatChange}" disabled="{!v.disabled}">
+        <option value="PDF">PDF</option>
+        <option value="Microsoft Word">Microsoft Word</option>
+    </lightning:select>
+     
+   <aura:if isTrue="{!v.isNotServiceOrderType}">
+    <lightning:dualListbox aura:id="selectSections"
+                                   name="Sections"
+                                   label="Print Sections"
+                                   sourceLabel="Print Sections"
+                                   selectedLabel="Selected Print Sections"
+                                   options="{!v.sections}"
+                                   value="{!v.selectedSectionsList}"
+                                   onchange="{!c.handleSectionChange}"
+                                   disabled="{!v.disabled}"/>
+    </aura:if>   
+    
+    
+			<aura:if isTrue="{!v.checkUser}">
+				<aura:if isTrue="{!v.omnicelllayout}">   
+					<lightning:dualListbox aura:id="selectDoc"
+											   name="cannedLanguage"
+											   label="Select Canned Language"
+											   sourceLabel="Select Canned Language"
+											   selectedLabel="Selected canned Language"
+											   options="{!v.cannedlanguage}"
+											   value="{!v.selectedDocsList}"
+											   onchange="{!c.handleDocChange}"
+											   disabled="{!v.disabled}"/>
+				</aura:if>
+				<aura:if isTrue="{!v.aesyntlayout}">   
+					<p>cannreq : {!v.cannedlanaesyntreq}</p>
+					<lightning:dualListbox aura:id="selectDoc1"
+											   name="cannedLanguage1"
+											   label="Select Canned Language"
+											   sourceLabel="Select Canned Language"
+											   selectedLabel="Selected canned Language"
+											   options="{!v.cannedlanaesynt}"
+											   value="{!v.selectedDocsList}"
+											   onchange="{!c.handleDocChange}"
+											   disabled="{!v.disabled}"/>
+				</aura:if>
+				<br/>
+				
+				<lightning:button variant="brand" label="Edit selected Canned Language" onclick="{!c.editcannedlanguage}" disabled="{!v.disabled}"/>
+				<aura:if isTrue="{!v.iframerender}">
+					<lightning:button variant="brand" label="Reset" onclick="{!c.resetterms}"/>
+					<lightning:inputRichText value = "{!v.terms}" aura:id="editedterms"/>
+				</aura:if>
+				<br/>
+                <br/>
+				<aura:if isTrue="{!v.isNotServiceOrderType}">
+				    <lightning:dualListbox aura:id="selectExhibit"
+											   name="Exhibits"
+											   label="Print Exhibits"
+											   sourceLabel="Print Exhibits"
+											   selectedLabel="Selected Print Exhibits"
+											   options="{!v.exhibits}"
+											   value="{!v.selectedexhibitsList}"
+											   onchange="{!c.handleExhibitChange}"
+											   disabled="{!v.disabled}"/>
+				</aura:if>
+			</aura:if>
+			<aura:if isTrue="{!v.isNotServiceOrderType}">
+                <!--IBA-3867 /4625 start -->
+				<aura:if isTrue="{!v.quoteSAPSalesOrg}">
+                    <lightning:input type="checkbox" name="Display Generic Drawers" label="Display Generic Drawers" checked="{!v.genericdrawers}" disabled="{!v.disabled}"/>
+                    <aura:set attribute="else">
+                        <lightning:input type="checkbox" name="Display USA List" label="Display USA List" checked="{!v.usalist}" disabled="{!v.disabled}"/>
+                        <lightning:input type="checkbox" name="Display Zero Dollar Items" label="Display Zero Dollar Items" checked="{!v.zerodollars}" disabled="{!v.disabled}"/>
+                        <lightning:input type = "checkbox" name= "Display Generic Drawers" label = "Display Generic Drawers" checked = "{!v.genericdrawers}" disabled="{!v.disabled}"/>
+                        <lightning:input type="checkbox" name="Display Products Unbundled" label="Display Products Unbundled" checked="{!v.productsunbundled}" disabled="{!v.disabled}"/>
+                        	<aura:if isTrue="{!v.checkUser}">
+                                <lightning:input type="checkbox" name="Service only" label="Print Service Only" checked="{!v.serviceonly}" disabled="{!v.disabled}"/>
+                        </aura:if>
+                    </aura:set>
+                </aura:if>
+                <!--IBA-3867/4625 end-->
+                <!--<lightning:input type="checkbox" name="Display USA List" label="Display USA List" checked="{!v.usalist}" disabled="{!v.disabled}"/>
+					<lightning:input type = "checkbox" name= "Display Zero Dollar Items" label = "Display Zero Dollar Items" checked = "{!v.zerodollars}" disabled="{!v.disabled}"/>
+					<lightning:input type = "checkbox" name= "Display Generic Drawers" label = "Display Generic Drawers" checked = "{!v.genericdrawers}" disabled="{!v.disabled}"/>
+					<lightning:input type = "checkbox" name= "Display Products Unbundled" label = "Display Products Unbundled" checked = "{!v.productsunbundled}" disabled="{!v.disabled}"/>
+					<aura:if isTrue="{!v.checkUser}">
+						<lightning:input type = "checkbox" name= "Service only" label = "Print Service Only" checked = "{!v.serviceonly}" disabled="{!v.disabled}"/>
+					</aura:if>
+					<!<aura:attribute name="options" type="List" default="[
+					{'label': 'Display USA List', 'value': 'Display USA List'},
+					{'label': 'Display Zero Dollar Items', 'value': 'Display Zero Dollar Items'},
+					{'label': 'Display Generic Drawers', 'value': 'Display Generic Drawers'},
+					{'label': 'Display Products Unbundled', 'value': 'Display Products Unbundled'}
+					]"/>
+					<aura:attribute name="value" type="List" default="option1"/>
+
+					<lightning:checkboxGroup name="Checkbox Group"
+											 label="Print Options"
+											 options="{! v.options }"
+											 value="{! v.value }"
+											 onchange="{! c.handleChange }"/>    -->
+					
+					<lightning:select name="select4" label="Number of Pictures per Page" required="true" aura:id = "noofpictures" disabled="{!v.disabled}">
+						<option value="1">1</option>
+						<option value="2">2</option>
+						<option value="3">3</option>
+						<option value="4">4</option>
+					</lightning:select> 
+	        </aura:if>
+			   <!-- <lightning:button variant="brand" label="Preview" onclick="selectPrint"/>-->
+		<lightning:button variant="brand" label="Draft" onclick="{!c.draftPrint}" disabled = "{!v.buttonsdisabled}"/>
+		<lightning:button variant="brand" label="Print" onclick="{!c.selectPrint}" disabled = "{!v.buttonsdisabled}"/>
+   
+ 
+		<aura:if isTrue="{!v.checkUser}">
+			<lightning:button variant="brand" label="Send to Opportunity Owner" onclick="{!c.sendtoopp}" disabled = "{!v.buttonsdisabled}"/>
+		</aura:if>
+<!-- IBA-1736 : Pabitra -->     	
+  		<aura:if isTrue="{!v.isModalOpen}">
+            <!-- Modal/Popup Box starts here-->
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <!-- Modal/Popup Box Header Starts here-->
+                    <header class="slds-modal__header">
+                        <lightning:buttonIcon iconName="utility:close"
+                                              onclick="{!c.closeModel}"
+                                              alternativeText="close"
+                                              variant="bare-inverse"
+                                              class="slds-modal__close"/>
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">{!v.title}</h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        <p>{!v.bodytxt}</p>
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <lightning:button variant="neutral"
+                                          label="{!v.closeButtonLabel}"
+                                          title="{!v.closeButtonLabel}"
+                                          onclick="{!c.closeModel}"/>
+                        <lightning:button variant="brand"
+                                          label="{!v.submitButtonLabel}"
+                                          title="{!v.submitButtonLabel}"
+                                          onclick="{!c.submitPrint}"/>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </aura:if>
+    <!-- end IBA-1736 : Pabitra -->
+</aura:component>

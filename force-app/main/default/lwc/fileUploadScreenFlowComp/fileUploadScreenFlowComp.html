@@ -1,0 +1,57 @@
+<template>
+    <lightning-card>
+        <div>
+            <lightning-input type="file" accept=".xlsx, .xls, .csv, .png, .doc, .docx, .pdf, .txt"
+                label="Attachment" onchange={openfileUpload}></lightning-input>
+                <template if:true={isShowModal}>
+
+                    <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+                        aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                        <div class="slds-modal__container">
+                            <header class="slds-modal__header">                                
+                                <lightning-card title="File Tag selection" icon-name="action:add_file"></lightning-card>
+                            </header>
+            
+                            <lightning-card>
+                                <div class="slds-m-around_medium">                                    
+                                        <template if:true={fileData}>
+                                            
+                                            <table class="slds-table slds-table_cell-buffer slds-table_bordered" aria-labelledby="element-with-table-label other-element-with-table-label">
+                                                <thead>
+                                                    <tr>
+                                                        <td>File Name</td>
+                                                        <td>Tag</td>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>                                                    
+                                                        <tr>
+                                                            <td>{fileData.filename}</td>
+                    
+                                                            <td>
+                                                                <lightning-record-edit-form object-api-name="ContentVersion">
+                                                                    <lightning-layout-item padding="around-small">
+                                                                        <lightning-input-field field-name="Tag__c" required variant = "label-hidden"
+                                                                            onchange={handleTagChange} data-index={index}>
+                                                                        </lightning-input-field>
+                                                                    </lightning-layout-item>
+                                                                </lightning-record-edit-form>  
+                                                            </td>
+                                                        </tr>
+                                                </tbody>
+                                            </table>                                          
+                                        </template>
+                                </div>
+                                
+                                <footer class="slds-modal__footer">
+                                    <lightning-button variant="brand" label="Submit" title="Submit" onclick={handleClick}
+                                        class="slds-m-left_x-small"></lightning-button>
+                                </footer>
+                            </lightning-card>
+                        </div>
+                    </section>
+                    <div class="slds-backdrop slds-backdrop_open"></div>
+                </template>
+        </div>
+        
+    </lightning-card>
+</template>

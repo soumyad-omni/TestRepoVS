@@ -1,0 +1,35 @@
+<apex:page standardController="Campaign" extensions="CampaignActivityPlanningController">
+
+    <style>
+        .fewerMore { display: none;}
+    </style>
+
+    <apex:pageblock id="Tsks" title="Planning Tasks"  >
+
+        <apex:pageBlockButtons location="top"> 
+            <apex:form >
+                <apex:commandLink action="{!newPlanning}" target="_parent"
+                    value="New Task" title="New Task">
+                </apex:commandLink>
+            </apex:form>
+        </apex:pageBlockButtons>
+
+        <apex:pageBlockTable value="{!tsks}" var="t" rendered="{!NOT(ISNULL(tsks))}">
+            <apex:column headerValue="Subject">
+                <apex:outputLink value="/{!t.Id}" target="_parent">{!t.Subject}</apex:outputLink>
+            </apex:column>
+            <apex:column value="{!t.Who.Name}" headerValue="Contact/Lead"/>
+            <apex:column value="{!t.ActivityDate}"/>
+            <apex:column value="{!t.Priority}"/>
+            <apex:column value="{!t.Status}"/>
+            <apex:column value="{!t.Description}"/>
+            <apex:column value="{!t.Owner.Name}" headerValue="Assigned To" />
+            <apex:column value="{!t.CreatedBy.Name}   {!t.CreatedDate}" headerValue="Created By/On"/>
+            <apex:column value="{!t.LastModifiedBy.Name}   {!t.LastModifiedDate}" headerValue="Last Modified By/On"/>
+        </apex:pageBlockTable>
+
+        <apex:outputLabel value="No records to display" rendered="{!(ISNULL(tsks))}" styleClass="noRowsHeader"></apex:outputLabel>
+
+    </apex:pageblock>
+
+</apex:page>

@@ -1,0 +1,6 @@
+<aura:component implements="flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickAction" access="global" controller="SegmentProcess_controller">
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/> 
+    <aura:attribute name = "Message" type = "String"/>
+    <lightning:formattedtext aura:id="outtext"> {!v.Message}  </lightning:formattedtext>      
+</aura:component>

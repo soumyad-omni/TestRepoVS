@@ -1,0 +1,729 @@
+<aura:component controller="AddProductForQuoteController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    <aura:attribute name="isOpen" type="boolean" default="false"/>
+    <aura:attribute name = "selectedbutton" type = "String"/>
+    <aura:attribute name="wrapperList" type="object"/>
+    <aura:attribute name="wrapperListQuote" type="object"/>
+    <aura:attribute name="myNumber" type="integer" default="0"/>
+    <aura:attribute name="parListFromParent" type="list" default="List"/>
+    <aura:attribute name="newAccount" type="Quote_Line__c" 
+                    default="{ 'sobjectType': 'Quote_Line__c','Product': '', Quantity: ''}"/>
+    <aura:attribute name="fields"
+                    type="String[]"
+                    default="['Product', 'Quantity']"/>
+    <aura:attribute name="fields1"
+                    type="String[]"
+                    default="['Product', 'Quantity']"/>
+    <aura:attribute name="allQuoteLines" type="Quote_Line__c[]"/>
+    <aura:attribute name="isImageModalOpen" type="boolean" default="false"/>
+    <aura:attribute name="imageId" type="String"/>
+    <aura:attribute name="parLocationList" type="list"/>
+    <aura:attribute name="openModal" type="boolean" default="false"/>
+    <aura:attribute name="isOpenMOdal" type="boolean" default="false"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:handler event="c:QuoteLinesRefresh" action="{!c.handleQuoteLinesRefresh}"/>
+    <aura:attribute name="artId" type="String" default="{!v.recordId}" access="global" />
+    <aura:attribute Name="selItem" type="object"  access="public" />
+    <aura:attribute name="sellItemId" type="String" access="public" />
+    <aura:attribute Name="poductItem" type="object"  access="public" />
+    <aura:attribute name="selectedParForQuote" type="String"/>
+    <aura:attribute name="productList" type="List"/>
+    <aura:attribute name="parList" type="List"/>
+    <aura:attribute name="isRenewalQuote" type="Boolean"/>
+    <aura:attribute name="parlocationName1" type="String"/>
+    <aura:attribute name="parlocationName2" type="String"/>
+    <aura:attribute name="parlocationName3" type="String"/>
+    <aura:attribute name="parlocationName4" type="String"/>
+    <aura:attribute name="parlocationName5" type="String"/>
+    <aura:attribute name="parlocationName6" type="String"/>
+    <aura:attribute name="searchText" type="String"/>
+    <aura:attribute name="mapValues" type="object" /> 
+    <aura:attribute name="isShiptoOpen" type="boolean" default="false"/>
+    <aura:attribute name="isSearchOpen" type="boolean" default="false"/>
+    <aura:attribute name="wrapperListN" type="list"/>
+    <aura:attribute name="firstPickList" type="String"/>
+    <aura:attribute name="selectedItem" type="String"/>
+    <aura:attribute name="selectedTabId" type="String"/>
+    <!--component attributs -->
+    <aura:attribute name="spinner" type="boolean" default="false"/>
+    <aura:attribute name="isEdit" type="boolean" default="FALSE"/>
+    
+    <aura:attribute name="data" type="Object"/>
+    <aura:attribute name="columns" type="List"/>
+    <aura:attribute name="errors" type="Object" default="[]"/>
+    <aura:attribute name="draftValues" type="Object" default="[]"/>
+    <aura:method name="sampleMethod" action="{!c.doActionPar}"
+                        description="Sample method with parameters">
+       <aura:attribute name="param" type="String" />
+	</aura:method>
+    <!--IBA-2004 start-->
+    <aura:attribute name="product" type="boolean" default="true"/>
+    <aura:attribute name="desc" type="boolean" default="true"/>
+    <aura:attribute type="String" name="sortField" />
+    <aura:attribute name="sortAsc" type="boolean"  />
+    <!--IBA-2004 end-->
+    <aura:if isTrue="{!v.spinner}">
+        <div aura:id="spinnerId" class="slds-spinner_container">
+            <div class="slds-spinner--brand  slds-spinner slds-spinner--large slds-is-relative" role="alert">
+                <span class="slds-assistive-text">Loading...</span>
+                <div class="slds-spinner__dot-a"></div>
+                <div class="slds-spinner__dot-b"></div>
+            </div>
+        </div>
+    </aura:if>
+    
+        <lightning:card class="productCardHeight">
+            <lightning:layout multipleRows="false" horizontalAlign="spread" class="slds-p-bottom_small">
+                <lightning:layoutItem size="7" padding="horizontal-small">
+                    <aura:if isTrue="{!v.selectedParForQuote != null}">
+                        <p style="font-size: large;">Selected Par Location Name: <b>{!v.selectedParForQuote}</b></p>
+                    </aura:if>
+                </lightning:layoutItem>
+                <lightning:layoutItem size="5" padding="horizontal-small">
+                    <lightning:layout multipleRows="false" horizontalAlign="spread">
+                        <lightning:layoutItem size="8">
+                            <lightning:input name="searchText" value="{!v.searchText}" placeholder="Enter product name or description to filter list..." variant="label-hidden"/>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="4">
+                            <lightning:button variant="brand" label="Search" title="Search"
+                                              onclick="{!c.searchProductsCtrl}"/>          
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                </lightning:layoutItem>
+            </lightning:layout>
+            <lightning:tabset selectedTabId="{!v.selectedTabId}" variant="scoped">
+                <aura:if isTrue="{!v.isSearchOpen}">
+                    <lightning:tab label="Search Products" id="searchProducts">
+                        <div class="slds-box slds-p-around_none" style="width: 100%; height: 25vh; overflow: auto;">
+                            <article class="slds-card">
+                                <table class="slds-table slds-table--bordered slds-table--cell-buffer">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">
+                                                <div class="slds-truncate" title="select"></div>
+                                            </th>
+                                            <!--IBA-2004 start-->
+                                            <th scope="col" id="srchProd" onclick="{!c.sortByProduct}"> Product
+                                                <!--<div class="slds-truncate" title="Product">Product</div> -->
+                                                <span>  
+                                                    <aura:if isTrue="{!v.product}"><lightning:icon iconName="utility:arrowup"  size="xx-small" alternativeText="Indicates approval"/>
+                                                        <aura:set attribute="else">
+                                                            <lightning:icon iconName="utility:arrowdown"  size="xx-small" alternativeText="Indicates approval"/>
+                                                        </aura:set>
+                                                    </aura:if>
+                                                </span>
+                                            </th>
+                                            <th scope="col" id="srchDes" onclick="{!c.sortByProduct}">Description
+                                                <!--<div class="slds-truncate" title="Description">Description</div> -->
+                                                <span>  
+                                                    <aura:if isTrue="{!v.desc}"><lightning:icon iconName="utility:arrowup"  size="xx-small" alternativeText="Indicates approval"/>
+                                                        <aura:set attribute="else">
+                                                            <lightning:icon iconName="utility:arrowdown"  size="xx-small" alternativeText="Indicates approval"/>
+                                                        </aura:set>
+                                                    </aura:if>
+                                                </span>
+                                            </th>
+                                            <!--IBA-2004 end-->
+                                            <th scope="col">
+                                                <div class="slds-truncate" title="Price List">Price List</div>
+                                            </th>                                        
+                                            <th scope="col">
+                                                <div class="slds-truncate" title="Details">Details</div>
+                                            </th>
+                                            <th scope="col">
+                                                <div class="slds-truncate" title="Quantity">Quantity</div>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <aura:iteration items="{!v.wrapperList.searchLstPrd}" var="item">
+                                            <tr>
+                                                <th scope="row">
+                                                    <ui:inputCheckbox text ="" value="{!item.isSelected}" aura:id="chkBoxId"/>
+                                                </th>
+                                                
+                                                <th scope="row">
+                                                    <div class="slds-truncate" title="{!item.productItem.ProductCode}"><p style="font-size: 12px;">{!item.productItem.ProductCode}</p></div>
+                                                </th>
+                                                <th scope="row">
+                                                    <div class="slds-truncate" title="{!item.productItem.Description}"><p style="font-size: 12px;">{!item.productItem.Description}</p></div>
+                                                </th>
+                                                <th scope="row">
+                                                    <div class="slds-truncate" title="{!item.priceList}"><p style="font-size: 12px;">{!item.priceList}</p></div>
+                                                </th>
+                                                <th scope="row">                                                
+                                                    <div style="font-size: 12px;"> 
+                                                        <lightning:formattedRichText  value="{!item.productItem.sales_text__c}" />                                                                                              
+                                                    </div>                                              
+                                                </th>
+                                                <th scope="row">
+                                                    <div style="width:50px;">
+                                                        <ui:inputNumber value="{!item.quantity}" aura:id="{!item.productItem.ProductCode}"/>
+                                                    </div>
+                                                </th> 
+                                                
+                                            </tr>
+                                        </aura:iteration>
+                                    </tbody>
+                                </table>
+                            </article>
+                        </div>
+                    </lightning:tab>
+                </aura:if>
+                <lightning:tab label="All Products" id="allproducts">
+                    <div class="slds-box slds-p-around_none" style="width: 100%; height: 21vh; overflow: auto;">
+                        <article class="slds-card">
+                            <aura:if isTrue="{!!v.isRenewalQuote}">
+                                
+                                <table class="slds-table slds-table--bordered slds-table--cell-buffer">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">
+                                                <div class="slds-truncate" title="select"></div>
+                                            </th>
+                                            <!--IBA-2004 start-->
+                                            <th scope="col" id="allProd" onclick="{!c.sortByProduct}"> Product
+                                                <!-- <div class="slds-truncate" title="Product">Product</div> -->
+                                                <span>  
+                                                    <aura:if isTrue="{!v.product}"><lightning:icon iconName="utility:arrowup"  size="xx-small" alternativeText="Indicates approval"/>
+                                                        <aura:set attribute="else">
+                                                            <lightning:icon iconName="utility:arrowdown"  size="xx-small" alternativeText="Indicates approval"/>
+                                                        </aura:set>
+                                                    </aura:if>
+                                                </span>
+                                            </th>
+                                            <th scope="col" id="allDes" onclick="{!c.sortByProduct}">Description
+                                                <!-- <div class="slds-truncate" title="Description">Description</div> -->
+                                                <span>  
+                                                    <aura:if isTrue="{!v.desc}"><lightning:icon iconName="utility:arrowup"  size="xx-small" alternativeText="Indicates approval"/>
+                                                        <aura:set attribute="else">
+                                                            <lightning:icon iconName="utility:arrowdown"  size="xx-small" alternativeText="Indicates approval"/>
+                                                        </aura:set>
+                                                    </aura:if>
+                                                </span>
+                                            </th> 
+                                            <!--IBA-2004 end-->
+                                            <th scope="col">
+                                                <div class="slds-truncate" title="Price List">Price List</div>
+                                            </th> 
+                                            <th scope="col">
+                                                <div class="slds-truncate" title="Details">Details</div>
+                                            </th>
+                                            <th scope="col">
+                                                <div class="slds-truncate" title="Quantity">Quantity</div>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <aura:iteration items="{!v.wrapperList.allLstPrd}" var="item">
+                                            <tr>
+                                                <th scope="row">
+                                                    <ui:inputCheckbox text ="" value="{!item.isSelected}" aura:id="chkBoxId"/>
+                                                </th>
+                                                
+                                                <th scope="row">
+                                                    <div class="slds-truncate" title="{!item.productItem.ProductCode}"><p style="font-size: 12px;">{!item.productItem.ProductCode}</p></div>
+                                                </th>
+                                                <th scope="row">
+                                                    <div class="slds-truncate" title="{!item.productItem.Description}"><p style="font-size: 12px;">{!item.productItem.Description}</p></div>
+                                                </th>
+                                                <th scope="row">
+                                                    <div class="slds-truncate" title="{!item.priceList}"><p style="font-size: 12px;">{!item.priceList}</p></div>
+                                                </th>
+                                                <th scope="row">                                                
+                                                    <div style="font-size: 12px;"> 
+                                                        <lightning:formattedRichText  value="{!item.productItem.sales_text__c}" />                                                                                              
+                                                    </div>                                              
+                                                </th>
+                                                <th scope="row">
+                                                    <div style="width:50px;">
+                                                        <ui:inputNumber value="{!item.quantity}" aura:id="{!item.productItem.ProductCode}"/>
+                                                    </div>
+                                                </th> 
+                                                
+                                            </tr>
+                                        </aura:iteration>
+                                    </tbody>
+                                </table>   
+                            </aura:if>
+                            <aura:if isTrue="{!v.isRenewalQuote}">
+                                <table class="slds-table slds-table--bordered slds-table--cell-buffer">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">
+                                                <div class="slds-truncate" title="select"></div>
+                                            </th>
+                                            <th scope="col">
+                                                <div class="slds-truncate" title="C4C Assets Name">C4C Assests Name</div>
+                                            </th>
+                                            <th scope="col">
+                                                <div class="slds-truncate" title="Product ID">Product ID</div>
+                                            </th>
+                                            <th scope="col">
+                                                <div class="slds-truncate" title="Description">Description</div>
+                                            </th>
+                                            <th scope="col">
+                                                <div class="slds-truncate" title="Serial ID">Serial ID</div>
+                                            </th>
+                                            <th scope="col">
+                                                <div class="slds-truncate" title="Ship To Name">Ship To Name</div>
+                                            </th>
+                                            <th scope="col">
+                                                <div class="slds-truncate" title="Status">Status</div>
+                                            </th>
+                                            <th scope="col">
+                                                <div class="slds-truncate" title="Quantity">Quantity</div>
+                                            </th>
+                                            
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <aura:iteration items="{!v.productList}" var="item">
+                                            <tr>
+                                                <td scope="row">
+                                                    <ui:inputCheckbox text ="" value="{!item.isSelected}" aura:id="chkBoxId"/>
+                                                </td>
+                                                
+                                                <td scope="row">
+                                                    <div class="slds-truncate" title="{!item.Name}"><p style="font-size: 12px;">{!item.Name}</p></div>
+                                                </td>
+                                                <td scope="row">
+                                                    <div class="slds-truncate" title="{!item.Product_ID__c}"><p style="font-size: 12px;">{!item.Product_ID__c}</p></div>
+                                                </td>
+                                                <td scope="row">
+                                                    <div class="slds-truncate" title="{!item.Description__c}"><p style="font-size: 12px;">{!item.Description__c}</p></div>
+                                                </td> 
+                                                <td scope="row">                                                
+                                                    <div class="slds-truncate" title="{!item.Serial_ID__c}"><p style="font-size: 12px;">{!item.Serial_ID__c}</p></div>
+                                                </td>                                       
+                                                <td scope="row">                                                
+                                                    <div class="slds-truncate" title="{!item.Ship_To_Name__c}"><p style="font-size: 12px;">{!item.Ship_To_Name__c}</p></div>
+                                                </td> 
+                                                <td scope="row">                                                
+                                                    <div class="slds-truncate" title="{!item.Status__c}"><p style="font-size: 12px;">{!item.Status__c}</p></div>
+                                                </td> 
+                                                <td scope="row">
+                                                    <div style="width:50px;">
+                                                        <ui:inputNumber value="{!item.quantity}" aura:id="{!item.Id}"/>
+                                                    </div>
+                                                </td> 
+                                                
+                                            </tr>
+                                        </aura:iteration>
+                                    </tbody>
+                                </table> 
+                            </aura:if>
+                            <!--<footer class="slds-card__footer" style="text-align: right;">
+                            <lightning:button variant="brand" 
+                                              label="Add to Quote"
+                                              title="Add to Quote"
+                                              onclick="{!c.saveProducts }"/>
+                        </footer>-->
+                        </article>
+                    </div>
+                </lightning:tab>
+                <lightning:tab label="A La Carte" id="one">
+                    <div class="slds-box slds-p-around_none" style="width: 100%; height: 21vh; overflow: auto;">
+                        <article class="slds-card">
+                            
+                            <aura:if isTrue="{!!v.isRenewalQuote}">
+                                
+                                <table class="slds-table slds-table--bordered slds-table--cell-buffer">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">
+                                                <div class="slds-truncate" title="select"></div>
+                                            </th>
+                                            <!--IBA-2004 start-->
+                                            <th scope="col" id="alaCarteProd" onclick="{!c.sortByProduct}">Product
+                                                <!--<div class="slds-truncate" title="Product">Product</div> -->
+                                                <span>  
+                                                    <aura:if isTrue="{!v.product}"><lightning:icon iconName="utility:arrowup"  size="xx-small" alternativeText="Indicates approval"/>
+                                                        <aura:set attribute="else">
+                                                            <lightning:icon iconName="utility:arrowdown"  size="xx-small" alternativeText="Indicates approval"/>
+                                                        </aura:set>
+                                                    </aura:if>
+                                                </span>
+                                            </th>
+                                            <th scope="col" id="alaCarteDes" onclick="{!c.sortByProduct}">Description
+                                                <!--<div class="slds-truncate" title="Description">Description</div>-->
+                                                <span>  
+                                                    <aura:if isTrue="{!v.desc}"><lightning:icon iconName="utility:arrowup"  size="xx-small" alternativeText="Indicates approval"/>
+                                                        <aura:set attribute="else">
+                                                            <lightning:icon iconName="utility:arrowdown"  size="xx-small" alternativeText="Indicates approval"/>
+                                                        </aura:set>
+                                                    </aura:if>
+                                                </span>
+                                            </th> 
+                                            <!--IBA-2004 end-->
+                                            <th scope="col">
+                                                <div class="slds-truncate" title="Price List">Price List</div>
+                                            </th>  
+                                            <th scope="col">
+                                                <div class="slds-truncate" title="Details">Details</div>
+                                            </th>
+                                            <th scope="col">
+                                                <div class="slds-truncate" title="Quantity">Quantity</div>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <aura:iteration items="{!v.wrapperList.lstPrd}" var="item">
+                                            <tr>
+                                                <th scope="row">
+                                                    <ui:inputCheckbox text ="" value="{!item.isSelected}" aura:id="chkBoxId"/>
+                                                </th>
+                                                
+                                                <th scope="row">
+                                                    <div class="slds-truncate" title="{!item.productItem.ProductCode}"><p style="font-size: 12px;">{!item.productItem.ProductCode}</p></div>
+                                                </th>
+                                                <th scope="row">
+                                                    <div class="slds-truncate" title="{!item.productItem.Description}"><p style="font-size: 12px;">{!item.productItem.Description}</p></div>
+                                                </th>
+                                                <th scope="row">
+                                                    <div class="slds-truncate" title="{!item.priceList}"><p style="font-size: 12px;">{!item.priceList}</p></div>
+                                                </th>
+                                                <th scope="row">                                                
+                                                    <div style="font-size: 12px;"> 
+                                                        <lightning:formattedRichText  value="{!item.productItem.sales_text__c}" />                                                                                              
+                                                    </div>                                              
+                                                </th>
+                                                <th scope="row">
+                                                    <div style="width:50px;">
+                                                        <ui:inputNumber value="{!item.quantity}" aura:id="{!item.productItem.ProductCode}"/>
+                                                    </div>
+                                                </th> 
+                                                
+                                            </tr>
+                                        </aura:iteration>
+                                    </tbody>
+                                </table>   
+                            </aura:if>
+                            <aura:if isTrue="{!v.isRenewalQuote}">
+                                <table class="slds-table slds-table--bordered slds-table--cell-buffer">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">
+                                                <div class="slds-truncate" title="select"></div>
+                                            </th>
+                                            <th scope="col">
+                                                <div class="slds-truncate" title="C4C Assets Name">C4C Assests Name</div>
+                                            </th>
+                                            <th scope="col">
+                                                <div class="slds-truncate" title="Product ID">Product ID</div>
+                                            </th>
+                                            <th scope="col">
+                                                <div class="slds-truncate" title="Description">Description</div>
+                                            </th>
+                                            <th scope="col">
+                                                <div class="slds-truncate" title="Serial ID">Serial ID</div>
+                                            </th>
+                                            <th scope="col">
+                                                <div class="slds-truncate" title="Ship To Name">Ship To Name</div>
+                                            </th>
+                                            <th scope="col">
+                                                <div class="slds-truncate" title="Status">Status</div>
+                                            </th>
+                                            <th scope="col">
+                                                <div class="slds-truncate" title="Quantity">Quantity</div>
+                                            </th>
+                                            
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <aura:iteration items="{!v.productList}" var="item">
+                                            <tr>
+                                                <td scope="row">
+                                                    <ui:inputCheckbox text ="" value="{!item.isSelected}" aura:id="chkBoxId"/>
+                                                </td>
+                                                
+                                                <td scope="row">
+                                                    <div class="slds-truncate" title="{!item.Name}"><p style="font-size: 12px;">{!item.Name}</p></div>
+                                                </td>
+                                                <td scope="row">
+                                                    <div class="slds-truncate" title="{!item.Product_ID__c}"><p style="font-size: 12px;">{!item.Product_ID__c}</p></div>
+                                                </td>
+                                                <td scope="row">
+                                                    <div class="slds-truncate" title="{!item.Description__c}"><p style="font-size: 12px;">{!item.Description__c}</p></div>
+                                                </td> 
+                                                <td scope="row">                                                
+                                                    <div class="slds-truncate" title="{!item.Serial_ID__c}"><p style="font-size: 12px;">{!item.Serial_ID__c}</p></div>
+                                                </td>                                       
+                                                <td scope="row">                                                
+                                                    <div class="slds-truncate" title="{!item.Ship_To_Name__c}"><p style="font-size: 12px;">{!item.Ship_To_Name__c}</p></div>
+                                                </td> 
+                                                <td scope="row">                                                
+                                                    <div class="slds-truncate" title="{!item.Status__c}"><p style="font-size: 12px;">{!item.Status__c}</p></div>
+                                                </td> 
+                                                <td scope="row">
+                                                    <div style="width:50px;">
+                                                        <ui:inputNumber value="{!item.quantity}" aura:id="{!item.Id}"/>
+                                                    </div>
+                                                </td> 
+                                                
+                                            </tr>
+                                        </aura:iteration>
+                                    </tbody>
+                                </table> 
+                            </aura:if>
+                            <!--<footer class="slds-card__footer" style="text-align: right;">
+                            <lightning:button variant="brand" 
+                                              label="Add to Quote"
+                                              title="Add to Quote"
+                                              onclick="{!c.saveProducts }"/>
+                        </footer>-->
+                        </article>
+                    </div>
+                </lightning:tab>
+                <aura:iteration items="{!v.mapValues}"  var="mapKey" indexVar="key">
+                    <lightning:tab label="{!mapKey.key}" id="{!mapKey.key}">
+                        <div class="slds-box slds-p-around_none" style="width: 100%; height: 21vh; overflow: auto;">
+                            <article class="slds-card">
+                                <aura:if isTrue="{!!v.isRenewalQuote}">
+                                    
+                                    <table class="slds-table slds-table--bordered slds-table--cell-buffer">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="select"></div>
+                                                </th>
+                                                <!--IBA-2004 start-->
+                                                <th scope="col" id="{!mapKey.key+'prdmap'}" onclick="{!c.sortByProduct}"> Product
+                                                   <!-- <div class="slds-truncate" title="Product">Product</div> -->
+                                                    <span>  
+                                                        <aura:if isTrue="{!v.product}"><lightning:icon iconName="utility:arrowup"  size="xx-small" alternativeText="Indicates approval"/>
+                                                            <aura:set attribute="else">
+                                                                <lightning:icon iconName="utility:arrowdown"  size="xx-small" alternativeText="Indicates approval"/>
+                                                            </aura:set>
+                                                        </aura:if>
+                                                    </span>
+                                                </th>
+                                                <th scope="col" id="{!mapKey.key+'desmap'}" onclick="{!c.sortByProduct}"> Description
+                                                    <!-- <div class="slds-truncate" title="Description">Description</div> -->
+                                                    <span>  
+                                                        <aura:if isTrue="{!v.desc}"><lightning:icon iconName="utility:arrowup"  size="xx-small" alternativeText="Indicates approval"/>
+                                                            <aura:set attribute="else">
+                                                                <lightning:icon iconName="utility:arrowdown"  size="xx-small" alternativeText="Indicates approval"/>
+                                                            </aura:set>
+                                                        </aura:if>
+                                                    </span>
+                                                </th>
+                                                <!--IBA-2004 end-->
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="Price List">Price List</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="Details">Details</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="Quantity">Quantity</div>
+                                                </th>
+                                                
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <aura:iteration items="{!mapKey.value}" var="item">
+                                                <tr>
+                                                    <th scope="row">
+                                                        <ui:inputCheckbox text ="" value="{!item.isSelected}" aura:id="chkBoxId"/>
+                                                    </th>
+                                                    
+                                                    <th scope="row">
+                                                        <div class="slds-truncate" title="{!item.productItem.ProductCode}"><p style="font-size: 12px;">{!item.productItem.ProductCode}</p></div>
+                                                    </th>
+                                                    <th scope="row">
+                                                        <div class="slds-truncate" title="{!item.productItem.Description}"><p style="font-size: 12px;">{!item.productItem.Description}</p></div>
+                                                    </th>
+                                                    <th scope="row">
+                                                        <div class="slds-truncate" title="{!item.priceList}"><p style="font-size: 12px;">{!item.priceList}</p></div>
+                                                    </th>
+                                                    <th scope="row">                                                
+                                                        <div style="font-size: 12px;"> 
+                                                            <lightning:formattedRichText  value="{!item.productItem.sales_text__c}" />                                                                                              
+                                                        </div>                                              
+                                                    </th>
+                                                    <th scope="row">
+                                                        <div style="width:50px;">
+                                                            <ui:inputNumber value="{!item.quantity}" aura:id="{!item.productItem.ProductCode}"/>
+                                                        </div>
+                                                    </th> 
+                                                    
+                                                </tr>
+                                            </aura:iteration>
+                                        </tbody>
+                                    </table>   
+                                </aura:if>
+                                <aura:if isTrue="{!v.isRenewalQuote}">
+                                    <table class="slds-table slds-table--bordered slds-table--cell-buffer">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="select"></div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="C4C Assets Name">C4C Assests Name</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="Product ID">Product ID</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="Description">Description</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="Serial ID">Serial ID</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="Ship To Name">Ship To Name</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="Status">Status</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="Quantity">Quantity</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="Par Location">Par Location</div>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <aura:iteration items="{!v.productList}" var="item">
+                                                <tr>
+                                                    <td scope="row">
+                                                        <ui:inputCheckbox text ="" value="{!item.isSelected}" aura:id="chkBoxId"/>
+                                                    </td>
+                                                    
+                                                    <td scope="row">
+                                                        <div class="slds-truncate" title="{!item.Name}"><p style="font-size: 12px;">{!item.Name}</p></div>
+                                                    </td>
+                                                    <td scope="row">
+                                                        <div class="slds-truncate" title="{!item.Product_ID__c}"><p style="font-size: 12px;">{!item.Product_ID__c}</p></div>
+                                                    </td>
+                                                    <td scope="row">
+                                                        <div class="slds-truncate" title="{!item.Description__c}"><p style="font-size: 12px;">{!item.Description__c}</p></div>
+                                                    </td> 
+                                                    <td scope="row">                                                
+                                                        <div class="slds-truncate" title="{!item.Serial_ID__c}"><p style="font-size: 12px;">{!item.Serial_ID__c}</p></div>
+                                                    </td>                                       
+                                                    <td scope="row">                                                
+                                                        <div class="slds-truncate" title="{!item.Ship_To_Name__c}"><p style="font-size: 12px;">{!item.Ship_To_Name__c}</p></div>
+                                                    </td> 
+                                                    <td scope="row">                                                
+                                                        <div class="slds-truncate" title="{!item.Status__c}"><p style="font-size: 12px;">{!item.Status__c}</p></div>
+                                                    </td> 
+                                                    <td scope="row">
+                                                        <div style="width:50px;">
+                                                            <ui:inputNumber value="{!item.quantity}" aura:id="{!item.Id}"/>
+                                                        </div>
+                                                    </td> 
+                                                    <td scope="row">
+                                                        <div>
+                                                            <ui:inputText value="{!item.parLocation}"/>
+                                                        </div>
+                                                    </td> 
+                                                </tr>
+                                            </aura:iteration>
+                                        </tbody>
+                                    </table> 
+                                </aura:if>
+                                
+                            </article>
+                        </div>
+                    </lightning:tab>
+                </aura:iteration>   
+            </lightning:tabset>
+            <div class="slds-p-left_small">
+                <lightning:button variant="brand" 
+                                  label="Add to Par"
+                                  title="Add to Par"
+                                  onclick="{!c.saveProducts }" class="par"/>
+                <lightning:button variant="brand" 
+                                  label="Add to All Pars"
+                                  title="Add to All Pars" 
+                                  onclick="{!c.saveProductsForAllPar}" class="allPar"/>
+                <lightning:button variant="brand" 
+                                  label="Preview" iconName="utility:image" iconPosition="left"
+                                  title="Preview"
+                                  onclick="{!c.openModel}" class="ImagePreview"/>
+            </div>
+        </lightning:card>
+    <c:ModalComp title="Preview Image" showModal="{!v.isImageModalOpen}" closeModal="{!c.closeModel}">
+        <aura:html tag="style">
+        	.slds-modal__footer{
+        	display:none !important;
+        }
+        </aura:html>
+        <lightning:card class="slds-modal__content">
+            <div>
+                <img src="{!v.imageId}"/>
+            </div>
+        </lightning:card>
+        <!--<div class="slds-col modal-footer">
+            <lightning:button class="slds-float_right" variant="destructive" label="Close" iconPosition="left" iconName="utility:close" title="Close" onclick="{! c.closeModel }" />
+        </div>-->
+    </c:ModalComp>
+    <lightning:card class="quoteLineCardHeight" title="Quote Lines" iconName="standard:quotes">
+        <!--    
+        <div style="width: 50%;float: left;margin-top: -5px;">
+                <ui:inputSelect class="dynamic" aura:id="InputAccountIndustry" change="{!c.onPicklistChange}" /> 
+                <ui:inputSelect class="dynamic space" aura:id="InputAccountIndustry2" change="{!c.onPicklistChangeProd}"/> 
+            </div>
+            -->
+        <div style="width:100%; height: 28vh; overflow: auto;">
+            <table class="slds-table slds-table--bordered slds-table--cell-buffer slds-scrollable_y">
+                <thead>
+                    <tr>
+                        <th scope="col">
+                            <div class="slds-truncate" title="Par Location">
+                                <ui:inputSelect class="dynamic" aura:id="InputAccountIndustry" change="{!c.onPicklistChange}" /> 
+                            </div>
+                        </th>
+                        <th scope="col">
+                            <div class="slds-truncate" title="Product">
+                                <ui:inputSelect class="dynamic space" aura:id="InputAccountIndustry2" change="{!c.onPicklistChangeProd}"/> 
+                            </div>
+                        </th>
+                        <th scope="col">
+                            <div class="slds-truncate" title="Name">Unit Price</div>
+                        </th>   
+                        <th scope="col">
+                            <div class="slds-truncate" title="Name">Serial #</div>
+                        </th> 
+                        <th scope="col">
+                            <div class="slds-truncate" title="Name">Extended Price</div>
+                        </th>   
+                        <th scope="col">
+                            <div class="slds-truncate" title="Quantity">Quantity</div>
+                        </th>
+                        
+                        <th scope="col">
+                            <div class="slds-truncate" title="select"><ui:inputCheckbox text ="" value="" aura:id="chkBoxId"/></div>
+                        </th>
+                    </tr>
+                </thead>
+                
+                <tbody>
+                    <aura:if isTrue="{!not(empty(v.wrapperListQuote))}">
+                        <aura:iteration items="{!v.wrapperListQuote.lstQuoteLine}" var="item">
+                            <c:AddproductForQuoteLines item="{!item}" parList="{!v.parList}"/>
+                        </aura:iteration>
+                    </aura:if>
+                    <aura:if isTrue="{!empty(v.wrapperListQuote)}">
+                        <tr><th scope="row"></th><th scope="row"></th><th scope="row">No Records Found...</th><th scope="row"></th><th scope="row"></th></tr>
+                    </aura:if>
+                </tbody>
+            </table>
+        </div>
+        <aura:if isTrue="{!not(empty(v.wrapperListQuote))}">
+            <div class="slds-p-left_small">
+                <lightning:button variant="brand" 
+                                  label="Delete Selected"
+                                  title="Delete Selected"
+                                  onclick="{!c.deleteMethod }" class="slds-p-left_small parA"/>
+                <lightning:button variant="brand" 
+                                  label="Change Selected"
+                                  title="Change Selected"
+                                  onclick="{!c.updateQuoteLines }" class="allParA"/>
+            </div>
+        </aura:if>
+    </lightning:card>
+</aura:component>

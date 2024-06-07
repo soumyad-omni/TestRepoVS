@@ -1,0 +1,22 @@
+<!--
+  @File Name          : NetValue_compare.cmp
+  @Description        : 
+  @Author             : ChangeMeIn@UserSettingsUnder.SFDoc
+  @Group              : 
+  @Last Modified By   : ChangeMeIn@UserSettingsUnder.SFDoc
+  @Last Modified On   : 26/6/2020, 12:40:09 pm
+  @Modification Log   : 
+  Ver       Date            Author      		    Modification
+  1.0    24/6/2020   ChangeMeIn@UserSettingsUnder.SFDoc     Initial Version
+-->
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickAction" access="global" controller="netValue_compare">
+	<aura:attribute name="qte" type="Quote" />
+    <aura:attribute name="recordError" type = "String" />
+    <aura:attribute name="rendered" type="boolean" default="true"/>
+    <aura:attribute name="flag" type="boolean" default="true"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:renderIf isTrue="{!v.rendered}">
+        		<lightning:button variant="brand" label="Compare Net Value" title="Compare Net Value" onclick="{! c.comp }" />
+    </aura:renderIf>
+        
+</aura:component>

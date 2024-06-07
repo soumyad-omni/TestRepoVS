@@ -1,0 +1,1635 @@
+<apex:page id="OmniCellProductDetail"  controller="OmnicellProductDetailController"  docType="html-5.0" sidebar="false" showHeader="false" standardStylesheets="false" applyHtmlTag="false" >
+     <style>
+        #toastmsg {
+          visibility: hidden;
+          min-width: 250px;
+          margin-left: -125px;
+          background-color: #46B555;
+          color: #fff;
+          text-align: center;
+          border-radius: 2px;
+          padding: 16px;
+          position: fixed;
+          z-index: 1;
+          left: 50%;
+          bottom: 300px;
+          font-size: 17px;
+        }
+        
+        #toastmsg.show {
+          visibility: visible;
+          -webkit-animation: fadein 0.15s, fadeout 0.15s 0.85s;
+          animation: fadein 0.25s, fadeout 0.25s 0.85s;
+        }
+        #bulktoastmsg { <!--IBA-3841 Sourav -->
+          visibility: hidden;
+          min-width: 250px;
+          background-color: #46B555;
+          color: #fff;
+          text-align: center;
+          border-radius: 2px;
+          padding: 16px;
+          position: fixed;
+          z-index: 1;
+          bottom: 300px;
+          font-size: 17px;
+        }
+        
+        #bulktoastmsg.show {<!--IBA-3841 Sourav -->
+          visibility: visible;
+          -webkit-animation: fadein 0.15s, fadeout 0.15s 4.5s;
+          animation: fadein 0.25s, fadeout 0.25s 4.5s;
+        }
+        @-webkit-keyframes fadein {
+          from {bottom: 0; opacity: 0;} 
+          to {bottom: 300px; opacity: 1;}
+        }
+        
+        @keyframes fadein {
+          from {bottom: 0; opacity: 0;}
+          to {bottom: 300px; opacity: 1;}
+        }
+        
+        @-webkit-keyframes fadeout {
+          from {bottom: 300px; opacity: 1;} 
+          to {bottom: 0; opacity: 0;}
+        }
+        
+        @keyframes fadeout {
+          from {bottom: 300px; opacity: 1;}
+          to {bottom: 0; opacity: 0;}
+        }
+        select.input-sm {
+          line-height: 40px;
+        }
+        select.input-sm {
+          height: 40px;
+          line-height: 30px;
+        }
+        .popupInputBox{
+        	border-radius: 4px;
+        	width:120px;
+         	height: 25px;
+         	margin-right: 50px;
+        }
+        .popupInputLabel{
+        	width:120px;
+        	display:inline-block;
+        }
+        .modalbox{
+         	width:700px;
+        }
+        .popupImg{
+        	margin-left:150px;
+        }
+        .popupDrugMM{
+        	border-radius: 4px;
+        	width:100px;
+        	margin-left: 50%;
+         	height: 25px;
+        }
+         
+        
+        
+        
+        .fg--search button {
+          background: transparent;
+          border: none;
+          cursor: pointer;
+          display: inline-block;
+          font-size: 20px;
+          position: absolute;
+          top: 0;
+          right: 0;
+          padding: 18px 20px;
+          z-index: 2;
+        }
+        input[type=search] {
+          width: 100%;
+          padding: 5px 10px;
+          margin: 8px 0;
+          display: inline-block;
+          border: 1px solid #ccc;
+          border-radius: 4px;
+          box-sizing: border-box;
+        }
+        .box {
+          width: 100%;
+          padding: 5px 10px 20px;
+          margin: 8px 0;
+          display: inline-block;
+          border-radius: 4px;
+          box-sizing: border-box;
+        }
+        
+        .paginate_button {
+          padding-right: 4px;
+        }
+        
+        .current {
+          color: black;
+          font-weight: normal;
+          font-size:13px;
+        }
+        
+        table.dataTable thead tr th {font-weight: normal;width: 160px;}
+        table.dataTable tbody tr td {padding: 10px 5px 10px 1px;}
+        .sorting_1{
+        padding-right: 4px;
+        }
+        .paginate_button:hover:not(.active) {background-color: #ddd;}
+        .required:after {
+            content:" *";
+            color: red;
+        }
+     </style>
+ <script src="{!$Resource.dataTableJs}"></script>
+ <script id="ProductDetail-Desktop" type="text/template">
+   {{#checkMinQty this}}{{/checkMinQty}}
+   <div class="panel panel-default product_detail_container product_type_standard phoneProductItem cc_panel cc_product_detail_container cc_product_type_standard">
+    <!-- SCP-474
+    <div class="panel-heading cc_heading">
+     <h3 class="panel-title cc_title">{{this.product.prodBean.name}}</h3>
+    </div>
+    -->
+    <div class="panel-body product_detail cc_body cc_product_detail" >
+     <div class="messagingSection-Error" role="alert" style="display: none"></div>
+     <div class="messagingAction-Info" role="alert" style="display: none">
+      <button type="button" class="close cc_close" data-dismiss="alert" aria-label="{{pageLabelMap 'Modal_Aria_Close'}}"><span aria-hidden="true">&#215;</span></button>
+     </div>
+     <div class="row">
+      <div class="col-md-5">
+       <div class="prod_media cc_prod_media">
+        {{#if this.mediaWrappers.[SVG Interactive Diagram]}}
+         {{#each this.mediaWrappers.[SVG Interactive Diagram]}}
+          <div class="interactive cc_interactive">{{displaySVG this 'mainProdImage prodDetail img-responsive'}}</div>
+         {{/each}}
+        {{/if}}
+        <div id="altImageModal" class="modal fade cc_alt_image_modal" tabindex="-1" role="dialog">
+         <div class="modal-dialog cc_modal-dialg" role="document">
+          <div class="modal-content cc_modal-content">
+           <div class="modal-header cc_modal-header">
+            <button type="button" class="close cc_close" data-dismiss="modal" aria-label="{{pageLabelMap 'Modal_Aria_Close'}}"><span aria-hidden="true">&#215;</span></button>
+            <h4 class="modal-title cc_modal-title" id="myModalLabel"></h4>
+           </div>
+           <div class="modal-body cc_modal-body">
+            <img class="modalImg cc_modal_img" src=""/>
+            <p class="modalText cc_modal_text"></p>
+           </div>
+          </div>
+         </div>
+        </div>
+        {{#if this.product.mediaWrapper }}
+         <div class="cc_product_detail_photo_container" id="photoContainer">
+          <div class="row">
+           <div class="col-md-12">
+            <div class="cc_main_prod_image">{{displayImage this.product.mediaWrapper 'mainProdImage prodDetail img-responsive'}}</div>
+           </div>
+          </div>
+          {{#if this.mediaWrappers.[Alternate Images]}}
+           <div class="row">
+            {{#each this.mediaWrappers.[Product Image]}}
+             <div class="col-xs-3">
+              <img class="alternate cc_alternate img-responsive thumbnail" src="{{productImage this}}" data-id="{{this.uri}}"/>
+             </div>
+            {{/each}}
+            {{#each this.mediaWrappers.[Alternate Images]}}
+             <div class="col-xs-3">
+              <img class="alternate cc_alternate img-responsive thumbnail" src="{{productImage this}}" data-id="{{this.uri}}"/>
+             </div>
+            {{/each}}
+           </div>
+          {{/if}}
+         </div>
+        {{else}}
+         {{#if this.mediaWrappers.[SVG Interactive Diagram]}}
+         {{else}}
+          <div class="cc_product_detail_photo_container" id="photoContainer">
+           <div class="row">
+            <div class="col-md-12">
+             <div class="cc_main_prod_image img-responsive">{{displayImage this.product.mediaWrapper 'mainProdImage prodDetail'}}</div>
+            </div>
+           </div>
+          </div>
+         {{/if}}
+        {{/if}}
+       </div>
+      </div>
+      <div class="col-md-7">
+       <div class="product_detail_item wishFinder cc_wish_finder" data-sku="{{this.product.prodBean.sku}}">
+
+        <h4 class="product_title cc_product_title">{{this.product.prodBean.name}}</h4>
+        {{#ifDisplay 'PD.DsplSku'}}
+         <div class="sku cc_sku">
+          <span class="cc_label">{{pageLabelMap 'ProductDetailsInc_SKU'}}</span>
+          <span class="value cc_value">{{this.product.prodBean.sku}}</span>
+         </div>
+        {{/ifDisplay}}
+        {{#ifDisplay 'PD.DsplUOM'}}
+         <div class="uom cc_uom">
+          <span class="cc_label">{{pageLabelMap 'ProductDetails_UnitOfMeasure'}}</span>
+          <span class="value cc_value">{{pageLabelPrefixMap 'UOM_' this.product.prodBean.UnitOfMeasure}}</span>
+         </div>
+        {{/ifDisplay}}
+        {{#ifDisplay 'PD.DsplAvlb'}}
+         <div class="inventory cc_inventory">
+          <span class="cc_label">{{pageLabelMap 'ProductDetails_Availability'}}</span>
+          {{#ifStoreSetting 'InventoryCheckFlag__c'}}
+           <span class="value cc_value">{{{this.product.inventory}}}</span>
+          {{else}}
+           <span class="value cc_value">{{{pageLabelMap this.product.availMsg}}}</span>
+          {{/ifStoreSetting}}
+         </div>
+        {{/ifDisplay}}
+        {{#ifDisplay 'PR.Enabled'}}
+         <div id="avgRating" class="rateit cc_rateit" data-rateit-value="{{this.product.avgRating}}" data-rateit-ispreset="true" data-rateit-readonly="true">
+          <span class="cc_label">{{pageLabelMap 'NumberofReviews' this.numberOfReviews }}</span>
+         </div>
+        {{/ifDisplay}}
+        {{#ifDisplay 'PD.DsplSDesc'}}
+         <div class="shortDesc cc_short_desc">
+          <p class="pblock cc_pblock">{{{this.product.prodBean.shortDesc}}}</p>
+         </div>
+        {{/ifDisplay}}
+        <hr>
+        <div class="row">
+         <div class="col-md-12">
+          {{#if this.product.showPricing}}
+           {{#ifDisplay 'PD.DsplPrc'}}
+            {{#if this.product.price}}
+             <div class="price_block cc_price_block">
+              {{#ifDisplay 'PD.DsplListPrc'}}
+               {{#if this.product.basePrice}}
+                <p class="baseprice cc_baseprice">
+                 <span class="cc_label">{{pageLabelMap 'ProductDetails_ListPrice'}}</span>
+                 <span class="value cc_value">{{price this.product.basePrice}}</span>
+                </p>
+               {{/if}}
+              {{/ifDisplay}}
+               <p class="price cc_price">
+                <span class="cc_label">{{pageLabelMap 'Price'}}</span>
+                <span class="value cc_value cc_price{{product.prodBean.id}}">
+                {{#if this.highAttrPrice}}
+                 {{#ifEquals this.lowAttrPrice this.highAttrPrice}}
+                  {{price this.lowAttrPrice}}
+                 {{else}}
+                 {{price this.lowAttrPrice}} - {{price this.highAttrPrice}}
+                 {{/ifEquals}}
+                {{else}}
+                 {{price this.product.price}}
+                {{/if}}
+                </span>
+               </p>
+               <p class="cc_sold_by">
+                {{#if this.product.sellerID}}
+                 <span class="soldbylabel cc_sold_by_label">{{pageLabelMap 'Prod_SoldBy'}}</span>
+                 <span class="soldbyname cc_sold_by_name">{{pdp-seller-field 'sfdcName' this.product.sellerID this.sellers}}</span>
+                {{/if}}
+               </p>
+              {{#ifDisplay 'PD.DsplSvPrc'}}
+              {{#if this.product.savings}}
+               <p class="savings">
+                <span class="cc_label">{{pageLabelMap 'YouSave'}}</span>
+                <span class="value cc_value">{{price this.product.savings}}</span>
+               </p>
+              {{/if}}
+              {{/ifDisplay}}
+              {{#if this.isTierPriced}}
+              <div class="cc_prt_tool_tip_div cc_prt_tool_tip_div_pdp">
+               <span class="cc_prt_tool_tip_text cc_prt_tool_tip_text_pdp" data-toggle="tooltip" title="{{pageLabelMap 'ProductPricingTiers_VolumeHover'}}">
+                {{pageLabelMap 'ProductPricingTiers_VolumePricing'}}
+               </span>
+              </div>
+              {{/if}}
+             </div>
+             <hr>
+            {{/if}}
+           {{/ifDisplay}}
+          {{/if}}
+         </div>
+        </div>
+
+        {{#if this.product.canAddtoCart}}
+         {{#ifDisplay 'pd.tiersassec'}}
+         {{else}}
+          <div class="cc_product_pricing_tiers{{this.product.prodBean.sfid}}"></div>
+         {{/ifDisplay}}
+
+         {{#unless this.primaryAttr}}
+                                    {{#ifDisplay 'PD.dspladdcart'}}
+                                        <div class="quantity_block gp_quantity_block cc_quantity_block">
+                                            {{#if this.product.qtySkipIncrement}}
+                                                <div class="row cc_qty_control_row">
+                                                    <div class="col-md-10 col-md-offset-2">
+                                                        <div class="form-group">
+                                                            <div class="input-group cc_input_group">
+                                                                <span class="input-group-btn cc_input_group_btn">
+                                                                    <input type="button" value="{{pageLabelMap 'Prod_QtyDecrFF'}}" class="btn btn-default btn-sm minusFF cc_minusff">
+                                                                    <input type="button" value="{{pageLabelMap 'Prod_QtyDecrSingle'}}" class="btn btn-default btn-sm minus cc_minus">
+                                                                </span>
+                                                                <input type="text" readonly="true" name="qty" value="0" class="entry form-control input-sm cc_entry" maxlength="7" />
+                                                                <span class="input-group-btn cc_input_group_btn">
+                                                                    <input type="button" value="{{pageLabelMap 'Prod_QtyIncrSingle'}}" class="btn btn-default btn-sm plus cc_plus">
+                                                                    <input type="button" value="{{pageLabelMap 'Prod_QtyIncrFF'}}" class="btn btn-default btn-sm plusFF cc_plusff">
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            {{else}}
+                                                {{#ifEquals this.product.qtySingleIncrement 1}}
+                                                    <div class="row cc_qty_control_row">
+                                                        <div class="col-md-6 col-md-offset-6">
+                                                            <div class="form-group">
+                                                                <div class="input-group cc_input_group">
+                                                                    <span class="input-group-btn cc_input_group_btn">
+                                                                        <input type="button" value="{{pageLabelMap 'Prod_QtyDecrSingle'}}" class="btn btn-default btn-sm minus cc_minus">
+                                                                    </span>
+                                                                    <input id="qty{{index}}" name="quickadd[{{index}}].qty" value="0" class="qty entry form-control input-sm cc_entry" maxlength="7" />
+                                                                    <span class="input-group-btn cc_input_group_btn">
+                                                                        <input type="button" value="{{pageLabelMap 'Prod_QtyIncrSingle'}}" class="btn btn-default btn-sm plus cc_plus">
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                {{else}}
+                                                    <div class="row cc_qty_control_row">
+                                                        <div class="col-md-12">
+                                                            <div class="form-horizontal">
+                                                                <div class="form-group">
+<!-- POC STARTS ------------------------------------------------------------------------------------------- 
+    													        {{#ifEquals this.product.prodBean.name 'Canisters'}}
+                                                                    <div class="col-sm-7">
+    																	<label for="reqtyp" class="control-label" style="text-align:right">Request Type</label>
+                                                                        <select id="reqtyp" name="reqtyp" value="Calibration" class="form-control" maxlength="20">
+                                                                           	<option value="Calibration">Calibration</option>
+                                                                        	<option value="Recalibration">Re-calibration</option>
+                                                                        	<option value="Repair">Repair</option>
+                                                                        </select>
+                                                                    
+    																	<label for="machine" class="control-label" style="text-align:right">Machine</label>
+                                                                            <select id="machine" name="machine" value="              " onfocus="loadMachineOptions()" class="form-control" maxlength="20" /></select>
+                                                                    
+	    																<label for="ndc" class="control-label" style="text-align:right">NDC</label>
+                                                                            <select id="ndc" name="ndc" value="" onfocus="loadNDCOptions()" class="form-control" maxlength="20" /></select>
+
+                                                                    </div>
+                                                                    <br>
+                                                                {{/ifEquals}}
+-- POC ENDS --------------------------------------------------------------------------------------------------------- -->
+
+                                                                    <div class="col-sm-7">
+	                                                                    <label for="qty" class="col-sm-7 control-label cc_qty">{{pageLabelMap 'Qty'}}</label>
+                                                                        <input type="text" id="qty" name="qty" onKeyUp="checkProductQuantity()" value="1" class="input-text entry plus_minus cc_entry form-control" maxlength="7" /><!-- IBA-4282 -->       
+                                                                        <br/><span id="qtyError" style="color:red"><B>{{this.title}}</B></span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                {{/ifEquals}}
+                                            {{/if}}
+                                            <input type="hidden" name="qtyIncrement" value="{{this.product.qtySingleIncrement}}" class="item_qtyIncrement cc_item_qty_increment" />
+                                            <input type="hidden" name="qtySkipIncrement" value="{{this.product.qtySkipIncrement}}" class="item_qtySkipIncrement cc_item_qty_skip_increment" />
+                                        </div>
+                                    {{/ifDisplay }}
+         {{#unless this.showNewSubscriptionSelection}}
+          {{#if this.product.prodBean.showSubscriptionSelection}}
+           <div class="row">
+            <div class="col-md-12">
+             <div class="cc_subscription_selection_div">
+              <p class="subscription_selection cc_subscription_selection">
+               <span class="subscriptionLabel cc_subscription_label">{{pageLabelMap 'Subscribe_And_Save_Label'}}</span>
+               <select class="subscriptionFrequencySelection cc_subscription_frequency_selection" data-subscription="{{this.product.prodBean.sku}}">
+                {{#each this.product.prodBean.subscriptionFrequencies}}
+                 <option value="{{safeQuote this}}">{{pageLabelMapMultiString 'Subscribe_And_Save_' this}}</option>
+                {{/each}}
+               </select>
+              </p>
+             </div>
+            </div>
+           </div>
+          {{/if}}
+                                        {{#ifDisplay 'PD.dspladdcart'}}
+                                            <div class="row">
+                                                <div class="col-md-10 col-md-offset-2">
+                                                    <div class="wishButtons plus_minus cc_plus_minus pull-right"></div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-8 col-md-offset-4">
+                                                   <!-- added as part of SCP -787 -->
+                                                    <div style="display:{!ShowCuserAccess}"  class="action cc_action">
+                                                                     {{#if this.disableAddToCart}}
+                                                                        <button Id="addToCartButton" disabled="disabled" type="button" class="btn btn-default btn-sm addItem cc_add_item pull-right" title="" data-sku="{{this.product.prodBean.sku}}" data-seller="{{this.product.sellerID}}">{{pageLabelMap 'Component_MiniwishList_AddToCart'}}</button>
+                                                                     {{else}}
+                                                                         <button Id="addToCartButton2"  type="button" class="btn btn-default btn-sm cc_add_item pull-right" onClick="checkCartItemcount()" title="" data-sku="{{this.product.prodBean.sku}}" data-seller="{{this.product.sellerID}}">{{pageLabelMap 'Component_MiniwishList_AddToCart'}}</button><!--IBA-3840 -->
+                                                                         <button Id="addToCartButton" style="display:none" type="button" class="btn btn-default btn-sm addItem cc_add_item pull-right " title="" data-sku="{{this.product.prodBean.sku}}" data-seller="{{this.product.sellerID}}">{{pageLabelMap 'Component_MiniwishList_AddToCart'}}</button><!--IBA-3840 -->
+                                                                     {{/if}}
+
+                                                    </div>
+                                                    <!-- added as part of SCP -787 -->
+                                                     <div style="display:{!HideCuserAccess}" class="action cc_action">
+                                                                        <button Id="addToCartButton" disabled="disabled" type="button" class="btn btn-default btn-sm addItem cc_add_item pull-right" title="" data-sku="{{this.product.prodBean.sku}}" data-seller="{{this.product.sellerID}}">{{pageLabelMap 'Component_MiniwishList_AddToCart'}}</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {{/ifDisplay}}
+         {{/unless}}
+         {{/unless}}
+        {{/if}}
+       </div>
+      </div>
+     </div>
+     {{#if this.primaryAttr}}
+      <div class="row">
+       <div class="col-md-12">
+        <div class="cc_product_attributes"></div>
+       </div>
+      </div>
+      <div class="row">
+       <div class="col-md-12">
+        <div class="cc_product_attributes_batch_header" > <!--hidden PacMed Sourav -->
+        </div>
+       </div>
+      </div>
+<!-- POC STARTS ------------------------------------------------------------------------------------------- --
+    													        {{#ifEquals this.product.prodBean.name 'Cassettes'}}
+                                                                    <div class="col-sm-7">
+    																	<label for="reqtyp" class="control-label" style="text-align:right">Request Type</label>
+                                                                        <select id="reqtyp" name="reqtyp" value="Calibration" class="form-control" maxlength="20">
+                                                                           	<option value="Calibration">Calibration</option>
+                                                                        	<option value="Recalibration">Re-calibration</option>
+                                                                        	<option value="Repair">Repair</option>
+                                                                        </select>
+                                                                    
+    																	<label for="machine" class="control-label" style="text-align:right">Machine</label>
+                                                                            <select id="machine" name="machine" value="              " onfocus="loadMachineOptions()" class="form-control" maxlength="20" /></select>
+                                                                    
+	    																<label for="ndc" class="control-label" style="text-align:right">Do not see your NDC? Select from below</label>
+                                                                            <select id="ndc" name="ndc" value="              " onfocus="loadNDCOptions()" onchange="processAttributes()" class="form-control" maxlength="20" /></select>
+
+                                                                    </div>
+                                                                    <br>
+                                                                {{/ifEquals}}
+                                                                            
+-- POC ENDS --------------------------------------------------------------------------------------------------------- -->	
+     {{/if}}
+     <div class="row">
+      <div class="col-md-7 col-md-offset-5">
+       {{#if this.showNewSubscriptionSelection}}
+        {{#if this.product.canAddtoCart}}
+         <div class="cc_subscription_selection_div">
+          <h4>{{pageLabelMap 'Subscribe_And_Save_Label'}}</h4>
+          {{#each this.subProdTerms}}
+           {{#if this.CC_NO_SUBSCRIPTION}}
+            <div class="cc_item_container">
+             <div class="radio cc_radio">
+              <label class="cc_radio_name">
+               <input value="nosuboption" data-nme="nosuboption" type="radio" name="subOptionGuider{{this.productSKU}}" {{this.checked}}/>
+               {{pageLabelMap 'Prod_NoSubscriptionOption' (price this.productPrice)}}</label>
+             </div>
+            </div>
+           {{else}}
+            <div class="cc_item_container">
+             <div class="radio cc_radio">
+              <label class="cc_radio_name">
+               <input value="{{this.sfid}}" data-nme="{{this.name}}" type="radio" name="subOptionGuider{{this.productSKU}}" {{this.checked}}/>
+               {{#if this.modifierSubscriptions}}
+                {{insertTokens this.pdpDisplayName this.displayName (price this.productPrice) (price this.subscriptionPrice) (pageLabelPrefixMap 'Subscriptions_Frequency_' this.orderFrequencyUOM) (pageLabelPrefixMap 'Subscriptions_Frequency_' this.installmentFrequencyUOM) this.orderFrequency this.installmentFrequency this.installmentCount this.orderCount (price this.modifierSubscriptions.[0].productPrice) (price this.modifierSubscriptions.[0].subscriptionPrice) this.modifierSubscriptions.[0].orderCount this.modifierSubscriptions.[0].installmentCount}}
+               {{else}}
+                {{insertTokens this.pdpDisplayName this.displayName (price this.productPrice) (price this.subscriptionPrice) (pageLabelPrefixMap 'Subscriptions_Frequency_' this.orderFrequencyUOM) (pageLabelPrefixMap 'Subscriptions_Frequency_' this.installmentFrequencyUOM) this.orderFrequency this.installmentFrequency this.installmentCount this.orderCount}}
+               {{/if}}
+              </label>
+             </div>
+            </div>
+           {{/if}}
+          {{/each}}
+          <div class="action pull-right cc_action" >
+           {{#ifDisplay 'PD.dspladdcart'}}
+            <button type="button" class="btn btn-default btn-sm addItem cc_add_item" data-sku="{{this.product.prodBean.sku}}">{{pageLabelMap 'Component_MiniwishList_AddToCart'}}</button>
+           {{/ifDisplay}}
+          </div>
+         </div>
+        {{/if}}
+       {{/if}}
+      </div>
+     </div>
+    </div>
+   </div>
+   <div class="tabSection"></div>
+   <div class="widgetSection"></div>
+  </script>
+
+ <script>
+    var minimumQuantity = 0;
+    Handlebars.registerHelper("checkMinQty", function(currentObj,options) { 
+            debugger;
+            minimumQuantity = this.product.prodBean.minimumQuantity;
+            if(this.product.prodBean.minimumQuantity !== 'undefined' && this.product.prodBean.minimumQuantity  != null && this.product.prodBean.minimumQuantity > 1){
+               this.disableAddToCart = true;
+               this.title = 'Minimum Quantity is '+this.product.prodBean.minimumQuantity;
+            }else{
+                this.disableAddToCart = false;
+                this.title = ' ';
+            }
+            return options.fn(this);  
+    });
+
+    function checkProductQuantity(sfid){
+      debugger;
+      var qtyVal = $("#qty").val();
+      if(qtyVal === "" && minimumQuantity !== 'undefined' && minimumQuantity  != null && minimumQuantity > 0){
+          $("#addToCartButton").prop('disabled', true);
+          $("#qtyError").html('<B>Minimum Quantity is '+minimumQuantity+'</B>');
+      }
+      else if(minimumQuantity !== 'undefined' && minimumQuantity  != null && minimumQuantity > 0 && minimumQuantity > parseInt(qtyVal )){
+         $("#addToCartButton").prop('disabled', true);
+          $("#qtyError").html('<B>Minimum Quantity is '+minimumQuantity+'</B>');
+      }else{
+         $("#addToCartButton").prop('disabled', false);
+         $("#qtyError").html('<br/>');
+      }
+<!-- Remove code IBA-3840 -->
+
+    } 
+
+    function processAttributes(){
+        var ndcVal = $("#ndc").val();
+        window.location.reload();	
+    }
+    
+	function loadMachineOptions (sfid){
+        
+	}
+
+	function loadNDCOptions (sfid){
+        
+
+	}
+
+
+    
+<!-- ------------------------------------------------------------------- POC ENDS -------------------------------->    
+
+</script>
+        <!--    ----------------------------- POC BEGINS ----------------------------- -->
+    <script id="ProductDetail-ProductAttributes-Desktop" type="text/template">
+    	 <!-- Drug Code Pop-up Start-->
+    	 <div id="addDrugCode" class="modal fade" tabindex="-1">
+         	<div class="modal-dialog modalbox">
+            	<div class="modal-content">
+                	<div class="modal-header">
+                    	<h5 class="modal-title heading">Add New Drug Code</h5>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        	<table>
+                        		<td style="padding:8px;">
+                                    <label for="drugNumber" class="popupInputLabel required">UPC Number (exact 13 characters):</label>
+                                    <input type="text" class="popupInputBox" name="DrugNumber" id="drugNumber" value="" onChange="checkValidationPopUp()" maxlength="13"/>
+                                	<br /><br />
+                                    <label for="drugName" class="popupInputLabel required">Drug Name: </label>
+                                    <input type="text" class="popupInputBox" name="DrugName" id="drugName" value="" onChange="checkValidationPopUp()"/>
+                                    <br /><br />
+                                    <label for="drugStrength" class="popupInputLabel required">Strength: </label>
+                                    <input type="text" class="popupInputBox" name="Strength" id="drugStrength" value="" onChange="checkValidationPopUp()"/>
+                                    <br /><br />
+                                    <label for="drugUnit" class="popupInputLabel required">Unit: </label>
+                                    <select name="Unit" id="drugUnit" class="popupInputBox" onChange="checkValidationPopUp()">
+                                    </select>
+                                    <br/><br/>
+                                    <label for="drugManufacturer" class="popupInputLabel required">Manufacturer: </label>
+                                    <input type="text" class="popupInputBox" name="Manufacturer" id="drugManufacturer" value="" onChange="checkValidationPopUp()"/>
+                                    <br /><br />
+                                    <label for="drugBrand" class="popupInputLabel required">Brand Name: </label>
+                                    <input type="text" class="popupInputBox" name="Brand" id="drugBrand" value="" onChange="checkValidationPopUp()"/>
+                                    <!--<br /><br />
+                                    <label for="drugPillForm" class="popupInputLabel required">Pill Form: </label>
+                                    <select name="PillForm" id="drugPillForm" class="popupInputBox" onChange="checkValidationPopUp()">
+                                        </select>-->
+                                    <br/><br/>
+                        		</td>
+                                <td style="padding:8px;"> 
+                                    <label style="font-weight: 500;margin-left: 50px;">Dimensions (medication measurements in MM): </label>
+                                    <br/>
+									<img class="popupImg" src="{!$Resource.PacMedwidth_1}" alt="Width#1" width="30" height="60">
+                                    <label >Width #1</label>
+                                    <br/>
+                                    <input type="text" id="width1" class="popupDrugMM"/>
+                                    <br/>
+                                    <img class="popupImg" src="{!$Resource.PacMedThickness_1}" alt="Width#1" width="32" height="60">
+                                    <label >Thickness #1</label>
+                                    <br/>
+                                    <input type="text" id="thickness1" class="popupDrugMM"/>
+                                    <br/>
+                                    <img class="popupImg" src="{!$Resource.PacMedwidth_2}" alt="Width#1" width="25" height="60">
+                                    <label >Width #2</label>
+                                    <br/>
+                                    <input type="text" id="width2" class="popupDrugMM"/>
+                                    <br/>
+                                    <img class="popupImg" src="{!$Resource.PacMedLength}" alt="Width#1" width="30" height="60">
+                                    <label>Length</label>
+                                    <br/>
+                                    <input type="text" id="length" class="popupDrugMM"/>
+                                    <br/>
+                                    <img class="popupImg" src="{!$Resource.PacMedThickness_2}" alt="Width#1" width="24" height="60">
+                                    <label >Thickness #2</label>
+                                    <br/>
+                                    <input type="text" id="thickness2" class="popupDrugMM"/> 
+                                    <br/>
+                                </td>
+                        	</table>
+                        <div>	
+                                <div class="col-md-2">
+                                	<span>Operation</span>
+                                	<p id="productpopup"></p>
+                                </div>
+                          		<div class="col-md-2">
+                                	<span>Machine</span>
+                                    <p id="machinepopup2"></p>
+                                    <select name="Machine" id="machinepopup" style="width:70px;display:none;">
+                                        <option value="" selected="selected">Machine</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <span class="required">Type</span>
+                                    <select name="Type" id="typepopup" style="width:60px" onChange="checkValidationPopUp()">
+                                        <option value="" selected="selected">Type</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <span>Quantity</span>
+                                    <input type="text" name="Quantity" id="quantitypopup" value="1" style="width:30px"></input>
+                                </div>
+                                <div class="col-md-3">
+                                    <span>Price</span>
+                                    <p id="pricepopup"></p>
+                                </div>
+                    	</div></br></br></br>
+						<div>
+                             	<p id="freeInfo" />  
+						</div>
+                        <div></br></div>
+                    </div>
+                    <div class="modal-footer">
+                        Button will be enabled when all mandatory fields marked with an <span style="color:Red;">*</span> are filled in. Including the Type.                                                                          
+                        <button type="button" class="btn btn-primary buttondisabledpopup" name="AddToCart" id="addToCart" onclick="insertDrugCode()">Add To Cart</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Drug Code Pop-up End-->
+		<!-- Custom Drug Search Pop-up Start-->
+		<div id="selectDrugCode" class="modal fade" tabindex="-1">
+            <div class="modal-dialog modalbox" style="width:1000px;">
+                <div class="modal-content">
+                    <div class="modal-header">
+                    	<h5 class="modal-title heading">Select Drug</h5>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <table id="AllDrugCodeTable" class="display" width="100%">
+                            <colgroup>
+                               <col style="width: 25%;padding-right:5px;">
+                               <col style="width: 30%;padding-right:5px;">
+                               <col style="width: 20%;padding-right:5px;">
+                               <col style="width: 15%;padding-right:5px;">
+                               <col style="width: 10%;padding-right:5px;">                                                                    
+                            </colgroup>    
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <!--<button type="button" class="btn btn-primary" name="SelectDrug" id="selectDrug" onclick="">Select</button>-->
+                    </div>
+                </div>
+            </div>
+        </div>	    
+        <!-- Custom Drug Search Pop-up End-->
+    	<div id="toastmsg">Item added sucessfully</div><!-- Added By Sourav Start -->
+		<div id="bulktoastmsg">Items are being loaded to the Cart. You will get notified once the cart is ready to use. Please do not add any Item</div><!-- IBA-3841 Sourav-->
+        <div id="custAttr">
+            <div class="row" >
+                <div class="col-md-3">
+                    <span>Machine</span>
+                    <select name="Machine" id="machine" class="form-control input-sm">
+                        <option value="" selected="selected">Select Machine</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <span>Type</span>
+                    <select name="Type" id="type" class="form-control input-sm ">
+                        <option value="" selected="selected">Select Type</option>
+                    </select>
+                </div>
+                <div class="col-md-3"><!--class="col-md-4" -->
+                    <span>Drug Code</span>
+                    <i class="fa fa-search" style="left: 180px;top:32px;position: absolute;cursor: pointer;" onClick="selectDrugCode()"></i>
+                    <input type="text" name="DrugCode" id="drugCode" class="form-control input-sm input" list="NDCListNew" onchange="checkValidation()"></input>
+					<datalist id="NDCListNew"> 
+                          <option id="drgOption" value="{{displayName}}" style="width:1000px">{{{displayName}}}</option> 
+                    </datalist>  
+                </div>
+				<!--<div class="col-md-1">
+                      <i class="fa fa-search" onClick="selectDrugCode()"></i>
+				</div>-->
+                <div class="col-md-3">
+                    <span>Quantity</span>
+                    <input type="text" name="Quantity" id="quantity" class="form-control input-sm" value="1" onchange="checkValidation()"></input>
+                </div>
+                <div class="col-md-3">
+                    <span>Price</span>
+                    <p id="price"></p>
+                </div>
+            </div> 
+            <div class="row">
+             	<div class="col-md-6">
+                 	<p id="freeCalibration"></p>
+             	</div>
+             	<div class="col-md-6">
+               		<button class="btn btn-default btn-sm pull-right buttondisabled" onclick="upsertItem()">Add To Cart</button>
+             	</div>
+            </div>
+            </br>
+            <div class="row">
+                 <div class="col-md-9">
+                     <p> Don't see your Drug Code? Please click on this button to add the drug code to the system.</p>
+                 </div>
+                 <div class="col-md-3">
+                   <button class="btn btn-default btn-sm pull-right addDrgbuttondisabled" onclick="addDrugCode()">Add Drug Code</button>
+                 </div>
+            </div>
+            </br>
+            <div class="row">
+                <div class="col-md-12">
+                    <p> Don't see your Machine? Please let your Customer Service Representative know. They will set up the data for you.</p>
+                </div>
+            </div>
+            </br>
+            <div class="row">
+                 <div class="col-md-10">
+                   <a href="{!$Resource.Canister_Cassette_BulkUpload}" download>Upload an order in Bulk(sample file)</a>
+                   <input id="fileUpload" type="file" name="fileName" class="pull-right"/>
+                </div>
+                 <div class="col-md-2">
+                       <button class="btn btn-default btn-sm pull-right bulkbuttondisabled" onClick="Upload()">Upload Order in Bulk</button>
+                 </div>
+            </div>
+        </div><!-- Added By Sourav End -->
+        <div id="stdAttr" style="display:none">      
+            <div class="gp_attr cc_prod_attr">
+                <div class="row cc_attr_row">
+                 {{#each attr}}
+                  {{#each .}}
+                   <div class="col-md-3 cc_attr">
+                    <span class="cc_attr_name">
+                     {{{@key}}}
+                    </span>
+                    <select id="cc_attr_{{@key}}" class="form-control input-sm cc_attr_{{@key}} gp_attr_select">
+                     {{#each this}}
+                      <option class="cc_attr_value" value="{{displayName}}" data-id="{{sfid}}" data-attr="{{parentAttribute}}-{{attributeID}}">{{{displayName}}}</option>
+                     {{/each}}
+                    </select>
+                   </div>
+                  {{/each}}
+                 {{/each}}
+                 <div class="col-md-3 cc_prod_attr_qty">
+                  {{#ifDisplay 'PD.dspladdcart'}}
+                   <span class="cc_attr_qty cc_qty">{{pageLabelMap 'ProductAttributes_Quantity'}}</span>
+                   <input type="text" class="form-control entry input-sm gp_attr_qty" value="1"/>
+                  {{/ifDisplay}}
+                 </div>
+                 <div class="col-md-3 cc_prod_attr_price">
+                  <span class="cc_attr_price cc_price_label">{{pageLabelMap 'ProductAttributes_Price'}}</span>
+                  <p class="gp_attribute_price"></p>
+                 </div>
+                </div>
+                <div class="row cc_prod_attr_warning">
+                 <div class="col-md-6">
+                  <p class="cc_add_to_batch_warning">
+                   {{pageLabelMap 'ProductAttributes_Warning'}}
+                  </p>
+                 </div>
+                 <div class="col-md-6">
+                  {{#ifDisplay 'PD.dspladdcart'}}
+                   <button class="btn btn-default btn-sm pull-right gp_addToBatch cc_add_to_batch">{{pageLabelMap 'ProductAttributes_AddToBatch'}}</button>
+                  {{/ifDisplay}}
+                 </div>
+                </div>
+               </div>
+        </div>
+	</script>
+    <script><!-- added by Sourav -->
+    	function checkValidation(){
+            if($("#machine").val() == null || $("#machine").val() == ''){
+                $('.buttondisabled').prop("disabled", true);
+            }
+            else if($("#type").val() == null || $("#type").val() == ''){
+                $('.buttondisabled').prop("disabled", true);
+            }
+            else if($("#quantity").val() < 1){
+                 $('.buttondisabled').prop("disabled", true);
+            } 
+            else {
+                  if($("#drugCode").val() == null || $("#drugCode").val() == ''){
+                      $('.buttondisabled').prop("disabled", true);
+                  } else {
+                  	  $('.buttondisabled').prop("disabled", false);
+                  }
+              }
+              var product = CCRZ.productDetailModel.get('product');
+              
+        }
+    	function checkValidationPopUp(){
+            if($("#drugNumber").val() == null || $("#drugNumber").val() == ''){
+            	$('.buttondisabledpopup').prop("disabled", true);
+            }
+            else if($("#drugNumber").val().length  != 13){
+                alert("UPC Number should be exact 13 characters");
+            	$('.buttondisabledpopup').prop("disabled", true);
+            }
+            else if($("#drugName").val() == null || $("#drugName").val() == ''){
+            	$('.buttondisabledpopup').prop("disabled", true);
+            }
+            else if($("#drugUnit").val() == null || $("#drugUnit").val() == ''){
+            	$('.buttondisabledpopup').prop("disabled", true);
+            }
+            else if($("#drugStrength").val() == null || $("#drugStrength").val() == ''){
+            	$('.buttondisabledpopup').prop("disabled", true);
+            }
+            else if($("#drugManufacturer").val() == null || $("#drugManufacturer").val() == ''){
+            	$('.buttondisabledpopup').prop("disabled", true);
+            }
+            else if($("#drugBrand").val() == null || $("#drugBrand").val() == ''){
+            	$('.buttondisabledpopup').prop("disabled", true);
+            }
+            else if($("#typepopup").val() == null || $("#typepopup").val() == ''){
+                //alert("drugManufacturer");
+            	$('.buttondisabledpopup').prop("disabled", true);
+            }
+            else{
+                $('.buttondisabledpopup').prop("disabled", false);
+            }
+        }
+    	function upsertItem(){
+            var drgCheck = false;
+                $('.buttondisabled').prop("disabled", true);
+            	var qtyLimit = {!$Label.SCP_Add_To_Cart_Validation};//IBA-3840
+                var prodAttribute = {};
+                var product = CCRZ.productDetailModel.get('product');
+                prodAttribute.machine = $("#machine").val();
+                prodAttribute.type = $("#type").val();
+                prodAttribute.drugCode = $("#drugCode").val();
+                prodAttribute.quantity = $("#quantity").val();
+                prodAttribute.SKU = product.prodBean.SKU;
+            	if(CCRZ.cartView.cartmodel.attributes.numberofAllCartItems != 0 && (CCRZ.cartView.cartmodel.attributes.numberofAllCartItems+1 >qtyLimit)){//IBA-3840
+                    alert("You can add upto "+qtyLimit+" items in a single Cart.");
+                }
+                else{
+                    OmnicellProductDetailController.upsertCartItem(
+                        CCRZ.pagevars.remoteContext,JSON.stringify(prodAttribute),
+                        function(response) {
+                           if (response) {
+                                if(response.success) {
+                                    if(typeof response.data.status !== 'undefined'){
+                                        if(response.data.status == 'successfull'){
+                                            var x = document.getElementById("toastmsg");
+                                            x.className = "show";
+                                            setTimeout(function(){ x.className = x.className.replace("show", ""); }, 1000);
+                                            $('#drugCode').val('');
+                                            var cartId = CCRZ.pagevars.currentCartID;
+                                            CCRZ.pubSub.trigger('cartChange', cartId);
+                                            $('.buttondisabled').prop("disabled", false);
+                                        }
+                                        else{
+                                            console.log('Response If');
+                                            alert("Please check the NDC, The NDC you have entered is not valid");
+                                            $('.buttondisabled').prop("disabled", false);
+                                        }
+                                        
+                                    }
+                                    
+                                }
+                                else{
+                                    console.log('Response Else');
+                                    alert("Please check the NDC, The NDC you have entered is not valid");
+                                    $('.buttondisabled').prop("disabled", false);
+                                }
+                            }
+                        });
+                }
+            
+        }
+    	function insertDrugCode(){
+            $('.buttondisabledpopup').prop("disabled", false);
+            var drugDetails = {};
+            drugDetails.name = $("#drugName").val();
+            drugDetails.number = $("#drugNumber").val();
+            drugDetails.strength = $("#drugStrength").val();
+            drugDetails.manufacturer = $("#drugManufacturer").val();
+            drugDetails.drugBrand = $("#drugBrand").val();
+            console.log($("#drugBrand").val());
+            drugDetails.unit = $("#drugUnit").val();
+            //drugDetails.pillform = $("#drugPillForm").val();
+            drugDetails.width1 = $("#width1").val();
+            drugDetails.thickness1 = $("#thickness1").val();
+            drugDetails.width2 = $("#width2").val();
+            drugDetails.length = $("#length").val();
+            drugDetails.thickness2 = $("#thickness2").val();
+            console.log(dataSet);
+            var table = $('#AllDrugCodeTable').DataTable();
+            var dataFind = table.search($("#drugNumber").val()).row({search: 'applied'}).data();
+            if(dataFind != null){
+                alert('The NDC that you are trying to add is already exist in the System.');
+            	console.log(table.search($("#drugNumber").val()).row({search: 'applied'}).data());
+            }
+            else{
+                OmnicellProductDetailController.insertDrug(
+                    CCRZ.pagevars.remoteContext,JSON.stringify(drugDetails),function(response) {
+                       if (response) {
+                            if(response.success) {
+                               if(typeof response.data.drugCode !== 'undefined'){
+                                        var optionValue = response.data.drugCode;
+                                        var optionText = response.data.drugCodeGenName+response.data.drugCodeBName+response.data.drugCodeMName+
+                                            response.data.drugCode;
+                                        $('#NDCListNew').append(`<option value="${optionValue}">
+                                                ${optionText}
+                                            </option>`);
+                                        var drghref = '<a href="#" id="' +response.data.drugCode+ '" onClick="AddselectedDrugCode(this.id)">'+response.data.drugCode+' </a>';
+                                        table.row.add( [
+                                            response.data.drugCodeGenName,
+                                            response.data.drugCodeBName,
+                                            response.data.drugCodeMName,
+                                            drghref,
+                                            response.data.drugCodeStrength
+                                        ] ).draw( false );
+                                        upsertItem2(response.data.drugCode);
+                                        
+                                }
+                            }
+                       }
+                    });
+            }
+        }
+    	function upsertItem2( drugCode){
+            //alert(drugCode);
+            $('#drugCode').val(drugCode);
+            var qtyLimit = {!$Label.SCP_Add_To_Cart_Validation};//IBA-3840
+            $('.buttondisabledpopup').prop("disabled", true);
+            var prodAttribute = {};
+            var product = CCRZ.productDetailModel.get('product');
+            prodAttribute.machine = $("#machinepopup").val();
+            prodAttribute.type = $("#typepopup").val();
+            prodAttribute.drugCode = drugCode;
+            prodAttribute.quantity = $("#quantitypopup").val();
+            prodAttribute.SKU = product.prodBean.SKU;
+            if(CCRZ.cartView.cartmodel.attributes.numberofAllCartItems != 0 && (CCRZ.cartView.cartmodel.attributes.numberofAllCartItems+1 >qtyLimit)){ //IBA-3840
+                alert("Drug Code is inserted successfully but the Item cannot be added as you cannot add more than 20 Items in a single Cart");
+            }
+            else{
+                OmnicellProductDetailController.upsertCartItem(
+                    CCRZ.pagevars.remoteContext,JSON.stringify(prodAttribute),
+                    function(response) {
+                       if (response) {
+                            if(response.success) {
+                                if(typeof response.data.status !== 'undefined'){
+                                    if(response.data.status == 'successfull'){
+                                        $('.buttondisabledpopup').prop("disabled", false);
+                                        $("#addDrugCode").modal('hide');
+                                        var x = document.getElementById("toastmsg");
+                                        x.className = "show";
+                                        setTimeout(function(){ x.className = x.className.replace("show", ""); }, 1000);
+                                        $('#drugCode').val('');
+                                    }
+                                    var cartId = CCRZ.pagevars.currentCartID;
+                                    CCRZ.pubSub.trigger('cartChange', cartId);
+                                    $("#drugName").val('');
+                                    $("#drugNumber").val('');
+                                    $("#drugStrength").val('');
+                                    $("#drugManufacturer").val('');
+                                    $("#drugUnit").val('');
+                                    $("#drugBrand").val('');
+                                    $("#width1").val('');
+                                    $("#thickness1").val('');
+                                    $("#width2").val('');
+                                    $("#length").val('');
+                                    $("#thickness2").val('');
+                                    $("#typepopup").val('');
+                                    checkValidation();
+                                }                            
+                       }
+                    }
+                });
+            }
+        }
+    </script><!-- added end by Sourav -->
+    <script type = "text/javascript"> <!-- Added by Sourav -->
+    	var dataSet;
+    	
+    	jQuery(function($){
+            
+            dataSet = []; 
+            var machinenamesOnly = [];
+            var DrugCodeOnly = [];
+            
+                CCRZ.pubSub.on('view:productDetailView:refresh',function(){
+                    var prodSKU = CCRZ.productDetailModel.get('product').prodBean.sku;//IBA-3840 - Start
+                    console.log(prodSKU);
+                    if(prodSKU == 'NEW-CALIB' || prodSKU == 'RECALIB' || prodSKU == 'REPAIR'){//IBA-4190
+                         OmnicellProductDetailController.getAttributes(
+                            CCRZ.pagevars.remoteContext,
+                            function(response) {
+                               if (response) {
+                                    if(response.success) {
+                                        $('#NDCListNew').empty();
+                                        if(typeof response.data.customattributeData !== 'undefined'){
+                                              machinenamesOnly = response.data.machineNamesOnly;
+                                              var allt = response.data.calibrationAllotted;
+                                              var purchsed = response.data.calibrationPurchased;
+                                              var newallt = response.data.newcalibrationAllotted;
+                                              var newpurchsed = response.data.newcalibrationPurchased;
+                                              var subjectObject = response.data.customattributeData;
+                                              var subjectSel = document.getElementById("machine");
+                                              var topicSel = document.getElementById("type");
+                                              var machinepopup = document.getElementById("machinepopup");
+                                              var typepopup = document.getElementById("typepopup");
+                                              var chapterSel = document.getElementById("price");
+                                              var pricepopup = document.getElementById("pricepopup");
+                                              var product = CCRZ.productDetailModel.get('product');
+                                              var drugUnits = response.data.drugUnits;
+                                              var drugForms = response.data.drugForms;
+                                              for (var x in subjectObject) {
+                                                subjectSel.options[subjectSel.options.length] = new Option(x, x);
+                                              }
+                                              subjectSel.onchange = function() {
+                                                topicSel.length = 1;
+                                                $("#machinepopup").val(this.value);
+                                                document.getElementById("machinepopup2").innerHTML = this.value;
+                                                chapterSel.innerHTML ='';//IBA-2967
+                                                if(this.value != ''){
+                                                    if(product.prodBean.SKU == 'RECALIB'){
+                                                        checkAllotmentandPurchased(allt[this.value],product.prodBean.SKU,purchsed[this.value]);
+                                                    }
+                                                    if(product.prodBean.SKU == 'NEW-CALIB'){
+                                                        checkAllotmentandPurchased(newallt[this.value],product.prodBean.SKU,newpurchsed[this.value]);
+                                                    }
+                                                    for (var y in subjectObject[this.value]) {
+                                                      if(y!= 'Canister' && product.prodBean.SKU == 'RECALIB'){
+                                                          document.getElementById("freeCalibration").style.display = "none";
+                                                      }
+                                                      else{
+                                                          document.getElementById("freeCalibration").style.display = "block";
+                                                      }
+                                                      topicSel.options[topicSel.options.length] = new Option(y, y);
+                                                    }
+                                                    typepopup.length = 1;
+                                                    for (var y in subjectObject[this.value]) {
+                                                      typepopup.options[typepopup.options.length] = new Option(y, y);
+                                                    }
+                                                    if(Object.keys(subjectObject[this.value]).length == 1){//IBA-2967
+                                                        var typeDefault = Object.keys(subjectObject[this.value])[0];
+                                                        $("#type").val(typeDefault);
+                                                        var z = subjectObject[this.value][Object.keys(subjectObject[this.value])];
+                                                        chapterSel.innerHTML = z;
+                                                    }
+                                                }
+                                              }
+                                              topicSel.onchange = function() {
+                                                $('#drugCode').val('')
+                                                var z = subjectObject[subjectSel.value][this.value];
+                                                chapterSel.innerHTML = z;
+                                                checkValidation();
+                                              }
+                                              //below for popup start
+                                              for (var x in subjectObject) {
+                                                machinepopup.options[machinepopup.options.length] = new Option(x, x);
+                                              }
+                                              machinepopup.onchange = function() {
+                                                typepopup.length = 1;
+                                                for (var y in subjectObject[this.value]) {
+                                                  typepopup.options[typepopup.options.length] = new Option(y, y);
+                                                }
+                                              }
+                                              typepopup.onchange = function() {
+                                                checkValidationPopUp();
+                                                var z = subjectObject[machinepopup.value][this.value];
+                                                pricepopup.innerHTML = z;
+                                              }
+                                              //below for popup End
+                                              var product = CCRZ.productDetailModel.get('product');
+                                              document.getElementById("productpopup").innerHTML = product.prodBean.name;
+                                              $('#productpopup').val(product.prodBean.SKU);
+                                            
+                                              if(product.prodBean.SKU == 'NEW-CALIB'){
+                                                  $('#stdAttr').css('display', 'none');
+                                                  var msg = document.getElementById("freeCalibration");
+                                                  msg.innerHTML = "Free New Order Allotted: <span id=\"allt\"></span></br>Free New Order Utilized: <span id=\"prch\"></span>";
+                                                  var msg2 = document.getElementById("freeInfo");
+                                                  msg2.innerHTML = "</br>Free New Order Allotted: <span id=\"allt2\"></span></br>Free New Order Utilized: <span id=\"prch2\"></span>";
+                                              }
+                                              else if(product.prodBean.SKU == 'RECALIB'){
+                                                  $('#stdAttr').css('display', 'none');
+                                                  var msg = document.getElementById("freeCalibration");
+                                                  msg.innerHTML = "Free Re-Calibration Order Allotted: <span id=\"allt\"></span></br>Free Re-Calibration Order Utilized: <span id=\"prch\"></span>";
+                                                  $('#quantity').prop("disabled", true);
+                                                  $('#quantitypopup').prop("disabled", true);
+                                                  var msg2 = document.getElementById("freeInfo");
+                                                  msg2.innerHTML = "</br>Free Re-Calibration Order Allotted: <span id=\"allt2\"></span></br>Free Re-Calibration Order Utilized: <span id=\"prch2\"></span>";
+                                              }
+                                              else if(product.prodBean.SKU == 'REPAIR'){
+                                                  $('#stdAttr').css('display', 'none');
+                                                  $('#quantity').prop("disabled", true);
+                                              }
+                                              else {
+                                                  $('#custAttr').css('display', 'none');
+                                                  document.getElementById('stdAttr').style.display = "block";
+                                              }
+                                        }
+                                        if(typeof response.data.optionListNew !== 'undefined'){
+                                            
+                                            DrugCodeOnly = response.data.optionListNew;
+                                            dataMarge(machinenamesOnly,DrugCodeOnly);
+                                            for(i = 0; i < response.data.optionListNew.length; i++){
+                                                /* var optionText = response.data.optionListNew[i].ccrz__AttributeID__c;
+                                                var optionValue = response.data.optionListNew[i].ccrz__AttributeID__c;
+                                                $('#NDCListNew').append(`<option value="${optionValue}">
+                                                    ${optionText}
+                                                </option>`);*/
+                                                
+                                                var arrData = [];
+                                                var strength = '';
+                                                var brandName = '';
+                                                var manuName = '';
+                                                var genName = '';
+                                                if(response.data.optionListNew[i].Generic_Drug_Name__c == null){
+                                                    genName = ' ';
+                                                }
+                                                else{
+                                                    genName = response.data.optionListNew[i].Generic_Drug_Name__c;;
+                                                }
+                                                
+                                                if(response.data.optionListNew[i].Brand_Name__c == null){
+                                                    brandName = ' ';
+                                                }
+                                                else{
+                                                    brandName = response.data.optionListNew[i].Brand_Name__c;;
+                                                }
+                                                
+                                                if(response.data.optionListNew[i].Manufacturer_Name__c == null){
+                                                    manuName = ' ';
+                                                }
+                                                else{
+                                                    manuName = response.data.optionListNew[i].Manufacturer_Name__c;;
+                                                }
+                                                arrData.push(genName); 
+                                                arrData.push(brandName);
+                                                arrData.push(manuName);
+                                                
+                                                arrData.push('<a href="#" id="' + response.data.optionListNew[i].DrugCodes__c + '" onClick="AddselectedDrugCode(this.id)">'+response.data.optionListNew[i].DrugCodes__c+' </a>'); 
+                                                if(response.data.optionListNew[i].Drug_Strength__c == null){
+                                                    strength = ' ';
+                                                }
+                                                else{
+                                                    strength = response.data.optionListNew[i].Drug_Strength__c;;
+                                                }
+                                                arrData.push(strength);
+                                                
+                                                dataSet.push(arrData);
+                                                
+                                                
+                                                var optionText = response.data.optionListNew[i].Generic_Drug_Name__c+response.data.optionListNew[i].Brand_Name__c+
+                                                    response.data.optionListNew[i].Manufacturer_Name__c+response.data.optionListNew[i].DrugCodes__c;
+                                                var optionValue = response.data.optionListNew[i].DrugCodes__c;
+                                                $('#NDCListNew').append(`<option value="${optionValue}">
+                                                    ${optionText}
+                                                </option>`);
+                                             }
+                                        }
+                                        for(var ix=0;ix<drugUnits.length;ix++){
+                                             $('#drugUnit').append($('<option></option>').val(drugUnits[ix]).html(drugUnits[ix]));      
+                                        }
+                                        getTable(dataSet);
+                                        $('.buttondisabled').prop("disabled", true);
+                                        $('.addDrgbuttondisabled').prop("disabled", true);
+                                        $('.bulkbuttondisabled').prop("disabled", false);
+                                    }
+                               }
+                         });
+                    }
+                }); 
+        });
+        function checkAllotmentandPurchased(allotement,sku,purchased){ 
+            if($("#machine").val() != '')
+            	$('.addDrgbuttondisabled').prop("disabled", false);
+            else
+                $('.addDrgbuttondisabled').prop("disabled", true);
+            if(sku == 'RECALIB'){
+                document.getElementById("allt").innerHTML = allotement;
+                document.getElementById("prch").innerHTML = purchased;  
+                document.getElementById("allt2").innerHTML = allotement;
+                document.getElementById("prch2").innerHTML = purchased;
+            }
+            if(sku == 'NEW-CALIB'){
+                document.getElementById("allt").innerHTML = allotement;
+                document.getElementById("prch").innerHTML = purchased;    
+                document.getElementById("allt2").innerHTML = allotement;
+                document.getElementById("prch2").innerHTML = purchased; 
+            }
+            $('#drugCode').val('')
+            
+        }
+        function addDrugCode(){
+            $("#addDrugCode").modal('show');
+            $('.buttondisabledpopup').prop("disabled", true);
+        }
+        function selectDrugCode(){
+            $("#selectDrugCode").modal('show');
+        }
+        function AddselectedDrugCode(id){
+            $('#drugCode').val(id);
+            checkValidation();
+            $("#selectDrugCode").modal('hide');
+        }
+        
+        function checkCartItemcount(){//IBA-3840
+            var qtyLimit = {!$Label.SCP_Add_To_Cart_Validation};
+            
+            if(CCRZ.cartView.cartmodel.attributes.numberofAllCartItems != 0 && ((CCRZ.cartView.cartmodel.attributes.numberofAllCartItems+1)>qtyLimit)){
+                alert("Item cannot be added as you cannot add more than "+qtyLimit+" Items in a single Cart");
+            }
+            else{
+                $( "#addToCartButton").trigger( "click" );
+            }
+            
+        }
+    </script>
+    
+  <script>
+  </script>
+ <!--       ----------------------------- POC ENDS --------------------------------->
+<!-- added as part of SCP -787 -->
+   <script id="MiniCart-Desktop" type="text/template">
+   <div class="panel panel-default MiniCart cc_mini_cart">
+    <div class="panel-heading cc_heading">
+     <h3 class="panel-title cc_title">{{pageLabelMap 'Header_MyCart'}}
+      <span class="pull-right">
+       <span class="icon-toggle cc_filter_icon" role="button" data-toggle="collapse" data-target="#collapseMiniCart" aria-expanded="true" aria-controls="collapseMiniCart">
+        <i class="fa fa-caret-down" aria-hidden="true"></i>
+       </span>
+      </span>
+     </h3>
+    </div>
+    <div id="collapseMiniCart" class="panel-collapse collapse in">
+     <div class="panel-body cc_body">
+      <div class="my_cart mini_cart cc_mini_cart">
+       {{#ifDisplay 'MC.Ext'}}
+        {{#ifGreater cartItemCount 0}}
+         {{#ifDisplay 'MC.DsplItem'}}
+          <div class="row cc_item_heading">
+           <div class="col-xs-8 cc_product">{{pageLabelMap 'MiniCart_Product'}}</div>
+           <div class="col-xs-4 pull-right cc_qty">{{pageLabelMap 'MiniCart_Quantity'}}</div>
+          </div>
+          {{#each this.cartItems}}
+           <div class="row cc_items">
+            <div class="col-xs-8 cc_prod_name">
+            {{#ifEquals pricingType 'external'}}
+             {{#if extName}}
+              {{productLink this.mockProduct 'small cc_product_name_link' text=(displayProductName 'Aggregate_Display' displayProductBean.name extName)}}
+             {{else}}
+              {{productLink this.mockProduct 'small cc_product_name_link' text=(displayProductName 'Aggregate_Display' displayProductBean.name mockProduct.name)}}
+             {{/if}}
+            {{else}}
+             {{productLink this.mockProduct 'small cc_product_name_link' text=(displayProductName 'Aggregate_Display' displayProductBean.name mockProduct.name)}}
+            {{/ifEquals}}
+            </div>
+            <div class="col-xs-4 cc_prod_qty">
+             <div id="CartItemDetail-Qty-View" class="quantity cc_quantity">
+              {{#ifEquals pricingType 'external'}}
+               <label for="{{this.itemID}}" class="sr-only">{{pageLabelMap 'MiniCart_Quantity'}}</label>
+               <input id="{{this.itemID}}" type="text" name="qty" class="form-control input-sm cc_input_sm" data-id= "{{this.itemID}}" value="{{this.quantity}}" readonly />
+              {{else}}
+               {{#ifNotEquals pricingType 'attrGroup'}}
+                {{#ifDisplay 'MC.RO'}}
+                 <label for="{{this.itemID}}" class="sr-only">{{pageLabelMap 'MiniCart_Quantity'}}</label>
+                 <input id="{{this.itemID}}" type="text" name="qty" class="form-control input-sm cc_input_sm" data-id= "{{this.itemID}}" value="{{this.quantity}}" readonly />
+                {{else}}
+                 <label for="qtyInput_{{this.itemID}}" class="sr-only">{{pageLabelMap 'MiniCart_EnterQuantity'}}</label>
+                 <input id="qtyInput_{{this.itemID}}" type="text" name="qty" class="form-control input-sm input-text entry cc_input_sm" data-id= "{{this.itemID}}" value="{{this.quantity}}" maxlength="7" />
+                {{/ifDisplay}}
+               {{/ifNotEquals}}
+               {{#ifEquals pricingType 'attrGroup'}}
+                <span class="cc_attributes_link{{this.itemID}}"><a href="#minicart_attribute_items{{this.itemID}}" class="attributeItemsLink cc_attribute_items_link" id="attributeItemsLink{{itemID}}" data-desktop="true" data-toggle="modal" data-id="{{itemID}}">{{pageLabelMap 'Cart_AttributeItems'}}</a></span>
+                {{> minicartAttributesDisplay}}
+               {{/ifEquals}}
+              {{/ifEquals}}
+             </div>
+            </div>
+           </div>
+           <div class="row cc_error_row">
+            <div class="col-xs-12 cc_error_col">
+             <div class="error-{{this.itemID}} miniCartError cc_mini_cart_error" style="display: none">
+             </div>
+            </div>
+           </div>
+          {{/each}}
+         {{/ifDisplay}}
+         <hr>
+         <div class="summary cc_summary">
+          <div class="row cc_row_total">
+           <div class="col-xs-6 cc_total_qty">{{pageLabelMap 'MiniCart_Total_Qty'}}</div>
+           <div class="col-xs-6 cc_total_price">{{pageLabelMap 'MiniCart_Total_Price'}}</div>
+          </div>
+          <div class="row cc_row_sum">
+           <div class="col-xs-6 cc_total_items"><span class="cc_cart_item_count">{{cartItemCount}} {{pageLabelMap 'MiniCart_Total_Items'}}</span></div>
+           <div class="col-xs-6 cc_subtotal"><span class="cc_subtotal">{{price subTotal}}</span></div>
+          </div>
+          <hr>
+          <div style="display:{!HideCuserAccess}" class="form-group text-center cc_form_group">
+           {{#ifDisplay 'MC.DsplItem'}}
+            {{#ifDisplay 'MC.RO'}}
+            {{else}}
+            <button disabled="disabled" class="btn btn-default btn-sm updateCartButton cc_update_cart_button" type="submit">{{pageLabelMap 'MiniCart_Update'}}</button>
+            {{/ifDisplay}}
+           {{/ifDisplay}}
+          <button disabled="disabled" class="btn btn-default btn-sm loggedInAction cc_logged_in_action" type="submit">{{pageLabelMap 'Component_MiniCart_Action'}}</button>
+          </div>
+           <div style="display:{!ShowCuserAccess}" class="form-group text-center cc_form_group">
+           {{#ifDisplay 'MC.DsplItem'}}
+            {{#ifDisplay 'MC.RO'}}
+            {{else}}
+            <button class="btn btn-default btn-sm updateCartButton cc_update_cart_button" type="submit">{{pageLabelMap 'MiniCart_Update'}}</button>
+            {{/ifDisplay}}
+           {{/ifDisplay}}
+          <button class="btn btn-default btn-sm loggedInAction cc_logged_in_action" type="submit">{{pageLabelMap 'Component_MiniCart_Action'}}</button>
+          </div>
+         </div>
+        {{else}}
+         <p class="cc_mini_cart_noitems">{{pageLabelMap 'Component_MiniCart_NoItems'}}</p>
+        {{/ifGreater}}
+       {{else}}
+        {{#ifGreater cartItemCount 0}}
+         <div class="row cc_row_caption">
+          <div class="col-xs-12 cc_col_caption">
+           {{#ifEquals cartItemCount 1}}
+            {{pageLabelMap 'Component_MiniCart_ThereIs'}}&#160;{{cartItemCount}}&#160;{{pageLabelMap 'Component_MiniCart_Item'}}
+           {{else}}
+            {{pageLabelMap 'Component_MiniCart_ThereAre'}}&#160;{{cartItemCount}}&#160;{{pageLabelMap 'Component_MiniCart_Items'}}
+           {{/ifEquals}}
+          </div>
+         </div>
+         <div class="row cc_row_subtotal">
+          <div class="col-xs-12 cc_col_subtotal">
+           {{pageLabelMap 'Component_MiniCart_Subtotal'}}:&#160;<strong>{{price subTotal}}</strong>
+          </div>
+         </div>
+         <div class="form-group cc_form">
+          <div class="form-group text-center cc_form_group">
+           <button class="btn btn-default btn-sm loggedInAction cc_logged_in_action" type="submit">{{pageLabelMap 'Component_MiniCart_Action'}}</button>
+          </div>
+         </div>
+        {{else}}
+         <div class="form-group cc_form_group">
+          <p class="cc_no_items">{{pageLabelMap 'Component_MiniCart_NoItems'}}</p>
+         </div>
+        {{/ifGreater}}
+       {{/ifDisplay}}
+      </div>
+      <div id="modalSec"></div>
+     </div>
+    </div>
+   </div>
+  </script>
+  <script>
+        function getTable(dataSet){
+            $('#AllDrugCodeTable').DataTable( {
+                     data: dataSet,
+                	 "aaSorting": [],
+                     "pagingType": "simple_numbers",
+                     dom: "<'row'<'col-xs-4'f>>"+ 
+                     "<'row box'<'col-sm-4'i><'col-sm-5'p><'col-sm-3'l>>" +
+                	 "<'row'<'col-sm-12'>>"+
+                     "<'row'<'col-sm-12'tr>>",
+                             
+                     retrieve: true,
+                     columns: [
+                         	{ title: "Generic Drug Name"},
+                         	{ title: "Brand Name"},
+                         	{ title: "Manufacturer"},
+                         	{ title: "Drug Code"},
+                         	{ title: "Strength"} 
+                     ]
+            } );
+        }
+    //Bulk upload
+    	var machineOnly = [];
+    	var drugOnly = [];
+    	var drugCodeOnly2 = [];
+    	function dataMarge(machinenamesOnly,drugCodeOnly){
+            machineOnly = machinenamesOnly;
+            drugOnly = drugCodeOnly;
+            for(var i=0;i<drugOnly.length;i++){
+                drugCodeOnly2[i] = drugOnly[i].DrugCodes__c;
+            }
+            
+        }
+    	function Upload() {
+            $('.bulkbuttondisabled').prop("disabled", true);//IBA-3841 - Sourav
+            var product = CCRZ.productDetailModel.get('product');
+            var qtyLimit = {!$Label.SCP_Add_To_Cart_Validation};//IBA-3840
+            var csvData = {};
+			csvData.cartItem = [];
+            var cdata = '';
+            var Items = {};
+            var fileUpload = document.getElementById("fileUpload");
+            var regex = /^([a-zA-Z0-9\s_\\.\-:])+(.csv)$/;
+            if (regex.test(fileUpload.value.toLowerCase())) {
+                if (typeof (FileReader) != "undefined") {
+                    var reader = new FileReader();
+                    reader.onload = function (e) {
+                        
+                        var customers = new Array();
+                        var rows = e.target.result.split("\r\n");
+                        var insertCallFlag = true;
+                        var allDrugFrmCSV = new Array();
+                        for (var i = 1; i < rows.length; i++) {
+                            var cells = rows[i].split(",");
+                            if (cells.length > 1) {                                
+                            }
+                        }
+                        console.log(allDrugFrmCSV);
+                        var errorMsgValidation = ''; //IBA-3840 - Start
+                        var diffQTY = qtyLimit;
+                        /*if(CCRZ.cartView.cartmodel.attributes.numberofAllCartItems != 0){
+                        	diffQTY = qtyLimit-CCRZ.cartView.cartmodel.attributes.numberofAllCartItems ;
+                        }
+                        if(rows.length > 12){
+                            		insertCallFlag = false;
+                                    errorMsgValidation = 'You cannot add more than 10 items at a time through bulk upload. Please divide the CSV into multiple files with 10 Items each';
+                        }
+                        if(CCRZ.cartView.cartmodel.attributes.numberofAllCartItems != 0 && CCRZ.cartView.cartmodel.attributes.numberofAllCartItems + rows.length-2 >qtyLimit){
+                            		insertCallFlag = false;
+                                    errorMsgValidation = 'You can add up to '+qtyLimit+' items in a single Cart. Cart already have '+CCRZ.cartView.cartmodel.attributes.numberofAllCartItems+' Items. You can add another '+diffQTY+' items otherwise total Cart Item Limit will be exceeded.';
+                        } */  //IBA-3840 - End //Comment out for IBA-3841 - Sourav
+                        console.log('##1'+insertCallFlag );
+                        if(insertCallFlag){ //IBA-3840
+                            for (var i = 1; i < rows.length; i++) {
+                                var drugStore = {};
+                                var cells = rows[i].split(",");
+                                if (cells.length > 1) {
+                                    var customer = {};
+                                    allDrugFrmCSV.push(cells[2]);
+                                    if(cells[0] == '' || cells[1] == '' || cells[2] == '' || cells[3] == ''){
+                                        console.log('##2'+insertCallFlag );
+                                        insertCallFlag = false;
+                                        errorMsgValidation = 'Please fill in all the required fields';
+                                        break;
+                                    }
+                                    if(!machineOnly.includes(cells[0])){
+                                        console.log('##3'+insertCallFlag );
+                                        insertCallFlag = false;
+                                        errorMsgValidation = 'Given machine '+cells[0]+' details is not found, please enter the valid Machine details or create a Machine data record to proceed further';
+                                        break;
+                                    }
+                                    if(cells[2].toString().length > 13){
+                                        console.log('##4'+insertCallFlag );
+                                        insertCallFlag = false;
+                                        errorMsgValidation = 'Drug Code length should be within 13 digits';
+                                        break;
+                                    }
+                                    
+                                    if(isNaN(cells[3])){
+                                        console.log('##5'+insertCallFlag );
+                                        insertCallFlag = false;
+                                        errorMsgValidation = 'Quantity should be Numeric';
+                                        break;
+                                    }
+                                    
+                                    customer.machine = cells[0];
+                                    customer.type = cells[1];
+                                    customer.drugCode = cells[2];
+                                    customer.quantity = cells[3];
+                                    customer.SKU = product.prodBean.SKU;
+                                    customers.push(customer);
+                                }
+                            }
+                        }
+                        console.log('##6'+insertCallFlag );
+                        if(insertCallFlag){
+                            OmnicellProductDetailController.bulkdrugCodeCheck(
+                            CCRZ.pagevars.remoteContext,JSON.stringify(allDrugFrmCSV),
+                            function(response) {
+                               if (response) {
+                                    if(response.success) {
+                                            if(typeof response.data.NDC_Check !== 'undefined'){
+                                                    if(response.data.NDC_Check == 'All NDC are not available'){
+                                                        console.log(response.data.NDC_Check );
+                                                        errorMsgValidation = 'Some NDC are not available in the System';
+                                                        console.log('##'+insertCallFlag );
+                                                        insertCallFlag = false;
+                                                        $('.bulkbuttondisabled').prop("disabled", true);//IBA-3841 - Sourav
+                                                    }
+                                            }
+                                            console.log('##'+insertCallFlag );
+                                            Items.CartData = customers;
+                                            if(insertCallFlag){
+                                                OmnicellProductDetailController.bulkUpload(//IBA-3841 - Sourav
+                                                        CCRZ.pagevars.remoteContext,JSON.stringify(customers),
+                                                        function(response) {
+                                                           if (response) {
+                                                                if(response.success) {
+                                                                    if(typeof response.data.status !== 'undefined'){
+                                                                        if(response.data.status == 'successful'){
+                                                                            var x = document.getElementById("bulktoastmsg");
+                                                                            x.className = "show";
+                                                                            setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);//IBA-3841 - Sourav                                                                            
+                                                                        }
+                                                                    }
+                                                                }
+                                                           }
+                                                        }
+                                                    );                                               
+                                            }
+                                            else{
+                                                    alert(errorMsgValidation);
+                                                $('.bulkbuttondisabled').prop("disabled", false);//IBA-3841 - Sourav
+                                            }
+                                    }
+                                    
+                               }
+                            });
+                        }
+                        else{
+                        	alert(errorMsgValidation);
+                            $('.bulkbuttondisabled').prop("disabled", false);//IBA-3841 - Sourav
+                        }
+                        
+                        
+                        cdata = JSON.stringify(Items);
+                    }
+                    reader.readAsText($("#fileUpload")[0].files[0]);
+                } else {
+                    alert("This browser does not support HTML5.");
+                }
+            } else {
+                alert("Please upload a valid CSV file.");
+            }
+            
+        }
+    	function CSVToJSON(csvData) {
+            var data = CSVToArray(csvData);
+            var objData = [];
+            for (var i = 1; i < data.length; i++) {
+                objData[i - 1] = {};
+                for (var k = 0; k < data[0].length && k < data[i].length; k++) {
+                    var key = data[0][k];
+                    objData[i - 1][key] = data[i][k]
+                }
+            }
+            var jsonData = JSON.stringify(objData);
+            jsonData = jsonData.replace(/},/g, "},\r\n");
+            return jsonData;
+        }
+    	function CSVToArray(csvData, delimiter) {
+            delimiter = (delimiter || ",");
+             var pattern = new RegExp((
+            "(\\" + delimiter + "|\\r?\\n|\\r|^)" +
+            "(?:\"([^\"]*(?:\"\"[^\"]*)*)\"|" +
+            "([^\"\\" + delimiter + "\\r\\n]*))"), "gi");
+            var data = [[]];
+            var matches = null;
+            while (matches = pattern.exec(csvData)) {
+                var matchedDelimiter = matches[1];
+                if (matchedDelimiter.length && (matchedDelimiter != delimiter)) {
+                    data.push([]);
+                }
+                if (matches[2]) {
+                    var matchedDelimiter = matches[2].replace(
+                    new RegExp("\"\"", "g"), "\"");
+                } else {
+                    var matchedDelimiter = matches[3];
+                }
+                data[data.length - 1].push(matchedDelimiter);
+            }
+            return (data);
+        }
+    </script>
+    <script>
+        //IBA-3840
+             $(document).keyup(function(event){
+                if (window.event && window.event.keyCode == 13 || event.which == 13) {
+                    console.log(event.target.id);
+                    var tgId = event.target.id;
+                    var substr1 = 'qtyInput_';
+                    if(tgId == 'qty'){
+                        checkCartItemcount();
+                    }
+                    if(tgId.includes(substr1)){
+                        $(".updateCartButton").click();
+                    }
+                }             
+            });
+    </script>
+<c:SCP_MiniCart_AttributeItems />
+<c:SCP_ProductDetailEff />
+</apex:page>

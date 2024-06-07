@@ -1,0 +1,565 @@
+<apex:page id="SCP_HomePage" controller="OmnicellProductDetailController"  applyHtmlTag="false" docType="html-5.0" sidebar="false" showHeader="false" standardStylesheets="false"> 
+
+<!-- Redirect to myOmnicell.com if not logged on (IBA-2826) -->
+<script>
+    
+    checkLogon();
+    
+    function checkLogon(){  
+
+        if (({!$User.FirstName='omniStore'}) && ({!$User.LastName='Site Guest User'})) {
+            window.location.replace("{!$Label.Omnicell_login_Page_URL}");
+        }
+    }
+    
+</script>
+    
+<!-- added as part of SCP -787 -->
+   <script  id="MiniQuickOrder-Desktop" type="text/template">
+   <div  class="panel panel-default cc_panel cc_mini_quick_order">
+    <div class="panel-heading cc_heading">
+     <h3 class="panel-title cc_title">{{pageLabelMap 'QuickOrder'}}
+      <span class="pull-right">
+       <span class="icon-toggle cc_filter_icon" role="button" data-toggle="collapse" data-target="#collapseMiniQuickOrder" aria-expanded="true" aria-controls="collapseMiniQuickOrder">
+        <i class="fa fa-caret-down" aria-hidden="true"></i>
+       </span>
+      </span>
+     </h3>
+    </div>
+    <div id="collapseMiniQuickOrder" class="panel-collapse collapse in">
+        <div class="panel-body cc_body">
+            <div id="quick_order" class="quick_order cc_quick_order"></div>
+            <p class="cc_caption">{{pageLabelMap 'QuickOrder_QuickOrderBoxCaption'}}</p>
+            <form id="skuQtyForm" class="form-horizontal cc_form_sku_qty" >
+                <div class="quickOrderRow cc_quick_order_row">
+                </div>
+            </form>
+        </div>
+        <div class="panel-footer cc_footer">
+            <div style="display:{!HideCuserAccess}" class="form-group text-center cc_form_group">
+                <button disabled="disabled" class="btn btn-default btn-sm addToCart cc_addtocart" type="submit">{{pageLabelMap 'QuickOrder_AddToCart'}}</button>
+                <button disabled="disabled" class="btn btn-default btn-sm addMore cc_addmore"  type="submit">{{pageLabelMap 'QuickOrder_AddMore'}}</button>
+            </div>
+            <div style="display:{!ShowCuserAccess}" class="form-group text-center cc_form_group">
+                <button class="btn btn-default btn-sm btnSubmit activeBtm" >{{pageLabelMap 'QuickOrder_AddToCart'}}</button><!-- IBA-3840-->
+                <button  class="btn btn-default btn-sm addMore cc_addmore"  type="submit">{{pageLabelMap 'QuickOrder_AddMore'}}</button>
+            </div>
+        </div>
+    </div>
+   </div>
+    </script> 
+    
+  <!-- added as part of SCP -787 -->
+   <script id="MiniCart-Desktop" type="text/template">
+   <div class="panel panel-default MiniCart cc_mini_cart">
+    <div class="panel-heading cc_heading">
+     <h3 class="panel-title cc_title">{{pageLabelMap 'Header_MyCart'}}
+      <span class="pull-right">
+       <span class="icon-toggle cc_filter_icon" role="button" data-toggle="collapse" data-target="#collapseMiniCart" aria-expanded="true" aria-controls="collapseMiniCart">
+        <i class="fa fa-caret-down" aria-hidden="true"></i>
+       </span>
+      </span>
+     </h3>
+    </div>
+    <div id="collapseMiniCart" class="panel-collapse collapse in">
+     <div class="panel-body cc_body">
+      <div class="my_cart mini_cart cc_mini_cart">
+       {{#ifDisplay 'MC.Ext'}}
+        {{#ifGreater cartItemCount 0}}
+         {{#ifDisplay 'MC.DsplItem'}}
+          <div class="row cc_item_heading">
+           <div class="col-xs-8 cc_product">{{pageLabelMap 'MiniCart_Product'}}</div>
+           <div class="col-xs-4 pull-right cc_qty">{{pageLabelMap 'MiniCart_Quantity'}}</div>
+          </div>
+          {{#each this.cartItems}}
+           <div class="row cc_items">
+            <div class="col-xs-8 cc_prod_name">
+            {{#ifEquals pricingType 'external'}}
+             {{#if extName}}
+              {{productLink this.mockProduct 'small cc_product_name_link' text=(displayProductName 'Aggregate_Display' displayProductBean.name extName)}}
+             {{else}}
+              {{productLink this.mockProduct 'small cc_product_name_link' text=(displayProductName 'Aggregate_Display' displayProductBean.name mockProduct.name)}}
+             {{/if}}
+            {{else}}
+             {{productLink this.mockProduct 'small cc_product_name_link' text=(displayProductName 'Aggregate_Display' displayProductBean.name mockProduct.name)}}
+            {{/ifEquals}}
+            </div>
+            <div class="col-xs-4 cc_prod_qty">
+             <div id="CartItemDetail-Qty-View" class="quantity cc_quantity">
+              {{#ifEquals pricingType 'external'}}
+               <label for="{{this.itemID}}" class="sr-only">{{pageLabelMap 'MiniCart_Quantity'}}</label>
+               <input id="{{this.itemID}}" type="text" name="qty" class="form-control input-sm cc_input_sm" data-id= "{{this.itemID}}" value="{{this.quantity}}" readonly />
+              {{else}}
+               {{#ifNotEquals pricingType 'attrGroup'}}
+                {{#ifDisplay 'MC.RO'}}
+                 <label for="{{this.itemID}}" class="sr-only">{{pageLabelMap 'MiniCart_Quantity'}}</label>
+                 <input id="{{this.itemID}}" type="text" name="qty" class="form-control input-sm cc_input_sm" data-id= "{{this.itemID}}" value="{{this.quantity}}" readonly />
+                {{else}}
+                 <label for="qtyInput_{{this.itemID}}" class="sr-only">{{pageLabelMap 'MiniCart_EnterQuantity'}}</label>
+                 <input id="qtyInput_{{this.itemID}}" type="text" name="qty" class="form-control input-sm input-text entry cc_input_sm" data-id= "{{this.itemID}}" value="{{this.quantity}}" maxlength="7" />
+                {{/ifDisplay}}
+               {{/ifNotEquals}}
+               {{#ifEquals pricingType 'attrGroup'}}
+                <span class="cc_attributes_link{{this.itemID}}"><a href="#minicart_attribute_items{{this.itemID}}" class="attributeItemsLink cc_attribute_items_link" id="attributeItemsLink{{itemID}}" data-desktop="true" data-toggle="modal" data-id="{{itemID}}">{{pageLabelMap 'Cart_AttributeItems'}}</a></span>
+                {{> minicartAttributesDisplay}}
+               {{/ifEquals}}
+              {{/ifEquals}}
+             </div>
+            </div>
+           </div>
+           <div class="row cc_error_row">
+            <div class="col-xs-12 cc_error_col">
+             <div class="error-{{this.itemID}} miniCartError cc_mini_cart_error" style="display: none">
+             </div>
+            </div>
+           </div>
+          {{/each}}
+         {{/ifDisplay}}
+         <hr>
+         <div class="summary cc_summary">
+          <div class="row cc_row_total">
+           <div class="col-xs-6 cc_total_qty">{{pageLabelMap 'MiniCart_Total_Qty'}}</div>
+           <div class="col-xs-6 cc_total_price">{{pageLabelMap 'MiniCart_Total_Price'}}</div>
+          </div>
+          <div class="row cc_row_sum">
+           <div class="col-xs-6 cc_total_items"><span class="cc_cart_item_count">{{cartItemCount}} {{pageLabelMap 'MiniCart_Total_Items'}}</span></div>
+           <div class="col-xs-6 cc_subtotal"><span class="cc_subtotal">{{price subTotal}}</span></div>
+          </div>
+          <hr>
+          <div style="display:{!HideCuserAccess}" class="form-group text-center cc_form_group">
+           {{#ifDisplay 'MC.DsplItem'}}
+            {{#ifDisplay 'MC.RO'}}
+            {{else}}
+            <button disabled="disabled" class="btn btn-default btn-sm updateCartButton cc_update_cart_button" type="submit">{{pageLabelMap 'MiniCart_Update'}}</button>
+            {{/ifDisplay}}
+           {{/ifDisplay}}
+          <button disabled="disabled" class="btn btn-default btn-sm loggedInAction cc_logged_in_action" type="submit">{{pageLabelMap 'Component_MiniCart_Action'}}</button>
+          </div>
+           <div style="display:{!ShowCuserAccess}" class="form-group text-center cc_form_group">
+           {{#ifDisplay 'MC.DsplItem'}}
+            {{#ifDisplay 'MC.RO'}}
+            {{else}}
+            <button class="btn btn-default btn-sm updateCartButton cc_update_cart_button" type="submit">{{pageLabelMap 'MiniCart_Update'}}</button>
+            {{/ifDisplay}}
+           {{/ifDisplay}}
+          <button class="btn btn-default btn-sm loggedInAction cc_logged_in_action" type="submit">{{pageLabelMap 'Component_MiniCart_Action'}}</button>
+          </div>
+         </div>
+        {{else}}
+         <p class="cc_mini_cart_noitems">{{pageLabelMap 'Component_MiniCart_NoItems'}}</p>
+        {{/ifGreater}}
+       {{else}}
+        {{#ifGreater cartItemCount 0}}
+         <div class="row cc_row_caption">
+          <div class="col-xs-12 cc_col_caption">
+           {{#ifEquals cartItemCount 1}}
+            {{pageLabelMap 'Component_MiniCart_ThereIs'}}&#160;{{cartItemCount}}&#160;{{pageLabelMap 'Component_MiniCart_Item'}}
+           {{else}}
+            {{pageLabelMap 'Component_MiniCart_ThereAre'}}&#160;{{cartItemCount}}&#160;{{pageLabelMap 'Component_MiniCart_Items'}}
+           {{/ifEquals}}
+          </div>
+         </div>
+         <div class="row cc_row_subtotal">
+          <div class="col-xs-12 cc_col_subtotal">
+           {{pageLabelMap 'Component_MiniCart_Subtotal'}}:&#160;<strong>{{price subTotal}}</strong>
+          </div>
+         </div>
+         <div class="form-group cc_form">
+          <div class="form-group text-center cc_form_group">
+           <button class="btn btn-default btn-sm loggedInAction cc_logged_in_action" type="submit">{{pageLabelMap 'Component_MiniCart_Action'}}</button>
+          </div>
+         </div>
+        {{else}}
+         <div class="form-group cc_form_group">
+          <p class="cc_no_items">{{pageLabelMap 'Component_MiniCart_NoItems'}}</p>
+         </div>
+        {{/ifGreater}}
+       {{/ifDisplay}}
+      </div>
+      <div id="modalSec"></div>
+     </div>
+    </div>
+   </div>
+  </script>
+  
+  <!-- added as part of SCP -787 -->
+  <script id="QuickOrder-WishlistItems-Desktop" type="text/template">
+    <div class="quick_wishlist cc_quick_wishlist">
+     <!--**************************************************-->
+     <div class="orderPaginationSec cc_orderPaginationSec"></div>
+     <!--**************************************************-->
+     <form id="deskQuickWishForm" class="wishForm cc_wish_form">
+      {{#ifNotEquals this.itemData.length 0}} 
+       {{#each_upto this.itemData 250}}
+        <div class="row cc_wish_row">
+         <div class="col-md-2 cc_wish_img">
+          {{productLink this.prodBean 'productName cc_prod_link' image=(displayImage this.mediaWrapper 'wishEntry img-thumbnail img-responsive' alt=this.prodBean.name dataId=this.prodBean.sku)}}
+         </div>
+         <div class="col-md-5 cc_wish_prod_details">
+          <div class="cc_name">
+           {{productLink this.prodBean 'productName cc_prod_link'}}
+          </div>
+          <div class="sku cc_sku">
+                                            {{#ifDisplay 'WL.DsplAddtlSku'}}
+           <span class="cc_label">{{pageLabelMap 'SKU'}}</span>
+           <span class="value cc_value">{{this.prodBean.sku}}</span>
+           {{/ifDisplay}}
+          </div>
+          <div class="cc_misc_details">
+           {{#if this.miscDetails}}
+            <p class="cc_misc_details">{{unescape this.miscDetails}}</p>
+           {{/if}}
+          </div>
+          {{#ifDisplay 'WL.DsplAddtInfo'}}
+           <a href="#additional_info{{this.prodBean.id}}" id="additionalInfoLink" data-toggle="modal" class="cc_additional_info">{{pageLabelMap 'AdditionalInfo'}}</a>
+           <div id="additional_info{{this.prodBean.id}}" class="modal fade cc_modal cc_quick_wishlist_modal" id="effAccounts" tabindex="-1" role="dialog" aria-labelledby="WishlistLabel" aria-hidden="true">
+            <div class="modal-dialog cc_modal_dialog" role="document">
+             <div class="modal-content cc_modal_content">
+              <div class="modal-header cc_modal_header">
+               <button type="button" class="close cc_close" data-dismiss="modal" aria-label="{{pageLabelMap 'Modal_Aria_Close'}}"><span aria-hidden="true">&#215;</span></button>
+               <h4 class="modal-title cc_modal_title" id="WishlistLabel">{{this.prodBean.name}} {{pageLabelMap 'AdditionalInfo'}}</h4>
+              </div>
+              <div class="modal-body cc_modal_body">
+               {{#if this.miscDetails}}
+                <p class="cc_misc_details">{{unescape this.miscDetails}}</p>
+               {{/if}}
+               {{#ifDisplay 'WL.DsplAddtlSku'}}
+                <div class="sku cc_sku">
+                 <span class="cc_label">{{pageLabelMap 'SKU'}} </span>
+                 <span class="value cc_value">{{this.prodBean.sku}}</span>
+                </div>
+               {{/ifDisplay}}
+               {{#ifDisplay 'WL.DsplAddtlShortDesc'}}
+                <p class="cc_short_desc">{{unescape this.prodBean.shortDesc}}</p>
+               {{/ifDisplay}}
+              </div>
+             </div>
+            </div>
+           </div>
+          {{/ifDisplay}}
+         </div>
+         <div class="col-md-5">
+          <div class="gp_quantity_block">
+           {{#if this.canAddtoCart}}
+            {{#if this.qtySkipIncrement}}
+             <div class="row cc_qty_control_row">
+              <div class="col-md-12">
+               <div class="form-group">
+                <div class="input-group cc_input_group">
+                 <span class="input-group-btn cc_input_group_btn">
+                  <input type="button" value="{{pageLabelMap 'Prod_QtyDecrFF'}}" class="btn btn-default btn-sm minusFF cc_minusff">
+                  <input type="button" value="{{pageLabelMap 'Prod_QtyDecrSingle'}}" class="btn btn-default btn-sm minus cc_minus">
+                 </span>
+                 <input type="text" readonly="true" name="quickadd[{{index}}].qty" class="qty entry form-control input-sm cc_entry" value="0" maxlength="7" />
+                 <span class="input-group-btn cc_input_group_btn">
+                  <input type="button" value="{{pageLabelMap 'Prod_QtyIncrSingle'}}" class="btn btn-default btn-sm plus cc_plus">
+                  <input type="button" value="{{pageLabelMap 'Prod_QtyIncrFF'}}" class="btn btn-default btn-sm plusFF cc_plusff">
+                 </span>
+                </div>
+               </div>
+              </div>
+             </div>
+            {{else}}
+                                            {{#ifEquals qtyIncrement 1}}
+                                                <div class="row cc_qty_control_row">
+                                                    <div class="col-md-6 col-md-offset-6">
+                                                        <div class="form-group">
+                                                            <div class="input-group cc_input_group">
+                                                                <span class="input-group-btn cc_input_group_btn">
+                                                                    <input type="button" value="{{pageLabelMap 'Prod_QtyDecrSingle'}}" class="btn btn-default btn-sm minus cc_minus">
+                                                                </span>
+                                                                <input id="qty{{index}}" name="quickadd[{{index}}].qty" value="1" class="qty entry form-control input-sm cc_entry" maxlength="7" />
+                                                                <span class="input-group-btn cc_input_group_btn">
+                                                                    <input type="button" value="{{pageLabelMap 'Prod_QtyIncrSingle'}}" class="btn btn-default btn-sm plus cc_plus">
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            {{else}}
+                                                    <div class="row cc_qty_control_row">
+                                                        <div class="col-md-5 col-md-offset-7">
+                                                            <div class="form-group">
+                                                                <input type="text" id="qty{{index}}" name="quickadd[{{index}}].qty" value="1" class="input-text qty entry plus_minus form-control cc_entry" maxlength="7" />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                {{/ifEquals}}
+                                            {{/if}}
+                                            <input type="hidden" name="qtyIncrement" value="{{this.qtySingleIncrement}}" class="item_qtyIncrement" />
+                                            <input type="hidden" name="qtySkipIncrement" value="{{this.qtySkipIncrement}}" class="item_qtySkipIncrement" />
+                                            <input type="hidden" name="quickadd[{{index}}].sku" value="{{this.prodBean.sku}}" />
+                                            <p class="text-right cc_text-right cc_pull-right">
+                                                {{#if this.showPricing}}
+                                                    {{#ifDisplay 'WL.DsplPrc' }}
+                                                        {{#if this.price}}
+                                                            <span class="cc_cart_inc_price">{{pageLabelMap 'CartInc_Price'}} {{{price this.price}}}</span>
+                                                        {{/if}}
+                                                    {{/ifDisplay}}
+                                                {{/if}}
+                                            </p>
+                                        {{else}}
+                                            <div class="row cc_qty_control_row">
+                                                <div class="col-md-5 col-md-offset-7">
+                                                    <div class="form-group">
+                                                        <input type="text" readonly="true" id="qty{{index}}" name="quickadd[{{index}}].qty" value="1" class="qty entry form-control cc_entry" maxlength="7" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {{/if}}
+                                        {{#if this.isTierPriced}}
+                                        <div class="row cc_prt_row_tmplentry">
+                                            <div class="text-right cc_text-right cc_prt_tool_tip_p cc_prt_tool_tip_p_tmplentry" data-toggle="tooltip" title="{{pageLabelMap 'ProductPricingTiers_VolumeHover'}}"> 
+                                                <span class="cc_prt_tool_tip_text cc_prt_tool_tip_text_tmplentry">{{pageLabelMap 'ProductPricingTiers_VolumePricing'}}</span> 
+                                            </div>
+                                        </div>
+                                    {{/if}}
+                                </div>
+                            </div>
+                        </div>
+                    <hr/>
+                {{/each_upto}}
+                <p style="display:{!HideCuserAccess}" class="cc_addto_cart"><button disabled="disabled" type="button" class="btn btn-default btn-sm addItem pull-right cc_add_item" data-id="{{uid}}">{{pageLabelMap 'Component_MiniwishList_AddToCart'}}</button></p>
+                <p style="display:{!ShowCuserAccess}" class="cc_addto_cart"><button type="button" class="btn btn-default btn-sm pull-right validationCheckWishlist" data-id="{{uid}}">{{pageLabelMap 'Component_MiniwishList_AddToCart'}}</button><!-- IBA-3840--></p>
+        {{/ifNotEquals}}
+     </form>
+    </div>
+   </script>
+<script id="EffAcctSel-Widget-View-Desktop" type="text/template">
+    <div class="panel panel-default cc_panel cc_effective_accounts">
+     <div class="panel-heading cc_heading">
+      <h3 class="panel-title cc_title">{{pageLabelMap 'EFFECTIVE_ACCOUNT_TITLE'}}</h3>
+     </div>
+     
+     {{#setBillingAddressHomePageData this}}{{/setBillingAddressHomePageData}} 
+     
+     <div class="panel-body cc_body">
+      {{#if this.ro}}
+       <p class="effAccount cc_eff_account">
+       
+        {{pageLabelMap 'SELECTED_ACCOUNT_WIDGET' workingEffAccount.name workingEffAccount.extrinsic.csnNumber workingEffAccount.billingAddress.address1 workingEffAccount.billingAddress.city workingEffAccount.billingAddress.state workingEffAccount.billingAddress.countryCode}}
+           
+       </p>
+      {{else}}
+       <p class="effAccount cc_eff_account" >
+        {{#if this.workingEffAccount }}
+            
+         {{pageLabelMap 'SELECTED_ACCOUNT_WIDGET' workingEffAccount.name workingEffAccount.extrinsic.csnNumber workingEffAccount.billingAddress.address1 workingEffAccount.billingAddress.city workingEffAccount.billingAddress.state workingEffAccount.billingAddress.countryCode}}
+        {{else}}
+         {{pageLabelMap 'SELECT_ACCOUNT' }}
+        {{/if}}
+       </p>
+       <div class="actions cc_actions">
+        <button class="btn btn-default btn-sm cc_pick_account" data-toggle="modal" data-target="#effAccounts" aria-hidden="true">{{pageLabelMap 'PICK_ACCOUNT'}}</button>
+        <button class="btn btn-default btn-sm saveData cc_save_data">{{pageLabelMap 'Save'}}</button>
+       </div>
+      {{/if}}
+     </div>
+    </div>
+    <div class="modal fade cc_effective_accounts_modal" id="effAccounts" tabindex="-1" role="dialog" aria-labelledby="effAccountsLabel">
+     <div class="modal-dialog  cc_modal_dialog" role="document">
+      <div class="modal-content cc_modal_content">
+       <div class="modal-header cc_modal_header">
+        <button type="button" class="close cc_close" data-dismiss="modal" aria-label="{{pageLabelMap 'Modal_Aria_Close'}}"><span aria-hidden="true">&#215;</span></button>
+        <h4 class="modal-title cc_modal_title" id="effAccountsLabel">{{pageLabelMap 'EFFECTIVE_ACCOUNT_TITLE'}}</h4>
+       </div>
+       <div class="modal-body cc_modal_body">
+        <div class="table-responsive">
+         <table class="table table-hover cc_table">
+          <thead class="cc_thead">
+           <tr class="cc_tr">
+            <th class="cc_th_name">{{{pageLabelMap 'Name'}}}</th>
+            <th class="cc_th_name">{{{pageLabelMap 'SCP_AccountCSNNumber'}}}</th>
+            <th class="cc_th_account_number">{{{pageLabelMap 'ACCOUNT_NUMBER'}}}</th>
+            <th class="cc_th_address">{{{pageLabelMap 'Address'}}}</th>
+            <th class="cc_th_picked"></th>
+           </tr>
+          </thead>
+          <tbody class="cc_tbody">
+           {{#each this.effectiveList}}
+           {{#setBillingAddressHomePageData this}}{{/setBillingAddressHomePageData}} 
+            <tr class="cc_tr">
+             <td class="cc_td_name">{{decodeHTML name}}</td>
+             <td class="cc_td_name">{{extrinsic.csnNumber}}</td>
+             <td class="cc_td_account_number">{{{accountNumber}}}</td>
+             <td class="cc_td_address">{{{pageLabelMap 'ADDRESS_FORMAT' billingAddress.address1 billingAddress.city billingAddress.state billingAddress.postalCode billingAddress.countryCode}}}</td>
+             <td class="cc_td_picked"><a href="#" class="cc_pick_account"><i class="pickSel pickAccount fa fa-chevron-right" data-id="{{sfid}}" aria-hidden="true"></i><span class="sr-only">{{pageLabelMap 'EffectiveAccount_SelectAccount'}}</span></a></td>
+            </tr>
+           {{/each}}
+          </tbody>
+         </table>
+        </div>
+       </div>
+      </div>
+     </div>
+    </div>
+   </script>
+   <script>
+        Handlebars.registerHelper("setBillingAddressHomePageData", function(currentObj,options) {  
+            debugger;
+            if(typeof this.workingEffAccount === 'undefined'){
+                this.billingAddress.address1 = this.extrinsic.poBox ? this.billingAddress.address1 + ',' + this.extrinsic.poBox : this.billingAddress.address1;
+                this.shippingAddress.address1  = this.extrinsic.poBox ? this.shippingAddress.address1 + ',' + this.extrinsic.poBox : this.shippingAddress.address1;   
+            }
+            else{ 
+                this.workingEffAccount.billingAddress.address1 = this.workingEffAccount.extrinsic.poBox ? this.workingEffAccount.billingAddress.address1 + ',' + this.workingEffAccount.extrinsic.poBox : this.workingEffAccount.billingAddress.address1;
+                this.workingEffAccount.shippingAddress.address1  = this.workingEffAccount.extrinsic.poBox ? this.workingEffAccount.shippingAddress.address1 + ',' + this.workingEffAccount.extrinsic.poBox : this.workingEffAccount.shippingAddress.address1;   
+            }
+            return options.fn(this);  
+        });
+    CCRZ.pubSub.on('view:cartView:refresh',function(){ //IBA-3840 Start
+            var el1 = document.getElementsByClassName("alert alert-danger").length;
+            var el2 = document.getElementsByClassName("alert alert-info").length;
+            console.log(el1);
+            console.log(el2);
+            if(el1!= 0){
+                var errorMsg = document.getElementsByClassName("alert alert-danger")[0].innerHTML;
+                const substr1= 'The following SKU(s) are invalid';
+                if(errorMsg.includes(substr1)){
+                    console.log(errorMsg.includes("The following SKU(s) are invalid"));
+                    $(".activeBtm").addClass("btnSubmit");
+                    $(".btnSubmit").removeClass("addToCart cc_addtocart");
+                }
+            }
+            if(el2!= 0 ){
+                var infoMsg = document.getElementsByClassName("alert alert-info")[0].innerHTML;
+                const substr2= 'The following SKU(s) were added';
+                if(infoMsg.includes(substr2)){
+                    console.log(infoMsg.includes("The following SKU(s) were added"));
+                    $(".activeBtm").addClass("btnSubmit");
+                    $(".btnSubmit").removeClass("addToCart cc_addtocart");
+                    $(".cc_sku_input").val(''); //iba-4709
+                    $(".cc_qty_input").val(1); //iba-4709
+                }
+            }
+        });
+            
+        $(document).ready(function() {
+            var qtyLimit = {!$Label.SCP_Add_To_Cart_Validation};
+            $(document).on('click', '.btnSubmit', function(){
+                var formData = form2js('skuQtyForm', '.', false, function (node) {}, false, true);
+                var dataSet = JSON.stringify(formData.quickorder);
+                const obj = JSON.parse(dataSet);
+                const items = new Set();
+                for(var i=0;i<obj.length;i++){
+                    if(obj[i].sku!='')
+                        items.add(obj[i].sku);
+                }
+                var diffQTY = qtyLimit;
+                if(CCRZ.cartView.cartmodel.attributes.numberofAllCartItems != 0){
+                    diffQTY = qtyLimit-CCRZ.cartView.cartmodel.attributes.numberofAllCartItems;
+                }
+                
+                if(CCRZ.cartView.cartmodel.attributes.numberofAllCartItems != 0 && (CCRZ.cartView.cartmodel.attributes.numberofAllCartItems + items.size) >qtyLimit){
+                      alert('You can add upto '+qtyLimit+' items in a single Cart. Cart already have '+CCRZ.cartView.cartmodel.attributes.numberofAllCartItems+' Items. You can add another '+diffQTY+' items otherwise total Cart Item Limit will be exceeded.');
+                }  
+                else{
+                      $(".btnSubmit").addClass("addToCart cc_addtocart");
+                      $(".addToCart").removeClass("btnSubmit");
+                      $(".addToCart").click();
+                }
+            });
+            
+            $(document).on('click', '.validationCheckWishlist', function(){
+                var objLink = $(event.target);
+               var formEle = $(objLink).closest('form');
+               var formData = form2js(formEle.attr('id'), '.', false, function(node) {}, false, true);
+               var scrubbedFormData = _.filter(formData.quickadd, function(item) { return item.qty !== "0" });
+               if (scrubbedFormData.length > 0) {
+                 var dataSet = JSON.stringify(scrubbedFormData);
+                }
+                const obj = JSON.parse(dataSet);
+                const items = new Set();
+                console.log(obj.length);
+                var diffQTY = qtyLimit;
+                if(CCRZ.cartView.cartmodel.attributes.numberofAllCartItems != 0){
+                    diffQTY = qtyLimit-CCRZ.cartView.cartmodel.attributes.numberofAllCartItems;
+                }
+                if(CCRZ.cartView.cartmodel.attributes.numberofAllCartItems != 0 && CCRZ.cartView.cartmodel.attributes.numberofAllCartItems + obj.length >qtyLimit){
+                      alert('You can add upto '+qtyLimit+' items in a single Cart. Cart already have '+CCRZ.cartView.cartmodel.attributes.numberofAllCartItems+' Items. You can add another '+diffQTY+' items otherwise total Cart Item Limit will be exceeded.');
+                }  
+                else{
+                      $(".validationCheckWishlist").addClass("addItem cc_add_item");
+                      $(".addItem").removeClass("validationCheckWishlist");
+                      $(".addItem").click();
+                }
+            });
+        }); 
+    // IBA-3840 End
+   </script><!-- IBA-3840 Start-->
+    <script id="MiniQuickOrder-Entry-Desktop" type="text/template">
+       <div class="form-group cc_form_quickorderrow">
+            <div class="col-xs-8">
+                <label for="quickorder[{{safeQuote this}}].sku" class="sr-only">Enter SKU</label>
+                <input id="quickorder[{{safeQuote this}}].sku" type="text" class="form-control quickOrderField test cc_sku_input" placeholder="{{pageLabelMap 'QuickOrder_SKUPlaceholder'}}" name="quickorder[{{safeQuote this}}].sku" />
+            	 <span id="quickorder[{{safeQuote this}}].spn"></span>
+            </div>
+            <div class="col-xs-4">
+                <label for="quickorder[{{safeQuote this}}].qty" class="sr-only">Enter Quantity</label>
+                <input id="quickorder[{{safeQuote this}}].qty" type="text" value="1" maxlength="7" class="form-control cc_qty_input" placeholder="{{pageLabelMap 'QuickOrder_QTYPlaceholder'}}" 
+                       name="quickorder[{{safeQuote this}}].qty" onKeyUp="chkMinProdQty({{safeQuote this}})"/>
+                    
+            </div>
+       </div>
+    </script><!-- IBA-3840 End-->
+    <script>
+    $(document).keyup(function(event){ //IBA-3840
+              
+            if (window.event && window.event.keyCode == 13 || event.which == 13) {
+                var pId = event.target.id;
+                var nId = '#quickorder[0].sku';
+                 $(".btnSubmit").click();
+            }             
+        });   
+
+    </script>
+    
+    <script>
+    // Start IBA-5327
+    function chkMinProdQty(sfid){
+        var skuId = "quickorder["+sfid+"].sku";
+        var qtyId = "quickorder["+sfid+"].qty";
+        var prodSKU = '';
+        var qtyVal = '';
+        var minimumQuantity = 0;
+        var cartQuantity = 0;
+        
+        if(document.getElementById(qtyId)){
+            qtyVal = document.getElementById(qtyId).value;
+            prodSKU = document.getElementById(skuId).value;
+        }
+        if(prodSKU != '' && prodSKU != null){
+            OmnicellProductDetailController.prodMinQty(
+                CCRZ.pagevars.remoteContext, prodSKU,
+                function(result, event){
+                    if(event.status){
+                        if(typeof result !== 'undefined'){
+                            minimumQuantity = result.data.prodDetails.Minimum_Quantity__c;
+                            if(result.data.cartDetails.length > 0){
+                                if(result.data.cartDetails[0].ccrz__Quantity__c != null || result.data.cartDetails[0].ccrz__Quantity__c!= ''){
+                                    cartQuantity = result.data.cartDetails[0].ccrz__Quantity__c;
+                                }else{
+                                    cartQuantity = 0;
+                                }
+                            }
+                            var minQty = minimumQuantity - cartQuantity;
+                            if(qtyVal === "" && minQty !== 'undefined' && minQty != null && minQty > 0){
+                                document.getElementById("quickorder["+sfid+"].spn").innerHTML='<p style="color:red"><b>Minimum Quantity is '+minimumQuantity+'</b></p>';
+                                $(".activeBtm").removeClass("btnSubmit");
+                            }else if(minQty !== 'undefined' && minQty  != null && minQty > 0 && minQty > parseInt(qtyVal )){
+                                document.getElementById("quickorder["+sfid+"].spn").innerHTML='<p style="color:red"><b>Minimum Quantity is '+minimumQuantity+'</b></p>';
+                                $(".activeBtm").removeClass("btnSubmit");
+                            }else{
+                                document.getElementById("quickorder["+sfid+"].spn").innerHTML='';
+                                $(".activeBtm").addClass("btnSubmit");
+                            }
+                            
+                        }
+                    }
+                });
+        }
+    }
+	// End IBA-5327
+</script>
+<c:SCP_MiniCart_AttributeItems />
+</apex:page>

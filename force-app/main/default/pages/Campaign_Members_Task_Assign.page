@@ -1,0 +1,617 @@
+<!-- ==================================================== -->
+<!-- Campaign_Pick_Members.page                           -->
+<!--                                                      -->
+<!-- Create by John E Szurley  Sprint 004                 -->
+<!--                                                      -->
+<!-- added logic for attachment from CG team as part of sprint-2,W-000081 -->
+<!-- ==================================================== -->
+<apex:page controller="CampaignMembersTaskAssignController" id="pageAssignTaskCampaignMembers" lightningStylesheets="true">
+    <!-- ==================================================== -->
+    <!-- Style Sheet for Tabs                                 -->
+    <!-- ==================================================== -->
+    <apex:stylesheet value="{!$Resource.tabStyleSheet}" />
+    
+    <style>
+        .trheader { 
+        background-color: #B0C4DE;
+        }
+        .trodd { 
+        background-color: #FCF7F7;
+        }
+        .treven {
+        background-color: #E3DCDB;
+        }  
+    </style>
+    
+    
+    
+    
+    <!-- ==================================================== -->
+    <!-- Java Script for Tab Navigation                       -->
+    <!-- ==================================================== -->
+    
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script src="//datatables.net/download/build/nightly/jquery.dataTables.js"></script>
+    
+    <script>
+    
+    function checkboxClicked(id) {
+        alert(id);
+        CallGetSelected(id);
+    }
+    
+    function callRunSearch() {
+        apexCallRunSearch();
+    }
+    function callAddAllMembers(){
+    	apexCallAddAllMembers();
+    }
+    function callAddAll() {
+        apexCallAddAll();
+    }
+    function crearAll(){
+        apexCallClearAll();
+    }
+    
+    function callReturn() {
+        apexreturnToCampaign();
+    }
+    
+    function validateEntry() {
+        var sat=document.getElementById('pageAssignTaskCampaignMembers:searchForm:taskEntryPageBlock:selectedAssignedTo');
+        var sub=document.getElementById('pageAssignTaskCampaignMembers:searchForm:taskEntryPageBlock:fldSubject');
+        var err = '';
+        
+        if (sub.value == null || sub.value == '') {
+            err = 'Please Enter a Value for Subject\n\n';
+        }
+        
+        if (sat.value ==null || sat.value == '') {
+            err = err + 'Please Select an Option from the Assign To Field\n\n';
+        }
+        
+        if (err != '') {        
+            alert(err);
+            return false;
+        }
+        
+    }
+    
+    function changetabs(tabnumber){
+        
+        var divTab1 = document.getElementById('page1');
+        var divTab2 = document.getElementById('page2');
+        
+        
+        var tabTab1 = document.getElementById('tab1');
+        var tabTab2 = document.getElementById('tab2');
+        
+        
+        if (tabnumber==1) {
+            divTab1.style.display="block";
+            tabTab1.className="current";
+        } else {
+            divTab1.style.display="none";
+            tabTab1.className="";
+        }
+        if (tabnumber==2) {
+            divTab2.style.display="block";
+            tabTab2.className="current";
+        } else {
+            divTab2.style.display="none";
+            tabTab2.className="";
+        }
+        
+        
+    }
+    
+    function changetabsandrefresh(){
+        
+        rerenderSelectedMembersPanel();
+        
+    }
+    
+    function selectMember(){
+    	holdSelectedMembers();
+    }
+    
+   
+    
+    var $j = jQuery.noConflict();
+    </script>
+    
+    
+    <apex:includeScript value="//wzrd.in/standalone/blob-util@latest" />
+    
+    
+    <!-- ==================================================== -->
+    <!-- Jquery for Table Sorting                             -->
+    <!-- ==================================================== -->
+    
+    <apex:stylesheet value="{!URLFOR($Resource.jQueryTableSorter, 'themes/blue/style.css')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.jQueryTableSorter,'jquery-latest.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.jQueryTableSorter,'jquery.tablesorter.js')}"/>
+    <script type="text/javascript">  
+    $(document).ready(function(){            
+        $("[id$=details]").tablesorter();
+    });    
+    
+    function reloadSorter(){
+    	$("[id$=details]").tablesorter();
+    }
+    </script>
+    
+    
+    <apex:outputText style="font-style:bold;font-size:24px;" value="{!$Label.Assign_task_to_Campaign_Members_of}: {0}">
+        <apex:param value="{!theCampaignName}"/>
+    </apex:outputText>
+    &nbsp;&nbsp;
+    <button type="button" onclick="callReturn();">{!$Label.Return_to_Campaign}</button>
+    <br/>
+    <br/>
+    <!-- ==================================================== -->
+    <!-- Tabs                                                 -->
+    <!-- ==================================================== -->
+    <ol id="toc">
+        <li id="tab1" class="current"><a href="#" onclick="changetabs(1);"><span>{!$Label.Select_Members}</span></a></li>
+        <li id="tab2"><a href="#" onclick="changetabs(2);"><span>{!$Label.Assign_Tasks}</span></a></li>
+        
+    </ol>
+    
+    <!-- ==================================================== -->
+    <!-- First Tab Page                                      -->
+    <!-- ==================================================== -->
+    <apex:form id="searchForm">
+        
+        <apex:actionFunction name="apexreturnToCampaign" action="{!returnToCampaign}" />
+        
+        
+        <apex:actionFunction name="rerenderSelectedMembersPanel" action="{!doNothing}" rerender="SelectedMembersPanel" oncomplete="changetabs(2);" status="status" />
+        <apex:actionFunction name="holdSelectedMembers" action="{!addSelectedMemberToList}" rerender="SelectedMembersPanel" status="status" />
+        <!--	<apex:param name="checkBox" assignTo="{!checked}"/>
+        </apex:actionFunction>-->
+        <!--<apex:actionFunction name="jobTitle" action="{!getJobTitle}" reRender="emptypanel" status="status"/>-->
+        
+        <div class="content" id="page1" style="display:block;">
+            <apex:outputPanel id="SearchFilterPanel">
+                <apex:pageMessages />
+                
+                <table width="100%" border="0">
+                    <tr>  
+                        <td width="800" valign="top">
+                            <apex:pageBlock id="FilterPanel"> 
+                                
+                                <table cellpadding="2" cellspacing="2">
+                                    <tr>
+                                        <td style="font-weight:bold;">{!$Label.Member_Status}<br/>
+                                            <apex:selectList id="selectedMemberStatus" value="{!selMemberstat}" multiselect="false" size="1">
+                                                <apex:selectOptions value="{!memberStatusValues}"/>
+                                            </apex:selectList>
+                                        </td>
+                                        <td style="font-weight:bold;">{!$Label.Member_Type}<br/>
+                                            <apex:selectList id="selectedMemberType" value="{!selMemberType}" multiselect="false" size="1">
+                                                <apex:selectOptions value="{!memberTypeValues}"/>
+                                            </apex:selectList>
+                                        </td>
+                                        <td style="font-weight:bold;">{!$Label.Account_Owner}<br/>
+											<apex:inputText value="{!selAcctOwnerName}" />
+                                        </td>
+                                        <td style="font-weight:bold;">{!$Label.CampaignMember_Task_Classification}<br/>
+                                            <apex:selectList id="selectedLeadClassification" value="{!selectedLeadClassification}" multiselect="false" size="1" >
+                                                <apex:selectOptions value="{!leadClassificationValues}"/>
+                                            </apex:selectList>
+                                        </td>
+                                        <td style="font-weight:bold;">{!$ObjectType.Contact.fields.Omnicell_Job_Code__c.label}<br/>
+                                            <apex:selectList id="selectedJobTitle" value="{!selectedJobTitle}" multiselect="true" size="4">
+                                                <apex:selectOptions value="{!omnicellJobTitleValues}"/>
+                                            </apex:selectList>
+                                        </td>
+                                        <td style="font-weight:bold;">{!$ObjectType.CampaignMember.fields.Product_Opportunity__c.label}<br/>
+                                            <apex:selectList id="selectedProductOpportunity" value="{!selectedProductOpportunity}" multiselect="true"  size="4" >
+                                                <apex:selectOptions value="{!productOpportunityValues}"/>
+                                            </apex:selectList>
+                                        </td>
+                                    </tr>
+                                    <tr>                                    
+                                        <td style="font-weight:bold;">{!$ObjectType.CampaignMember.fields.Follow_up_Field_Filter__c.label}<br/>
+                                            <apex:inputText value="{!selFollowUpField}" />
+                                        </td>
+                                        <td style="font-weight:bold;">{!$ObjectType.CampaignMember.fields.Follow_up_Task_Assigned__c.label}<br/>
+                                            <apex:inputCheckbox value="{!selFollowUpTask}" />
+                                        </td>
+                                        
+                                    </tr>
+                                    <tr>
+                                        <td style="font-weight:bold;"><br/>
+                                            <apex:commandButton action="{!addFilter}" value="{!$Label.Add_Filter}" id="cbAddFilter" reRender="details,totCount,page-buttons" status="status" oncomplete="reloadSorter();"/>
+                                        </td>
+                                        <td style="font-weight:bold;"><br/>
+                                            <apex:commandButton action="{!clearFilter}" value="{!$Label.Clear_Filter}" id="cbClearFilter" reRender="details,totCount,page-buttons,SearchFilterPanel" status="status" oncomplete="reloadSorter();"/>
+                                        </td>
+                                    </tr>
+                                </table>
+                                
+                            </apex:pageBlock>
+                        </td>
+                    </tr>
+                </table>
+                
+            </apex:outputPanel>
+            
+            <apex:outputPanel id="SearchResultsPanel">
+                
+                
+                <table width="100%" border="0">
+                    <tr>
+                        <td width="800" valign="top">
+                            
+                            <apex:pageBlock mode="edit" id="results">
+                                
+                                <table>
+                                    <tr>
+                                        <td>
+                                            <apex:outputPanel id="totCount">
+                                            <apex:outputText style="font-style:italic; font-weight:bold; font-size:120%;" value="{!$Label.Record_Count} = {!totalSize}">
+                                                <apex:param value="{!cntCMs}"/>
+                                            </apex:outputText><br/>  
+                                            </apex:outputPanel>
+                                        </td>
+                                        <td colspan="5">
+                                            &nbsp;&nbsp;&nbsp;
+                                        </td>
+                                        <!--<td>
+                                            <button type="button" onclick="callAddAllMembers();" status="status" >Add All Members</button>
+                                        </td>
+                                        <td colspan="5">
+                                            &nbsp;&nbsp;&nbsp;
+                                        </td>-->
+                                        <td>
+                                            <button type="button" onclick="callAddAll();" status="status" >{!$Label.Add_All_Members_on_List_Below}</button>
+                                        </td>
+                                        <td colspan="5">
+                                            &nbsp;&nbsp;&nbsp;
+                                        </td>
+                                        <td>
+                                            <button type="button" onclick="changetabsandrefresh();" >{!$Label.Assign_Tasks_to_Checked_Members}</button>
+                                        </td>
+                                    </tr>
+                                </table>
+                                <apex:PageBlockTable value="{!lstCampaignMembers}" var="item" id="details" styleClass="tablesorter" headerClass="header">
+                                    <apex:column width="25px">
+                                        <apex:inputCheckbox id="cb" onchange="selectMember();" value="{!item.checked}" disabled="{!IF(item.cm.Task_Assigned__c,true,false)}"/><!-- disabled="{!IF(OR(item.isLeadOwnerIsQueue,item.cm.Task_Assigned__c),true,false)}"/> --><!--</apex:input>disabled="{!IF(item.cm.Task_Assigned__c,true,false)}"/>-->
+                                    </apex:column>
+                                    <apex:column value="{!item.cm.Task_Assigned__c}" />
+                                    <apex:column value="{!item.memberType}" headerValue="{!$Label.Member_Type}"/>
+                                    <apex:column value="{!item.memberStatus}" headerValue="{!$Label.Member_Status}"/>
+                                    <apex:column value="{!item.fullName}" headerValue="{!$Label.Full_Name}"/>
+                                    <apex:column value="{!item.company}" headerValue="{!$ObjectType.Lead.fields.Company.label}" />
+                                    <apex:column value="{!item.title}" headerValue="{!$ObjectType.Lead.fields.Title.label}" />
+                                    <apex:column value="{!item.omniJobTitleCode}" headerValue="{!$Label.Omnicell_Job_Title_Code}"/>                                    
+                                    <!--<apex:column value="{!item.followUpTaskHasBeenAssd}" headerValue="Follow-Up Task has been Assigned"/>-->
+                                    <apex:column value="{!item.acctName}" headerValue="{!$Label.Account_Name}"/>
+                                     <apex:column value="{!item.country}" headerValue="{!$Label.Country}"/>
+                                    <apex:column value="{!item.division}" headerValue="{!$ObjectType.Account.fields.Division_Account__c.label}"/>
+                                    <apex:column value="{!item.region}" headerValue="{!$ObjectType.Account.fields.Region__c.label}"/>
+                                    <apex:column value="{!item.territory}" headerValue="{!$ObjectType.Account.fields.Account_Territory__c.label}"/>
+                           <!--           <apex:column value="{!item.worldRegion}" headerValue="{!$ObjectType.Account.fields.World_Region__c.label}"/>   IBA-4149 -->
+                                    <apex:column value="{!item.acctStatus}" headerValue="{!$ObjectType.Account.fields.Account_Status__c.label}"/>
+                                    <apex:column value="{!item.facilityType}" headerValue="{!$ObjectType.Account.fields.Facility_Type__c.label}"/>
+                                    <apex:column value="{!item.partnerType}" headerValue="{!$ObjectType.Account.fields.Partner_Type__c.label}"/>
+                                    <apex:column value="{!item.prodOpportunity}" headerValue="{!$ObjectType.CampaignMember.fields.Product_Opportunity__c.label}"/>
+                                    <apex:column value="{!item.leadClassification}" headerValue="{!$ObjectType.CampaignMember.fields.Lead_Classification__c.label}"/>
+                                    <apex:column value="{!item.followUpFieldFilter}" headerValue="{!$ObjectType.CampaignMember.fields.Follow_up_Field_Filter__c.label}"/>
+                                    <!--<apex:column value="{!item.leadOwner}" headerValue="{!$Label.Lead_Owner}"/>-->
+                                    <apex:column value="{!item.acctOwner}" headerValue="{!$Label.Account_Owner}"/>
+                                    <!--<apex:column value="{!item.VP}" headerValue="{!$ObjectType.Account.fields.VP__c.label}"/>
+                                    <apex:column value="{!item.directManager}" headerValue="{!$Label.Direct_Manager}"/>-->
+                                    <apex:column value="{!item.keyAcctManager}" headerValue="{!$Label.Key_Account_Manager}"/>
+                                    <!--<apex:column value="{!item.regionalManager}" headerValue="{!$Label.Regional_Manager}"/>
+                                    <apex:column value="{!item.director}" headerValue="{!$Label.Director}"/>-->
+                                    <apex:column value="{!item.insideSalesRep}" headerValue="{!$Label.Inside_Sales_Rep}"/>
+                                    <!--<apex:column value="{!item.salesDevelopmentConsultant}" headerValue="{!$Label.Sales_Development_Consultant}"/>-->
+                                    <apex:column value="{!item.IVRep}" headerValue="{!$Label.IV_Sales_Consultant}"/>
+                                    <!--<apex:column value="{!item.perfCenterRep}" headerValue="{!$Label.Performance_Center_Rep}"/>-->                                    
+                                    <apex:column value="{!item.createdDate}" headerValue="{!$ObjectType.CampaignMember.fields.CreatedDate.label}"/>
+                                    <apex:column value="{!item.lastModifiedDate}" headerValue="{!$ObjectType.CampaignMember.fields.LastModifiedDate.label}"/>
+                                    
+                                   
+                                </apex:PageBlockTable>            
+                                <apex:actionFunction name="apexCallAddAllMembers" action="{!addAllMembers}" rerender="SelectedMembersPanel" onComplete="changetabs(2) ;" status="status" />
+                                <apex:actionFunction name="apexCallAddAll" action="{!addAll}" rerender="SelectedMembersPanel" onComplete="changetabs(2) ;" status="status" />
+                                <apex:actionFunction name="apexCallClearAll" action="{!removeAll}" rerender="SelectedMembersPanel" onComplete="changetabs(2) ;" status="status" />
+                            </apex:pageBlock>
+                        </td>
+                    </tr>
+                </table>
+            </apex:outputPanel>
+        <!--<apex:commandButton action="{!Beginning}" title="Beginning" value="<<" disabled="{!disablePrevious}" reRender="myPanel,myButtons"/>
+        <apex:commandButton action="{!Previous}" title="Previous" value="<" disabled="{!disablePrevious}" reRender="myPanel,myButtons"/>        
+        <apex:commandButton action="{!Next}" title="Next" value=">" disabled="{!disableNext}" reRender="myPanel,myButtons"/>
+        <apex:commandButton action="{!End}" title="End" value=">>" disabled="{!disableNext}" reRender="myPanel,myButtons"/>  
+         -->   
+            
+            <!-- Paginatation Controls  -->
+<apex:outputPanel id="page-buttons">
+<apex:commandButton value="Previous" rerender="details,page-buttons" action="{!previous}" disabled="{!hasPrevRecords}" oncomplete="reloadSorter();"/>
+<apex:repeat value="{!PageIndexes}" var="p">
+<!--<apex:outputText value="{!p}"/>-->
+</apex:repeat>
+<apex:commandButton value="Next" rerender="details,page-buttons" action="{!next}" disabled="{!hasNextRecords}" oncomplete="reloadSorter();"/>
+    <br/>
+<apex:outputText value="Showing Page # {!PageNumber} of {!TotalPages}" />
+</apex:outputPanel>
+        </div>
+        
+        <!-- ==================================================== -->
+        <!-- Second Tab Page                                      -->
+        <!-- ==================================================== -->
+        <div class="content" id="page2" style="display:none;">
+            
+            <apex:outputPanel id="taskToAssignArea">
+                <apex:pageBlock mode="edit" id="taskEntryPageBlock">
+                    <table width="100%">
+                        <tr>
+                            <td width="4%">
+                                &nbsp;
+                            </td>
+                            <td width="10%">
+                                <b>Subject:</b>&nbsp;
+                            </td>
+                            <td width="38%">
+                                <apex:image url="{!$Resource.RequiredBar}" />
+                                <apex:inputField value="{!proxyObject.Subject}"  id="fldSubject" />
+                            </td>
+                            
+                            <td width="10%">
+                                <b>Due Date:</b>&nbsp;
+                            </td>
+                            <td width="38%">
+                                <apex:inputField value="{!proxyObject.ActivityDate}" id="fldActivityDate" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="4%">
+                                &nbsp;
+                            </td>
+                            <td width="10%">
+                                <b>Comments:</b>&nbsp;
+                            </td>
+                            <td colspan="3" width="86%" valign="top">
+                                <apex:inputTextarea rows="8" cols="140" value="{!proxyObject.Description}" id="fldDescription" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="4%">
+                                &nbsp;
+                            </td>
+                            <td width="10%">
+                                <b>Status:</b>&nbsp;
+                            </td>
+                            <td width="38%">
+                                <apex:inputField value="{!proxyObject.Status}" id="fldStatus" />
+                            </td>
+                            <td width="10%">
+                                <b>Priority:</b>&nbsp;
+                            </td>
+                            <td width="38%">
+                                <apex:inputField value="{!proxyObject.Priority}" id="fldPriority" />
+                            </td>
+                            
+                        </tr>
+                        <tr>
+                            <td width="4%">
+                                &nbsp;
+                            </td>
+                            <td width="10%">
+                                <b>Assign To:</b>&nbsp;
+                            </td>
+                            <td colspan="3" width="86%">
+                                <apex:image url="{!$Resource.RequiredBar}" />
+                                <apex:selectList id="selectedAssignedTo" value="{!selAssignedTo}" multiselect="false" size="1" >
+                                    <apex:selectOptions value="{!assignToValues}"/>
+                                </apex:selectList>
+                            </td>
+                            
+                            
+                        </tr>
+                        
+                        
+                        
+                        
+                        <tr><td colspan="5">&nbsp;</td></tr>
+                        <tr>
+                            <td width="4%">
+                                &nbsp;
+                            </td>
+                            <td width="10%">&nbsp;</td>
+                            <td colspan="3" width="86%">
+                                <apex:commandButton onClick="return validateEntry();" action="{!assignTaskToCampaignMembers}" value="{!$Label.Assign_Tasks}" id="cbAddCampaignMembers" status="status" />
+                            </td>
+                        </tr>
+                    </table>
+                </apex:pageBlock>
+            </apex:outputPanel> 
+            <br/>
+            <br/>
+            <apex:outputPanel id="SelectedMembersPanel">
+                <apex:pageBlock mode="edit" id="SelectedMembersPageBlock">
+                    <table>
+                        <tr class="trheader">
+                            <th width="25px">Task Assigned</th>
+                            <th width="25px">{!$Label.Member_Type}</th>                            
+                            <th width="25px">{!$Label.Member_Status}</th>   
+                            <th width="25px">{!$Label.Full_Name}</th>
+                            <th width="25px">{!$ObjectType.Lead.fields.Company.label}</th>
+                            <th width="25px">{!$ObjectType.Lead.fields.Title.label}</th>
+                            <th width="25px">{!$Label.Omnicell_Job_Title_Code}</th>
+                            <!--<th width="75px">Follow-Up Task Has Been Assigned</th>-->
+                            <th width="25px">{!$Label.Account_Name}</th>
+                            <th width="25px">{!$Label.Country}</th>
+                            <th width="25px">{!$ObjectType.Account.fields.Division_Account__c.label}</th>
+                            <th width="25px">{!$ObjectType.Account.fields.Region__c.label}</th>
+                            <th width="25px">{!$ObjectType.Account.fields.Account_Territory__c.label}</th>
+                       <!--  <th width="25px">{!$ObjectType.Account.fields.World_Region__c.label}</th>           IBA-4149  -->
+                            <th width="25px">{!$ObjectType.Account.fields.Account_Status__c.label}</th>
+                            <th width="25px">{!$ObjectType.Account.fields.Facility_Type__c.label}</th>
+                            <th width="25px">{!$ObjectType.Account.fields.Partner_Type__c.label}</th>
+                            <th width="25px">{!$ObjectType.CampaignMember.fields.Product_Opportunity__c.label}</th>
+                            <th width="25px">{!$ObjectType.CampaignMember.fields.Lead_Classification__c.label}</th>
+                            <th width="75px">{!$ObjectType.CampaignMember.fields.Follow_up_Field_Filter__c.label}</th>
+                            <!--<th width="25px">{!$Label.Lead_Owner}</th>-->
+                            <th width="25px">{!$Label.Account_Owner}</th>
+                            <!--<th width="25px">{!$ObjectType.Account.fields.VP__c.label}</th>
+                            <th width="25px">{!$Label.Direct_Manager}</th>-->
+                            <th width="25px">{!$Label.Key_Account_Manager}</th>
+                            <!--<th width="25px">{!$Label.Regional_Manager}</th>
+                            <th width="25px">{!$Label.Director}</th>-->
+                            <th width="25px">{!$Label.Inside_Sales_Rep}</th>
+                            <!--<th width="25px">{!$Label.Sales_Development_Consultant}</th>-->
+                            <th width="25px">{!$Label.IV_Sales_Consultant}</th>
+                            <!--<th width="25px">{!$Label.Performance_Center_Rep}</th>-->
+                            <th width="25px">{!$ObjectType.CampaignMember.fields.CreatedDate.label}</th>
+                            <th width="25px">{!$ObjectType.CampaignMember.fields.LastModifiedDate.label}</th>
+                            
+                        </tr>
+                        <apex:repeat value="{!selectedCampaignMembers}" var="scm" id="theSelected">
+                            <tr>
+                                <td width="25px">
+                                    <apex:outputText value="{!scm.cm.Task_Assigned__c}" />
+                                </td>
+                                <td width="25px">
+                                    <apex:outputText value="{!scm.memberType}" />
+                                </td>
+                                <td width="25px">
+                                    <apex:outputText value="{!scm.memberStatus}" />
+                                </td>
+                                <td width="25px">
+                                    <apex:outputText value="{!scm.fullName}" />
+                                </td>
+                                <td width="25px">
+                                    <apex:outputText value="{!scm.company}" />
+                                </td>
+                                <td width="25px">
+                                    <apex:outputText value="{!scm.title}" />
+                                </td>
+                                <td width="25px">
+                                    <apex:outputText value="{!scm.omniJobTitleCode}" />
+                                </td>
+                                <!--<td width="25px">
+                                    <apex:outputText value="{!scm.followUpTaskHasBeenAssd}" />
+                                </td>-->
+                                <td width="25px">
+                                    <apex:outputText value="{!scm.acctName}" />
+                                </td>
+                                <td width="25px">
+                                    <apex:outputText value="{!scm.country}" />
+                                </td>
+                                <td width="25px">
+                                    <apex:outputText value="{!scm.division}" />
+                                </td>
+                                <td width="25px">
+                                    <apex:outputText value="{!scm.region}" />
+                                </td>
+                                <td width="25px">
+                                    <apex:outputText value="{!scm.territory}" />
+                                </td>
+                                <td>
+                                	<apex:outputText value="{!scm.worldRegion}" />
+                                </td>
+                                <td width="25px">
+                                    <apex:outputText value="{!scm.acctStatus}" />
+                                </td>
+                                <td width="25px">
+                                    <apex:outputText value="{!scm.facilityType}" />
+                                </td>
+                                <td width="25px">
+                                    <apex:outputText value="{!scm.partnerType}" />
+                                </td>
+                                <td width="25px">
+                                    <apex:outputText value="{!scm.prodOpportunity}" />
+                                </td>
+                                <td width="25px">
+                                    <apex:outputText value="{!scm.leadClassification}" />
+                                </td>
+                                <td width="25px">
+                                    <apex:outputText value="{!scm.followUpFieldFilter}" />
+                                </td>
+                                <!--<td width="25px">
+                                    <apex:outputText value="{!scm.leadOwner}" />
+                                </td>-->
+                                <td width="25px">
+                                    <apex:outputText value="{!scm.acctOwner}" />
+                                </td>
+                                <!--<td width="25px">
+                                    <apex:outputText value="{!scm.VP}" />
+                                </td>
+                                <td width="25px">
+                                    <apex:outputText value="{!scm.directManager}" />
+                                </td>-->
+                                <td width="25px">
+                                    <apex:outputText value="{!scm.keyAcctManager}" />
+                                </td>
+                               <!-- <td width="25px">
+                                    <apex:outputText value="{!scm.regionalManager}" />
+                                </td>
+                                <td width="25px">
+                                    <apex:outputText value="{!scm.director}" />
+                                </td>-->
+                                <td width="25px">
+                                    <apex:outputText value="{!scm.insideSalesRep}" />
+                                </td>
+                                <!--<td width="25px">
+                                    <apex:outputText value="{!scm.salesDevelopmentConsultant}" />
+                                </td>-->
+                                <td width="25px">
+                                    <apex:outputText value="{!scm.IVRep}" />
+                                </td>
+                                <!--<td width="25px">
+                                    <apex:outputText value="{!scm.perfCenterRep}" />
+                                </td>-->
+                                <td width="25px">
+                                    <apex:outputText value="{!scm.createdDate}" />
+                                </td>
+                                <td width="25px">
+                                    <apex:outputText value="{!scm.lastModifiedDate}" />
+                                </td>
+                            </tr>
+                        </apex:repeat>
+                    </table>
+                </apex:pageBlock>
+                
+            </apex:outputPanel>
+            
+            
+            
+        </div>
+        
+        
+        <apex:outputPanel id="emptypanel"></apex:outputPanel>
+        <apex:outputpanel >
+            <apex:actionstatus id="status">
+                <apex:facet name="start">
+                    <div class="waitingSearchDiv" id="el_loading" style="background-color: #fbfbfb;
+                                                                         height: 100%;opacity:0.65;width:100%;"> 
+                        <div class="waitingHolder" style="top: 74.2px; width: 91px;">
+                            <img class="waitingImage" src="/img/loading.gif" title="Please Wait..." />
+                            <span class="waitingDescription">Please Wait...</span>
+                        </div>
+                    </div>
+                </apex:facet>
+            </apex:actionstatus>
+        </apex:outputpanel>
+        
+        
+        
+        
+    </apex:form>
+    
+    <script>
+    var url = location.href;
+    var match = url.match(/inline=1/);
+    if (match != null) { 
+        var newUrl = url.replace(/inline=1/, '');
+        window.top.location=newUrl;
+    }
+    </script>
+    
+</apex:page>

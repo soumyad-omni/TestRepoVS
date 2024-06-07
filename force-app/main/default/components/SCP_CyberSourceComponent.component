@@ -1,0 +1,654 @@
+<!--
+@description       : 
+@author            : ChangeMeIn@UserSettingsUnder.SFDoc
+@group             : 
+@last modified on  : 07-30-2021
+@last modified by  : ChangeMeIn@UserSettingsUnder.SFDoc
+Modifications Log 
+Ver   Date         Author                               Modification
+1.0   07-30-2021   ChangeMeIn@UserSettingsUnder.SFDoc   Initial Version
+-->
+<apex:component controller="SCP_CyberSourceController">
+    <style>
+        .btn-warning {
+        background-color: #46b555;
+        color :#f5f5f5;
+        border-color:#ccc;
+        }
+        .cancelAddress:hover {
+        background-color: gray;
+        }
+        .cancelAddress:active:focus{
+        background-color: gray;
+        }
+        .cc_creditcardinfo p{
+        color :#FF0000;
+        }
+        <!--SCP-806 start-->
+        .spinner-border {
+        display: inline-block;
+        width: 2rem;
+        height: 2rem;
+        vertical-align: text-bottom;
+        border: .25em solid currentColor;
+        border-right-color: transparent;
+        border-radius: 50%;
+        animation: spinner-border .75s linear infinite;
+        }
+        @keyframes spinner-border {
+        to { transform: rotate(360deg); }
+        }
+        #sopccModalPay {
+        opacity:0.0 !important;
+        }
+        <!--SCP-806 end-->
+    </style>
+    
+    <script id="Payment-Desktop" type="text/template">
+    <div class="panel panel-default cc_panel cc_checkout_payment_panel" > 
+        <div class="panel-body cc_body"> 
+            <!--<input class="btn btn-default btn-sm" type="button" onClick="goback();" value="{{pageLabelMap 'Back'}}" alt="{{pageLabelMap 'Back'}}" />
+                <div class="checkoutContainer checkoutPaymentContainer cc_checkout_payment_container">
+                    <div class="ccpgcs-messagingSection-Error" style="display: none"></div>
+                    <div class="poPayment-messagingSection-Error" style="display: none"></div>
+                    
+                    <div class="messagingSection-Error" style="display: none"></div>
+                    <div class="messagingSection-Info" style="display: none"></div>
+                    <div class="messagingSection-Warning" style="display: none"></div>-->
+                    
+                    
+                    <div class="checkoutPaymentTarget"></div>
+                    </div>
+                    </div>
+                    </div>
+                    </script>
+    
+    <!-- Added as part of Defect - SCP-819 -->
+    <script id="PaymentProcessor-Desktop" type="text/template">
+    <!--SCP-789 start-->
+        <div id="myModal" class="modal fade" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Warning!</h5>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <p style="color:red;">Please note that this PO has already been used, do you want to continue?</p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-primary" data-dismiss="modal" name="yesId" id="yesId" onclick="changevalYes()">Yes</button>
+                                <button type="button" class="btn btn-primary" data-dismiss="modal" name="noId" id="noId" onclick="changevalNo()">No</button>
+                                </div>
+                                </div>
+                                </div>
+                                </div>
+                                <!--SCP-789 end--> 
+                                    <div id="errModal" class="modal fade" tabindex="-1">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-body" style="font-size:15px;font-family:Arial;">
+                                                    <div class="ccpgcs-messagingSection-Error" style="display: none"></div>
+                                                    <div style="position: relative;left: 45%;">
+                                                        <input class="btn btn-default btn-sm" type="button" onClick="goback();" value="{{pageLabelMap 'Back'}}" alt="{{pageLabelMap 'Back'}}" />
+                                                            </div>
+                                                        </div>
+                                                        </div>
+                                                        </div>
+                                                        </div>
+                                                        <!--SCP-806 start-->
+                                                            <div id="pModal" class="modal fade" tabindex="-1">
+                                                                <div class="modal-dialog">
+                                                                    <div class="modal-content">
+                                                                        <div class="modal-body">
+                                                                            Processing Payment... &nbsp;&nbsp;
+    <div class="spinner-border drSpinner" role="status">
+        <span class="sr-only">Loading...</span>
+        </div>
+        </div>
+        </div>
+        </div>
+        </div>
+        <!--SCP-806 end-->        
+            <div class="panel cc_panel cc_payment_processor" style="display: none"> <!-- style="display: none" --> 
+                <div class="panel-body cc_body">
+                    <div class="storedpayment-messagingSection-Error" role="alert" style="display: none"></div>
+                    <div class="storedpayment-messagingSection-Warning" role="alert" style="display: none"></div>
+                    <div class="storedpayment-messagingSection-Info" role="alert" style="display: none">
+                        <button type="button" class="close cc_close" data-dismiss="alert" aria-label="{{pageLabelMap 'Modal_Aria_Close'}}"><span aria-hidden="true">&#215;</span></button>
+                        </div>
+                        
+                        {{#if true }}
+                        {{#ifDisplay 'WLT.Enabled'}}
+                        {{#if this.storedPayments}}
+                        <div class="panel panel-default cc_panel cc_payment_processor_mywallet">
+                            <div class="panel-heading cc_heading">
+                                <h3 class="panel-title cc_title">{{pageLabelMap 'PaymentProcessor_MyWallet'}}</h3>
+                                </div>
+                                <!--<input class="btn btn-default btn-sm" type="button" onClick="window.location.reload();" value="Back"/>-->
+                                    <!--<button type="button" class="btn" onClick="window.location.reload();">Back</button>-->
+                                    <div class="panel-body cc_body">
+                                        <div class="cc_stored_payments_container">
+                                            <div class="cc_top_section">{{pageLabelMap 'PaymentProcessor_Top'}}</div>
+                                            {{#each this.storedPayments}}
+                                            <div class="cc_stored_payments_container {{this.accountType}}">
+                                                <div class="radio">
+                                                    <label for="storedPaymentSelection{{this.sfid}}" class="cc_stored_payments_selector {{this.sfid}}">
+                                                        <input id="storedPaymentSelection{{this.sfid}}" type="radio" name="storedPaymentSelection" value="{{this.sfid}}" class="storedPaymentSelection {{this.sfid}}" data-id="{{this.sfid}}" {{#ifEquals @root.storedSelected this.sfid}}checked{{/ifEquals}}/></span>
+                                                        </label>
+                                                        <span class="cc_stored_payment_display">
+                                                    {{pageLabelMapMultiString 'PaymentDisplay_' this.accountType this.accountType this.accountNumber this.subAccountNumber (pageLabelMapMultiString 'PaymentType_' this.paymentType) (pageLabelMapMultiString 'PaymentExpMonth_' this.expirationMonth) (pageLabelMap this.expirationYear) this.displayName}}
+                          </span>
+                          </div>
+                          </div>
+                          {{/each}}
+                          <div class="cc_payment_action_container">
+                              <p class="panel-body pull-right cc_action_buttons">
+                                  <button type="button" id="storePaymentBtn" class="btn btn-default btn-sm useStoredPayment cc_use_stored_payment">{{pageLabelMap 'PaymentProcessor_UseStoredPayment'}}</button>
+                                  </p>
+                                  </div>
+                                  </div>
+                                  </div>
+                                  <div class="cc_creditcardinfo" ><p>{{pageLabelMap 'SCP_CreditCardInfo'}}</p></div> 
+                                      </div>
+                                  {{/if}}
+                                  {{/ifDisplay}}
+                                  {{/if}}
+                                  </div>
+                                  <div class="paymentMidSection">{{pageLabelMap 'PaymentProcessor_MidSec'}}</div>
+                                  {{#if this.paymentTypes}}
+                                  <div class="cc_payment_types_container">
+                                      <ul class="nav nav-tabs cc_nav-tabs cc_nav-tabs-payment" role="tablist">
+                                          {{#each this.paymentTypes}}
+                                           <li role="presentation" {{#ifEquals @index 0 }} class="active cc_nav-tabs_li" {{/ifEquals}}>
+                                           <a href="#{{@key}}" aria-controls="{{@key}}" role="tab" class="cc_nav-tabs_anchor" data-toggle="tab">{{pageLabelMapMultiString 'PaymentProcessorTab_' @key}}</a>
+                                           </li>
+                                           {{/each}}
+                                           </ul>
+                                           <!--***********-->
+                                               <div class="tab-content cc_tab-content">
+                                                   {{#each this.paymentTypes}}
+                                                    <div role="tabpanel" class="cc_tab-pane tab-pane {{#ifEquals @index 0 }} active {{/ifEquals}} " id="{{@key}}">
+                                                    <div class="paymentTypeContainer {{@key}} err cc_payment_type">
+                                                    {{pageLabelMap 'Payment_LoadingPaymentType'}}
+                                            </div>
+                                            </div>
+                                            {{/each}}
+                                            </div>
+                                            </div>
+                                            {{/if}}
+                                            </div>
+                                            </script>
+    <!-- SCP-769 start -->
+    <script id="PaymentPO-Both" type="text/template">
+    <div class="panel panel-default cc_panel cc_payment_po">
+        <div class="panel-heading cc_heading">
+            <h3 class="panel-title cc_title">{{pageLabelMap 'PMTPO_NewPO'}}</h3>
+            </div>
+            <div class="panel-body cc_body">
+                <div class="poPayment-messagingSection-Error" style="display: none"></div> 
+                <form id="newWalletForm" class="form-horizontal newPOForm cc_form-horizontal cc_new_po_form" forceSSL="true">
+                    <p class="cc_payment_po_instructions">{{pageLabelMap 'PMTPO_Instr'}}</p>
+                    <div class="form-group">
+                        <label for="accountNumber" class="col-sm-2 control-label poLabel Number fieldLabel cc_po_label_number">{{pageLabelMap 'PMTPO_PONum'}}</label>
+                            <div class="col-sm-10">
+                            <input id="accountNumber" type="text" name="accountNumber" maxlength="50" class="form-control">
+                            </div>
+                            </div>
+                        {{#if true }}
+                        {{#ifDisplay 'WLT.Enabled'}}
+                            <div class="form-group">
+                            <div class="col-sm-offset-2 col-sm-10">
+                            <div class="checkbox">
+                            <label for="saveAsStoredPayment" class="poLabel SavePayment fieldLabel cc_po_label_save_payment">
+                            <input type="checkbox" name="saveAsStoredPayment" id="saveAsStoredPayment" value="true" />
+                        {{pageLabelMap 'MyWallet_SavePayment'}}
+                            </label>
+                            </div>
+                            </div>
+                            </div>
+                            <div class="form-group">
+                            <label for="displayName" class="col-sm-2 control-label poLabel Name fieldLabel cc_po_label_name">{{pageLabelMap 'MyWallet_NameOpt'}}</label>
+                            <div class="col-sm-10">
+                            <input type="text" name="displayName" id="displayName" maxlength="50" class="form-control">
+                            </div>
+                            </div>
+                        {{/ifDisplay}}
+                        {{/if}}
+                            <div class="form-group">
+                            <label class="col-sm-2 control-label poLabel fieldLabel" >Attach File</label>
+                            
+                            <input class="col-sm-offset-2 " style="padding-top: 8px; padding-left: 15px;" type="file" id="fileupload" />
+                            
+                            </div>
+                            <div class="cc_po_action_buttons">
+                            <p class="panel-body pull-right cc_action_buttons">
+                            <input type="button" class="btn btn-default btn-sm button makePOPayment cc_make_po_payment" id="save" data-id="newWalletForm" value="{{pageLabelMap 'Payment_MakePayment'}}" />
+                            </p>
+                            </div>
+                            </form>
+                            </div>
+                            </div>
+                            </script>
+    <!-- SCP-769 end -->
+    <script>
+    var isViewRenderedFirstTime = true;
+    var currentView ;
+    var selectCyberAddressListMap = new Map();
+    var selectedAddress = '';
+    var modelOpeningFirstTime  = true;
+    var chval = ''; // SCP-789
+    CCRZ.pubSub.once("view:PaymentsSOPCCView:refresh", function (view) {
+        debugger;
+        var viewPrototype = Object.getPrototypeOf(view);  
+        if (viewPrototype != null) {
+            var _view = view;
+            viewPrototype.events = _.extend(viewPrototype.events, {
+                "click .validateCVN": "validateCVN",
+                "click .creditCardSelected": "creditCardSelected",
+            });
+            viewPrototype.validateCVN = function (event) {
+                debugger;
+                var errorHTML = '<div class="alert alert-danger">Field Validation Errors</div>';
+                var isErrorExists = false;
+                if(typeof $(".firstName").val() === 'undefined' || $(".firstName").val() === ''){
+                    isErrorExists = true;
+                    errorHTML = errorHTML + '<div class="alert alert-danger">First Name</div>';
+                }
+                if(typeof $(".lastName").val() === 'undefined' || $(".lastName").val() === ''){
+                    isErrorExists = true;
+                    errorHTML = errorHTML + '<div class="alert alert-danger">Required: Last Name</div>';
+                } 
+                if(typeof $(".cardType option:selected" ).attr('data-sfid') === 'undefined' || $(".cardType option:selected" ).attr('data-sfid') === ''){
+                    isErrorExists = true;
+                    errorHTML = errorHTML + '<div class="alert alert-danger">Payment Type</div>';
+                }
+                if(typeof $(".cardNumber").val() === 'undefined' || $(".cardNumber").val() === ''){
+                    isErrorExists = true;
+                    errorHTML = errorHTML + '<div class="alert alert-danger">Required: Card Number</div>';
+                }
+                if(typeof $(".cardExpirationMM").val() === 'undefined' || $(".cardExpirationMM").val() === ''){
+                    isErrorExists = true;
+                    errorHTML = errorHTML + '<div class="alert alert-danger">Required: MM</div>';
+                }
+                if(typeof $(".cardExpirationYYYY").val() === 'undefined' || $(".cardExpirationYYYY").val() === ''){
+                    isErrorExists = true;
+                    errorHTML = errorHTML + '<div class="alert alert-danger">Required: YYYY</div>';
+                }
+                if(typeof $(".cardCvn").val() === 'undefined' || $(".cardCvn").val() === ''){
+                    isErrorExists = true;
+                    errorHTML = errorHTML + '<div class="alert alert-danger">Required: CVV</div>';
+                }
+                if(typeof $("#address").val() === 'undefined' || $("#address").val() === ''){ 
+                    isErrorExists = true;
+                    errorHTML = errorHTML + '<div class="alert alert-danger">Required: Select Address</div>';
+                }
+                if(isErrorExists){
+                    $(".ccpgcs-messagingSection-Error").html(errorHTML);
+                    $(".ccpgcs-messagingSection-Error").show(); 
+                }else{
+                    $(".ccpgcs-messagingSection-Error").html('');
+                    $(".ccpgcs-messagingSection-Error").hide(); 
+                    $("#sopccPayment").addClass("sopccMakePayment");
+                    $("#sopccPayment").removeClass("validateCVN");
+                    $("#sopccPayment").click();
+                    //showprocess();// SCP-806                
+                    setTimeout(function(){ 
+                        $("#sopccPayment").addClass("validateCVN");
+                        $("#sopccPayment").removeClass("sopccMakePayment");
+                    }, 2000);
+                }
+            };
+            viewPrototype.creditCardSelected = function (event) {
+                alert('credit card selected');
+            }; 
+            view.delegateEvents();
+            currentView = view;
+            view.render();
+        }         
+    });
+    
+    CCRZ.pubSub.on('view:PaymentsSOPCCView:refresh',function(){
+        if(selectedContactData.slectedPayment === 'cc'){
+            showprocess();
+            //alert(selectedContactData.creditBillId);
+            debugger;
+            $(".cardCvn").prop( "disabled", false); 
+            $("#sopccPayment").addClass("validateCVN");
+            $("#sopccPayment").removeClass("sopccMakePayment");
+            $('a[href="#sopcc"]').addClass('creditCardSelected');
+            //$(".cardType").attr("onClick","validateSelectList()");
+            $(".cardType").attr("id","paymentcard");
+            selectCyberAddressListMap = new Map();
+            modelOpeningFirstTime  = true;
+            SCP_CyberSourceController.getBillingAddressContactList(
+                CCRZ.pagevars.remoteContext,selectedContactData.creditBillId,
+                function (response) {
+                    debugger;
+                    if (response) {
+                        if(response.success) {
+                            debugger;
+                            if(typeof response.data.newBill !== 'undefined'){
+                                var newbillAddress = response.data.newBill;
+                                var addressListHTML = '<option value="'+newbillAddress.Id+'">';
+                                var firstName2 =  newbillAddress.ccrz__FirstName__c;
+                                var lastName2 = newbillAddress.ccrz__LastName__c;
+                                var companyName2 = newbillAddress.ccrz__CompanyName__c;
+                                var addFirst2 = newbillAddress.ccrz__AddressFirstline__c;
+                                var city2 = newbillAddress.ccrz__City__c;
+                                var state2 = newbillAddress.ccrz__StateISOCode__c;
+                                var postal2 = newbillAddress.ccrz__PostalCode__c;
+                                var country2 = newbillAddress.ccrz__CountryISOCode__c;
+                                addressListHTML = addressListHTML + firstName2+lastName2+companyName2+','+addFirst2+','+city2+','+state2+','+postal2+','+country2+'</option>';
+                            }
+                            else{
+                                var cartObj = response.data.cartObjJSON;
+                                var addressListHTML = '<option value="">Select Address</option>';
+                                addressListHTML = '<option value="'+cartObj.ccrz__BillTo__c+'">';
+                                var firstName =  cartObj.ccrz__BillTo__r.ccrz__FirstName__c ? cartObj.ccrz__BillTo__r.ccrz__FirstName__c : '';
+                                var lastName = cartObj.ccrz__BillTo__r.ccrz__LastName__c ? cartObj.ccrz__BillTo__r.ccrz__LastName__c  : '';
+                                var companyName = cartObj.ccrz__BillTo__r.ccrz__CompanyName__c ? cartObj.ccrz__BillTo__r.ccrz__CompanyName__c + ',': '';
+                                var addFirst = cartObj.ccrz__BillTo__r.ccrz__AddressFirstline__c ? cartObj.ccrz__BillTo__r.ccrz__AddressFirstline__c + ',' : '';
+                                var city = cartObj.ccrz__BillTo__r.ccrz__City__c ? cartObj.ccrz__BillTo__r.ccrz__City__c + ',': '';
+                                var state = cartObj.ccrz__BillTo__r.ccrz__StateISOCode__c ? cartObj.ccrz__BillTo__r.ccrz__StateISOCode__c+ ','  : '';
+                                var postal = cartObj.ccrz__BillTo__r.ccrz__PostalCode__c ? cartObj.ccrz__BillTo__r.ccrz__PostalCode__c + ',': '';
+                                var country = cartObj.ccrz__BillTo__r.ccrz__CountryISOCode__c ? cartObj.ccrz__BillTo__r.ccrz__CountryISOCode__c : '';
+                                addressListHTML = addressListHTML + firstName+lastName+companyName+addFirst+city+state+postal+country+'</option>';
+                            }
+                            setTimeout(function(){ 
+                                $("#address").html(addressListHTML);
+                                //selectCyberAddressListMap.set(cartObj.ccrz__BillTo__c,$("option[value='"+cartObj.ccrz__BillTo__c+"']").text());
+                                bindEvent();
+                            }, 2000);
+                            
+                            
+                        }
+                    } 
+                }
+            );
+            
+            
+            validateSelectList();
+            $(".firstName").val(selectedContactData.creditFname);
+            $(".lastName").val(selectedContactData.creditLname);
+            $(".cardNumber").val(selectedContactData.creditNum);
+            $(".cardExpirationMM").val(selectedContactData.expm);
+            $(".cardExpirationYYYY").val(selectedContactData.expy);
+            $(".cardCvn").val(selectedContactData.creditCVN);
+            //alert(selectedContactData.credaddress);
+            document.getElementById('address').value = selectedContactData.credaddress;
+            
+            setTimeout(function(){ 
+                $("#sopccPayment" ).trigger( "click" );
+            }, 25000);
+        }
+    });
+    function validateSelectList(){
+        if(isViewRenderedFirstTime){
+            /*$(".cardType option").val(function(idx, val) {
+              debugger;
+              $(this).siblings('[value="'+ val +'"]').remove();
+            });*/
+            
+            $('#paymentcard').find('option').remove().end();
+            var selectArray = [];
+            var htmlString = '<option value="">Select Card Type</option>';
+            var x = '<option selected="selected" data-sfid="'+selectedContactData.paycardid+'" data-verification="true" value="'+selectedContactData.paycard+'">'+selectedContactData.paycardname+'</option>';
+            
+            htmlString = x;
+            
+            /*$('.cardType > option').each(function() {
+                alert(selectedContactData.paycard);
+                alert($(this).val());
+                if($(this).val() === selectedContactData.paycard){
+                    
+                debugger;
+                if((jQuery.inArray($(this).val(),selectArray) < 0) && typeof $(this).val() !== 'undefined' && $(this).val() !== '') {
+                    var x = '<option selected="selected" data-sfid="'+$(this).attr('data-sfid')+'" data-verification="true" value="'+$(this).val()+'">'+$(this).text()+'</option>';
+                    selectArray.push($(this).val());
+                    htmlString = x;
+                }
+                    }
+            });*/
+            
+            $('.cardType').html(htmlString);
+            isViewRenderedFirstTime = false;
+        }
+    }
+    function bindEvent(){
+        $('#cc_pgcs_sopcc_modal_Address').on('hidden.bs.modal', function () {
+            debugger;
+            if($('.modal-backdrop').hasClass('in')){
+                $('.modal-backdrop').removeClass('in');
+                $('.modal-backdrop').css('pointer-events','none');                        
+            }
+            setTimeout(function(){ 
+                if($("#address").val() !== '' && $("#address").val() !== selectedAddress){
+                    var temp = $("#address").val();
+                    var selectListHTML = '<option value="">Select Address</option>';
+                    selectListHTML = selectListHTML +'<option value="'+$("#address").val()+'">'+$("#address option:selected" ).text()+'</option>';
+                    selectCyberAddressListMap.forEach((values,keys)=>{
+                        if(keys !== temp){
+                        selectListHTML = selectListHTML +'<option value="'+keys+'">'+values+'</option>';
+                    }
+                                                      });
+                    $("#address").html(selectListHTML);
+                    $("#address").val(temp);
+                    selectCyberAddressListMap.set($("#address").val(),$("#address option:selected" ).text());
+                }
+            }, 1000);
+        });
+        $('#cc_pgcs_sopcc_modal_Address').on('show.bs.modal', function () {
+            selectedAddress = $("#address").val();
+        });
+    }
+    
+    var isfirsttime = true;
+    function getBillingAddress(){
+        SCP_CyberSourceController.getBillingAddressList(
+            CCRZ.pagevars.remoteContext,
+            function (response) {
+                debugger;
+                if (response) {
+                    if(response.success) {
+                        debugger;
+                        var cartObj = response.data.cartObjJSON;
+                        var addressListHTML = '<option value="">Select Address</option>';
+                        addressListHTML = addressListHTML + '<option value="'+cartObj.name+'">';
+                        var firstName =  cartObj.name;
+                        addressListHTML = addressListHTML + firstName+'</option>';
+                        $("#address").html(addressListHTML);                                                    
+                    }
+                } 
+            }
+        );
+    }
+    // SCP-789 start
+    CCRZ.pubSub.on("view:PaymentsPOView:refresh", function () {
+        if(selectedContactData.slectedPayment === 'po'){
+            $('#pModal').modal('show');
+            setTimeout(function(){
+                $('#pModal').modal('hide')
+            }, 10000);
+            $("#accountNumber").val(selectedContactData.ponum);
+            $("#displayName").val(selectedContactData.poname);
+            document.getElementById("saveAsStoredPayment").checked = selectedContactData.chkpo;
+            $("#save").addClass("POvalidate");
+            $("#save").removeClass("makePOPayment");
+            setTimeout(function(){ 
+                $("#save" ).trigger( "click" );
+            }, 5000);
+            
+        }
+        
+        if(selectedContactData.slectedPayment === 'spo'){
+            $('#pModal').modal('show');
+            setTimeout(function(){
+                $('#pModal').modal('hide')
+            }, 10000);
+            var x = "#storedPaymentSelection"+selectedContactData.storedpoid;
+            
+            setTimeout(function(){ 
+                // $("#storedPaymentSelectiona7R6C000000tG3KUAU").prop("checked", true);
+                //$("#storedPaymentSelectiona7R6C000000tG3KUAU").attr('checked', 'checked'); 
+                $(x).trigger( "click" ); 
+                $("#storePaymentBtn" ).trigger( "click" );
+            }, 5000);
+            
+        }
+    });
+    CCRZ.pubSub.once("view:PaymentsPOView:refresh", function (view) {
+        debugger;
+        var viewPrototype = Object.getPrototypeOf(view);  
+        if (viewPrototype != null) {
+            var _view = view;
+            viewPrototype.events = _.extend(viewPrototype.events, {
+                "click .POvalidate": "POvalidate",
+            });
+            viewPrototype.POvalidate = function (event) {
+                debugger;
+                var ponum = $("#accountNumber").val();
+                /*OmniCellBillingAddressController.getpo(
+                    CCRZ.pagevars.remoteContext,ponum,
+                    function (response) {
+                        
+                        if (response) {
+                            if(response.success) {
+                                if(response.data.isUpdated === true){
+                                    $("#myModal").modal('show');
+                                    $("#myModal").on('hidden.bs.modal', function(){
+                                        
+                                        if(chval === 'Yes'){
+                                            $("#save").addClass("makePOPayment");
+                                            $("#save").removeClass("POvalidate");
+                                            $("#save").click();
+                                        }
+                                        
+                                    });
+                                }else{
+                                    $("#save").addClass("makePOPayment");
+                                    $("#save").removeClass("POvalidate");
+                                    $("#save").click();
+                                }
+                            }    
+                        } 
+                    }
+                );*/
+                $("#save").addClass("makePOPayment");
+                $("#save").removeClass("POvalidate");
+                $("#save").click();
+            };
+            
+            view.delegateEvents();
+            currentView = view;
+            view.render();
+        }
+    });
+    
+    function changevalNo() {
+        chval='No';
+    }
+    function changevalYes() {
+        chval='Yes';
+    }
+    // SCP-789 end
+    
+    // SCP-769 start
+    /*var maxStringSize = 6000000;    //Maximum String size is 6,000,000 characters
+    var maxFileSize = 4350000;      //After Base64 Encoding, this is the max file size
+    var chunkSize = 950000;         //Maximum Javascript Remoting message size is 1,000,000 characters
+    var attachment;
+    var attachmentName;
+    var fileSize;
+    var positionIndex;
+    var doneUploading;
+    function attachfile(){
+        
+        var file = document.getElementById('fileupload').files[0];
+        console.log(file);
+        if(file != undefined) {
+            if(file.size <= maxFileSize) {
+                attachmentName = file.name;
+                var fileReader = new FileReader();
+                fileReader.onloadend = function(e) {
+                    attachment = window.btoa(this.result);  //Base 64 encode the file before sending it
+                    positionIndex=0;
+                    fileSize = attachment.length;
+                    console.log("Total Attachment Length: " + fileSize);
+                    doneUploading = false;
+                    if(fileSize < maxStringSize) {
+                        uploadAttachment(null);
+                    } else {
+                        alert("Base 64 Encoded file is too large.  Maximum size is " + maxStringSize + " your file is " + fileSize + ".");
+                    }
+                    
+                }
+                fileReader.onerror = function(e) {
+                    alert("There was an error reading the file.  Please try again.");
+                }
+                fileReader.onabort = function(e) {
+                    alert("There was an error reading the file.  Please try again.");
+                }
+                
+                fileReader.readAsBinaryString(file);  //Read the body of the file
+                
+            } else {
+                alert("File must be under 4 MB in size.  Your file is too large.  Please try again.");
+            }
+        } else {
+            deleteAttachment();
+        }
+    }
+    function uploadAttachment(fileId) {
+        var attachmentBody = "";
+        if(fileSize <= positionIndex + chunkSize) {
+            attachmentBody = attachment.substring(positionIndex);
+            doneUploading = true;
+        } else {
+            attachmentBody = attachment.substring(positionIndex, positionIndex + chunkSize);
+        }
+        console.log("Uploading " + attachmentBody.length + " chars of " + fileSize);
+        SCP_CyberSourceController.doUploadAttachment(
+            CCRZ.pagevars.remoteContext, attachmentBody, attachmentName, fileId, 
+            function (response) {
+                if(response.success) {                   
+                    console.log("File Upload Successful!");            
+                }
+            }
+        );
+    }
+    function deleteAttachment(){
+        SCP_CyberSourceController.dAttachment(
+            CCRZ.pagevars.remoteContext, 
+            function (response) {
+                if(response.success) {                   
+                    console.log("File deletion Successful!");            
+                }
+            }
+        );
+    }*/
+    // SCP-769 end
+    // SCP-806 start
+    function showprocess(){
+        $('#sopccModalPay').modal('hide');
+        
+        $('#pModal').modal('show');
+        setTimeout(function(){
+            
+            if(typeof $(".ccpgcs-messagingSection-Error").text() === 'undefined' || $(".ccpgcs-messagingSection-Error").text() === '' || $(".ccpgcs-messagingSection-Error").text() === null){
+                $('#pModal').modal('hide')
+            }else{
+                //alert($(".ccpgcs-messagingSection-Error").text())
+                $('#pModal').modal('hide')
+                $('#errModal').modal('show');
+            }
+        }, 35000);
+        
+        $('#sopccModalPay').modal('hide');
+    }
+    // SCP-806 end
+    function goback(){
+        location.reload(true);
+    }
+    </script>       
+</apex:component>

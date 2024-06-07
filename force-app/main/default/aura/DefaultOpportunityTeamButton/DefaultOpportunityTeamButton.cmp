@@ -1,0 +1,17 @@
+<!--**********************************************************************
+Name:  DefaultOpportunityTeamButton
+Copyright © 2019
+======================================================
+======================================================
+Purpose: 
+This component included a button to call batch class default the opportunity team                                                            
+======================================================
+======================================================
+History:                                                   
+VERSION      AUTHOR                      DATE             DETAIL               Description
+0.1          Venu Kukkapalli          05/29/2019 	Developed by CG Team    INITIAL DEVELOPMENT
+***********************************************************************-->
+<aura:component controller="DefaultOpportunityTeamButtonController" implements="flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId" access="global" >
+    <lightning:button name="schActUpdt" label="Default Opportunity Team" onclick="{!c.schedule}" class="cls">
+    </lightning:button>
+</aura:component>

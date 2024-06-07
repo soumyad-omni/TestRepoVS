@@ -1,0 +1,37 @@
+<!-- AccountNotifyComponent -->
+<aura:component controller="AccountCreateController" implements="flexipage:availableForAllPageTypes,force:hasRecordId" access="global" >
+
+    <!--force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" -->
+    <aura:attribute name="isReady" type="Boolean" default="false" access="public" />
+    <aura:attribute name="isError" type="Boolean" default="false" access="public" />
+	<aura:attribute name="rtnMessage" type="String" access="public" />
+    
+	<aura:attribute name="sap_account_id" type="String" access="public" /> 
+    <aura:handler name="init" value="{!this}" action="{!c.onInit}"/>
+    <aura:handler name="change" value="{!v.isReady}" action="{!c.displayMessage}"/>
+    
+ 	<aura:attribute name="cardTitle" type="Aura.Component[]">
+        <h2><span style="color:red;">{! v.rtnMessage }</span></h2>
+    </aura:attribute>
+    
+     <!-- <aura:if isTrue="{! and(v.isDataReady,!empty(v.sap_account_id)) }">-->
+    <!-- show if ready     <aura:if isTrue="{! and(v.isDataReady,!empty(v.sap_account_id)) }">-->
+    <aura:if isTrue="{! v.isError }">
+        <lightning:card title="{! v.cardTitle }" variant="Narrow" iconName="standard:account" />  
+    </aura:if> 
+    
+    <!-- show if ready -->  
+    <!--
+    <lightning:card title="SAP Notification Failure" variant="Narrow" iconName="standard:product_consumed">
+            <p class="slds-p-horizontal_small">
+                <aura:if isTrue="{! v.isError }">
+                    <lightning:layoutItem padding="0" size="12">
+                        <div class="">
+                            <span>{! v.rtnMessage }</span>
+                        </div>
+                    </lightning:layoutItem>
+                </aura:if>                 
+            </p>
+    </lightning:card>
+-->
+</aura:component>

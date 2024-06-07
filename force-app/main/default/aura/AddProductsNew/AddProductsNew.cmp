@@ -1,0 +1,10 @@
+<aura:component controller="AddProductForQuoteController" implements="flexipage:availableForRecordHome,force:hasRecordId" access="global">   
+    <aura:attribute name="isButtonShow" type="boolean" default="false"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:if isTrue="{!v.isButtonShow}">
+        <lightning:button variant="brand"
+                          label="Add Products New"
+                          title="Add Products New"
+                          onclick="{! c.navigateToAddNewPar }" />
+    </aura:if>
+</aura:component>

@@ -1,0 +1,68 @@
+<aura:component implements="flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId" controller = "QuoteApprovalProgressController">
+    <aura:attribute name="simpleRecord" type="Object"/>
+    <aura:attribute name="chrecordId" type = "String"/>
+    <aura:attribute name = "chId" type = "boolean"/>
+    <aura:attribute name = "Pendingqueues" type = "String[]"/>
+    <aura:attribute name = "queuesnotstarted" type = "String[]"/>
+    <aura:attribute name = "Approvedqueues" type = "List"/>
+    <aura:attribute name = "Rejectedqueues" type = "String[]"/>
+    <aura:attribute name = "ApprovedDates" type = "List"/>
+    <aura:attribute name = "transformedData" type = "List"/>
+    <aura:attribute name="lstKey" type="List"/>
+   <aura:attribute name="fullMap" type="map"/>
+    <aura:attribute name="lstKey1" type="List"/>
+   <aura:attribute name="fullMap1" type="map"/>
+    <force:recordData aura:id="quoteApproval" recordId="{!v.recordId}"
+                      targetFields="{!v.simpleRecord}" layoutType="FULL" mode="EDIT" />
+    <aura:handler name="init" value="this" action="{!c.doInit}"/>
+    <aura:if isTrue="{!v.chId}">
+
+    <div class="slds-box_x-smal">
+        
+        
+        
+        <aura:iteration items="{!v.lstKey1}" var="key">
+         <c:mapEntryChild map="{!v.fullMap1}" key="{!key}"/>
+          <lightning:picklistPath aura:id="picklistPath" recordId="{!v.chrecordId}"
+                                    variant="linear"
+                                    picklistFieldApiName="Progress_Rejected__c"
+                                    onselect="{!c.handleSelect}">
+            </lightning:picklistPath>
+            
+      
+    </aura:iteration>
+    <aura:iteration items="{!v.lstKey}" var="key" >
+      <c:mapEntryChild map="{!v.fullMap}" key="{!key}"/>
+        <lightning:picklistPath aura:id="picklistPath" recordId="{!v.chrecordId}"
+                                    variant="non-linear"
+                                    picklistFieldApiName="Progress_Approved__c"
+                                    onselect="{!c.handleSelect}">
+            </lightning:picklistPath>
+   </aura:iteration>
+    <aura:iteration items="{!v.Pendingqueues}" var="pendingqueue">    
+        
+            <p>{!pendingqueue}</p><br/>
+            <lightning:picklistPath aura:id="picklistPath" recordId="{!v.chrecordId}"
+                                    variant="non-linear"
+                                    picklistFieldApiName="Progress_Pending__c"
+                                    onselect="{!c.handleSelect}">
+            </lightning:picklistPath>
+      
+    </aura:iteration>
+    
+<aura:iteration items="{!v.queuesnotstarted}" var="queuenotstarted">    
+        
+            <p>{!queuenotstarted}</p><br/>
+            <lightning:picklistPath aura:id="picklistPath" recordId="{!v.chrecordId}"
+                                    variant="non-linear"
+                                    picklistFieldApiName="Approval_Progress_Status_Not_Started__c"
+                                    onselect="{!c.handleSelect}">
+            </lightning:picklistPath>
+      
+    </aura:iteration>    
+    </div>
+        <aura:set attribute="else">
+        Dev-Notes : You should have a quote approval chevron record to print chevrons.
+    </aura:set>
+    </aura:if>
+    </aura:component>

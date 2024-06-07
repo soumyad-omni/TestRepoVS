@@ -1,0 +1,80 @@
+<aura:component controller="C4CTicketsController" implements="lightning:isUrlAddressable,force:hasRecordId,flexipage:availableForRecordHome" description="C4C Service Ticket List" access="global" >
+    <!-- Note: attribute recordId is automatically available when adding "force:hasRecordId" interface above -->
+	<!-- Note: attribute pageReference is automatically available when adding "lightning:isUrlAddressable" interface above -->
+	<aura:attribute name="viewAll" type="Boolean" default="false" access="global" />
+    <aura:attribute name="columns" type="List" default="[]" access="private" />
+    <aura:attribute name="data" type="List" default="[]" access="private" />
+    <aura:attribute name="count" type="String" default="0" access="private" />
+    <aura:attribute name="isWaiting" type="Boolean" default="true" access="private" />
+    <aura:handler name="init" value="{!this}" action="{!c.onInit}"/>
+
+    <lightning:card class="slds-card_boundary" iconName="standard:task" title="{! 'C4C Service Requests (' + v.count+ ')' }">
+    	<aura:set attribute="actions">
+			<!--<lightning:buttonIcon alternativeText="open"  class="{!v.isOpen ? 'slds-is-selected' : ''}" iconName="{!v.isOpen ? 'utility:chevrondown' : 'utility:chevronleft'}" onclick="{!c.handleOpenButtonClick}" />	    	
+    		<lightning:buttonIcon alternativeText="refresh" class="slds-button_icon-border-filled" iconName="utility:refresh" onclick="{!c.onInit}" /> -->
+    	</aura:set>
+        <aura:if isTrue="{!v.viewAll}" >
+            <lightning:layout multipleRows="true" horizontalAlign="center">
+                <lightning:layoutItem padding="around-small" size="12">
+                    <div style="height: 500px">
+                        <lightning:datatable data="{!v.data }" columns="{!v.columns}" keyField="ID" hideCheckboxColumn="true" minColumnWidth="80" showRowNumberColumn="true"/>
+                    </div>
+                </lightning:layoutItem>
+            </lightning:layout>
+            
+            <aura:set attribute="else">
+                <lightning:layout multipleRows="true" horizontalAlign="center">
+                    <lightning:layoutItem padding="around-small" size="12">
+                        <div class="previewMode SMALL forceRelatedListPreview">
+                            <ul class="uiAbstractList">
+                                <aura:iteration items="{!v.data}" var="item">
+                                    <li class="slds-var-p-horizontal_medium slds-var-p-vertical_xx-small desktop forceImageRelatedListStencil forceRecordLayout">
+                                        <div class="listItemBody withActions" >
+                                            <h3 class="primaryField" data-aura-rendered-by="68:2296;a">
+                                                <span class="data-social-photo-guid-8672b082-dc4f-48e6-bdda-e3f764cad2f1 photoContainer forceSocialPhoto_v2 forceOutputLookup">
+                                                    <lightning:icon iconName="standard:related_list" alternativeText="Approved" size=" small"/>
+                                                </span>
+                                                <a class="textUnderline outputLookupLink slds-truncate forceOutputLookup"><span class="view-all-label ">{!item.ID}</span></a>
+                                            </h3>
+                                            <ul class="itemRows truncate">
+                                                <li class="tableRowGroup">
+                                                    <div class="slds-list--horizontal forceListRecordItem">
+                                                        <div class="slds-item--label slds-truncate recordCell">Action Name:</div>
+                                                        <div class="slds-item--detail slds-truncate recordCell">{!item.ActionName}</div>
+                                                    </div>
+                                                </li>
+                                                <li class="tableRowGroup">
+                                                    <div class="slds-list--horizontal forceListRecordItem">
+                                                        <div class="slds-item--label slds-truncate recordCell">Assigned To Name:</div>
+                                                        <div class="slds-item--detail slds-truncate recordCell">{!item.AssignedToName}</div>
+                                                    </div>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        
+                                        <!--<dl class="slds-dl_horizontal">
+                                        <dt class="slds-dl_horizontal__label">Action Name</dt>
+                                        <dd class="slds-dl_horizontal__detail">{!item.ActionName}</dd>
+                                        <dt class="slds-dl_horizontal__label">Assigned To Name</dt>
+                                        <dd class="slds-dl_horizontal__detail">{!item.AssignedToName}</dd>
+                                    </dl>-->
+                                    </li>
+                                </aura:iteration>
+                            </ul>
+                        </div>
+                    </lightning:layoutItem>
+                </lightning:layout>
+                <aura:if isTrue="{!v.data.length}">
+                    <div class="slds-card__footer slds-align_absolute-center" data-aura-rendered-by="2146:0">
+                        <a><span class="view-all-label" onclick="{!c.navigateToViewAll}">View All</span></a>
+                    </div>
+                </aura:if>
+            </aura:set>
+        </aura:if>
+    	<aura:if isTrue="{!v.isWaiting}">
+            <lightning:layoutItem padding="around-small" size="12">
+                <lightning:spinner variant="brand" size="small" alternativeText="Fetching data" />
+            </lightning:layoutItem>
+        </aura:if>
+    </lightning:card>
+</aura:component>

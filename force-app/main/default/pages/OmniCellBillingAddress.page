@@ -1,0 +1,591 @@
+<!--
+  @description       : 
+  @author            : ChangeMeIn@UserSettingsUnder.SFDoc
+  @group             : 
+  @last modified on  : 06-08-2021
+  @last modified by  : ChangeMeIn@UserSettingsUnder.SFDoc
+  Modifications Log 
+  Ver   Date         Author                               Modification
+  1.0   05-27-2021   ChangeMeIn@UserSettingsUnder.SFDoc   Initial Version
+-->
+<apex:page controller="OmniCellBillingAddressController" id="OmniCellBillingAddress" applyHtmlTag="false" docType="html-5.0" sidebar="false" showHeader="false" standardStylesheets="false">  
+   <style><!-- Added for SCP-846 -->
+       .contactText {
+          width: 25%;
+          padding: 6px 12px;
+          margin: 8px 0;
+          display: inline-block;
+          border: 1px solid #ccc;
+          border-radius: 4px;
+          box-sizing: border-box;
+        }
+   </style>
+   <script id="UserInfo-Desktop" type="text/template">
+   <div class="panel panel-default cc_panel cc_checkout_user_info">
+    <div class="panel-heading cc_heading">
+     <h3 class="panel-title cc_title">{{pageLabelMap 'CheckOut_ContactInformation'}}</h3>
+    </div>
+    <div class="panel-body cc_body">
+     <form id="mainform" class="cc_userInfo_form">
+      <div class="main-messagingSection-Error" style="display: none"></div>
+      <div class="form-group">
+       <label for="firstNameField" class="cc_contact_input_firstname_label">{{pageLabelMap 'CheckOut_FirstName'}}</label>
+       <input id="firstNameField"  disabled="disabled" type="text" class="form-control contactInput cc_contact_input_firstname" name="buyerFirstName" maxlength=40 value="{{this.buyerFirstName}}" />
+      </div>
+      <div class="form-group">
+       <label for="lastNameField" class="cc_contact_input_lastname_label">{{pageLabelMap 'CheckOut_LastName'}}</label>
+       <input id="lastNameField" disabled="disabled" type="text" class="form-control contactInput cc_contact_input_lastname" name="buyerLastName" maxlength=40 value="{{this.buyerLastName}}" />
+      </div>
+      <div class="form-group">
+       <label for="homePhoneField" class="cc_contact_input_phone_label">{{pageLabelMap 'CheckOut_PrimaryPhone'}}</label>
+       <input id="homePhoneField" disabled="disabled" type="text" class="form-control contactInput cc_contact_input_phone" name="buyerPhone" maxlength=40 value="{{this.buyerPhone}}" />
+      </div>
+      <div class="form-group">
+       <label for="emailField" class="cc_contact_input_email_label">{{pageLabelMap 'CheckOut_Email'}}</label>
+       <input id="emailField" disabled="disabled" type="email" class="form-control contactInput cc_contact_input_email" name="buyerEmail" maxlength=80 value="{{this.buyerEmail}}" />
+      </div>
+     </form>
+     <div class="cc_address_entry_billing">
+      {{> addressEntry this.billingAddress}}
+     </div>
+     <div class="cc_address_entry_shipping">
+      {{> addressEntry this.shippingAddress}}
+     </div>
+     {{#ifDisplay 'Dspl.CCEmail'}}
+      <form id="ccEmailForm" class="cc_ccemail_new">
+       <div class="ccemail-messagingSection-Error" style="display: none"></div>
+       <h3 class="cc_ccemail_title">{{pageLabelMap 'CheckOut_ccEmailAddress'}}</h3>
+       <p class="cc_ccemail_helptext">{{{pageLabelMap 'CheckOut_ccEmailAddressHelpText'}}}</p>
+       <div class="form-group">
+        <label for="ccEmailAddress" class="cc_contact_input_cc_email_label">{{pageLabelMap 'CheckOut_ccEmailAddress'}}</label>
+        <input id="ccEmailAddress" type="text" class="form-control contactInput ccemail cc_contact_input_cc_email" name="ccEmailAddresses" maxlength=80 value="{{this.ccEmailAddresses}}" />
+       </div>
+      </form>
+     {{/ifDisplay}}
+
+     <form class="userInformation cc_user_information">
+      <p class="cc_user_information_helptext">{{{pageLabelMap 'Required_Fields'}}}</p>
+      <p class="link_button cc_link_button">
+       <input class="btn btn-default btn-sm processBack cc_process_back" type="button" value="{{pageLabelMap 'Back'}}" alt="{{pageLabelMap 'Back'}}" />
+       <input id="contB" class="btn btn-default btn-sm  updateCartCustomFields  cc_process_user_info" type="button" value="{{pageLabelMap 'CheckOut_Continue'}}" alt="{{pageLabelMap 'CheckOut_Continue'}}" />
+      </p>
+     </form>
+    </div>
+   </div>
+  </script>
+
+  <script id="UserInfo-AddressEdit-Desktop" type="text/template">
+    {{#modifyData this}}{{/modifyData}} 
+   <form id="{{classPrefix}}AddressForm" class="addressForm">
+    <div class="{{classPrefix}}-messagingSection-Error" style="display: none"></div>
+    <h3 class="cc_section_title">{{pageLabelMap sectionLabel}}</h3>
+    {{#ifEquals classPrefix 'shipping'}}
+     <a onclick="shippingStateChanged()" class="copyAddress cc_copy_address">{{pageLabelMap 'Checkout_UseBillingAddress'}}</a>
+    {{/ifEquals}}
+    <p class="change_address cc_change_address">
+     <a href="#modal_{{classPrefix}}" data-toggle="modal" class="cc_change_address_modal">{{pageLabelMap 'UserInfo_AddressBook'}}</a>
+    </p>
+    {{#ifDisplay 'SO.DsplAddrName'}}
+     <!--<div class="form-group">
+      <label for="firstName">{{pageLabelMap 'CheckOut_FirstName'}}</label>
+      <input id="firstName" type="text" class="form-control {{classPrefix}}firstNameField {{classPrefix}}Field cc_contact_input_firstname" name="{{classPrefix}}Address.firstName" maxlength=100 value="{{this.firstName}}" />
+     </div>
+     
+     <div class="form-group">
+      <label for="lasttName">{{pageLabelMap 'CheckOut_LastName'}}</label>
+      <input id="lastName" type="text" class="form-control {{classPrefix}}lastNameField {{classPrefix}}Field cc_contact_input_lastname" name="{{classPrefix}}Address.lastName" maxlength=100 value="{{this.lastName}}" />
+     </div>
+     -->
+      {{#ifEquals classPrefix 'billing'}}
+     <div class="form-group">
+      <label for="firstName">{{pageLabelMap 'CheckOut_FirstName'}}</label>
+      <input id="firstName" type="text" disabled="disabled" class="form-control {{classPrefix}}LoggedUserFirstName {{classPrefix}}Field LoggedUserFirstName"  maxlength=100 value="{{this.buyerFirstName}}" />
+     </div>
+       {{/ifEquals}}
+       
+        {{#ifEquals classPrefix 'billing'}}
+     <div class="form-group">
+      <label for="firstName">{{pageLabelMap 'CheckOut_LastName'}}</label>
+      <input id="firstName" type="text" disabled="disabled" class="form-control {{classPrefix}}LoggedUserLast {{classPrefix}}Field LoggedUserLastName"  maxlength=100 value="{{this.buyerLastName}}" />
+     </div>
+       {{/ifEquals}}
+       
+    {{/ifDisplay}}
+    {{#ifDisplay 'SO.DsplAddrCompany'}}
+     <div class="form-group">
+      <label for="companyName">{{pageLabelMap 'Profile_CompanyName'}}</label>
+      <input id="companyName" type="text" disabled="disabled" class="form-control {{classPrefix}}companyField {{classPrefix}}Field cc_contact_input_company" name="{{classPrefix}}Address.companyName" maxlength=100 value="{{this.companyName}}" />
+     </div>
+    {{/ifDisplay}}
+    {{#ifEquals classPrefix 'billing'}}
+      <div class="form-group">
+          <label for="billingcompanyName2">{{pageLabelMap 'Profile_CompanyName2'}}</label>
+          <input id="billingcompanyName2" disabled="disabled" type="text" class="form-control {{classPrefix}}companyField2 " maxlength=100 value="{{this.companyName2}}" />
+     </div>
+    {{/ifEquals}}
+    {{#ifEquals classPrefix 'shipping'}}
+      <div class="form-group">
+          <label for="shippingcompanyName2">{{pageLabelMap 'Profile_CompanyName2'}}</label>
+          <input id="shippingcompanyName2" disabled="disabled" type="text" class="form-control {{classPrefix}}companyField2 " maxlength=100 value="{{this.companyName2}}" />
+     </div>
+     <!-- SCP-763 start -->
+     <div class="form-group">
+     <label>Attn:</label>
+          <input id="attn" type="text" class="form-control " value="{!companyattn}"/>
+     </div>
+     <!-- SCP-763 end -->
+     <div class="form-group">
+     <div id="error-msg-fn" style="color:red;"></div> <!-- B2B-123 -->
+        <div> <!-- B2B-849 Start-->
+          <label>First Name</label><label for="contactList" style="color:red;">*&nbsp;&nbsp;&nbsp;</label><input id="cfname" type="text" class="contactText"/>&nbsp;&nbsp;&nbsp;
+          <div id="error-msg-ln" style="color:red;"></div>
+          <label>Last Name</label><label for="contactList" style="color:red;">*&nbsp;&nbsp;&nbsp;</label><input id="clname" type="text" class="contactText"/>
+        </div>
+        <div>
+          <div id="error-msg-ph" style="color:red;"></div>
+          <label>Contact No</label><label for="contactList" style="color:red;">*&nbsp;&nbsp;</label><input id="cphone" type="text" class="contactText"/>
+        </div><!-- B2B-849 End-->
+       <!-- <label for="contactList">Contacts</label><label for="contactList" style="color:red;">*</label>--> <!-- B2B-123 -->
+       <!-- <div class="contactList">
+            <span class="">
+                <select id="contactList" class="form-control">
+                  {{{this.contactListHTML}}}                
+                  </select>
+            </span>
+        </div>--><!--Commented out for B2B-849 -->
+    </div>
+    {{/ifEquals}}
+    <input type="hidden" class="{{classPrefix}}addrReadOnly {{classPrefix}}Field" name="{{classPrefix}}Address.addrReadOnly" maxlength=100 value="{{this.addrReadOnly}}" />
+    <input type="hidden" class="{{classPrefix}}acctIdField {{classPrefix}}Field" name="{{classPrefix}}Address.partnerId" maxlength=100 value="{{this.partnerId}}" />
+    <input type="hidden" class="{{classPrefix}}sfid {{classPrefix}}Field" name="{{classPrefix}}Address.sfid" maxlength=100 value="{{this.sfid}}" />
+    <div class="form-group">
+     <label for="address1">{{pageLabelMap 'Profile_Address'}}</label>
+     <input id="address1" disabled="disabled" type="text" class="form-control {{classPrefix}}Address1 {{classPrefix}}Field cc_contact_input_address" name="{{classPrefix}}Address.address1" value="{{this.address1}}" maxlength="40" />
+     <input id="address2" disabled="disabled" type="text" class="form-control {{classPrefix}}Address2 {{classPrefix}}Field cc_contact_input_address" name="{{classPrefix}}Address.address2" value="{{this.address2}}" maxlength="40" />
+     <input id="address3" disabled="disabled" type="text" class="form-control {{classPrefix}}Address3 {{classPrefix}}Field cc_contact_input_address" name="{{classPrefix}}Address.address3" value="{{this.address3}}" maxlength="40" />
+    </div>
+    <div class="form-group">
+     <label for="country">{{pageLabelMap 'CheckOut_Country'}}</label>
+     {{{selectGeo 'country' this.countryList this.countryCode 'countryListing form-control' this.classPrefix}}}
+    </div>
+    <div class="form-group">
+     <label for="state">{{pageLabelMap 'CheckOut_State'}}</label>
+     <div class="stateSection cc_state_section"></div>
+    </div>
+    <div class="form-group">
+     <label for="city">{{pageLabelMap 'CheckOut_City'}}</label>
+     <input id="city" disabled="disabled" type="text" class="form-control {{classPrefix}}City {{classPrefix}}Field cc_contact_input_city" name="{{classPrefix}}Address.city" maxlength=255 value="{{this.city}}" />
+    </div>
+    <div class="form-group">
+     <label for="postalCode">{{pageLabelMap 'CheckOut_PostalCode'}}</label>
+     <input id="postalCode" disabled="disabled" type="text" class="form-control {{classPrefix}}PostalCode {{classPrefix}}Field cc_contact_input_postal_code" name="{{classPrefix}}Address.postalCode" value="{{this.postalCode}}" maxlength=10/>
+    </div>
+    <div class="form-group" style="display:none;">
+     <label for="SAPCustomerNumber">SAPCustomerNumber</label>
+     <input id="SAPCustomerNumber" type="text" class="form-control {{classPrefix}}SAPCustomerNumber"  value="{{this.SAPCustomerNumber}}" maxlength=10/>
+    </div>
+   </form>
+   {{#ifEquals classPrefix 'billing'}}
+   <div id="modal_{{classPrefix}}" class="modal fade cc_address_book_modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog cc_modal-dialg" role="document">
+     <div class="modal-content cc_modal-content">
+      <div class="modal-header cc_modal-header">
+       <button type="button" class="close closeBilling" data-dismiss="modal" aria-label="{{pageLabelMap 'Modal_Aria_Close'}}"><span aria-hidden="true">&#215;</span></button>
+       <h4 class="modal-title cc_title">{{pageLabelMap 'UserInfo_AddressBookModal'}}</h4>
+      </div>
+      <div class="modal-body cc_modal-body">
+       {{#each this.accListArrayBilling}}
+            <div class="row cc_billing_shipping_info">
+               <div class="col-md-6 cc_personal_info">
+                   <div class="address_selection_display">
+                       <p class="cc_addr_company">{{this.Name}}</p>
+                        <span class="addr_line1 cc_addr_line">{{this.BillingStreet}}{{#if this.PO_BOX__c}}P.O. Box: {{this.PO_BOX__c}}{{/if}}</span><br/><!--Added PO Box for SCP-735 -->
+                        <span class="cc_addr_city">{{this.BillingCity}}</span>
+                        <span class="cc_addr_state">,&nbsp;{{this.BillingState}}</span>
+                        <span class="cc_addr_postal">&nbsp;{{this.BillingPostalCode}}</span><br>
+                        <span class="cc_addr_country">{{this.BillingCountry}}</span><br>
+                        <span class="cc_addr_extId"></span><br/>
+                     </div>
+                     <br/>
+                </div>
+               <div class="col-md-6 cc_select">
+                <input type="button" value="Select Address" class="btn btn-default btn-sm shippingField cc_select_address" data-id="{{this.Id}}" onclick="updateBillingAddress('{{this.Id}}')" readonly="readonly">
+               </div>
+              </div>       
+           <hr>
+       {{/each}}
+      </div>
+     </div>
+    </div>
+   </div>
+   {{/ifEquals}}
+   {{#ifEquals classPrefix 'shipping'}}
+   <div id="modal_{{classPrefix}}" class="modal fade cc_address_book_modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog cc_modal-dialg" role="document">
+     <div class="modal-content cc_modal-content">
+      <div class="modal-header cc_modal-header">
+       <button type="button" class="close closeShipping" data-dismiss="modal" aria-label="{{pageLabelMap 'Modal_Aria_Close'}}"><span aria-hidden="true">&#215;</span></button>
+       <h4 class="modal-title cc_title">{{pageLabelMap 'UserInfo_AddressBookModal'}}</h4>
+      </div>
+      <div class="modal-body cc_modal-body">
+       {{#each this.accListArray}}
+          {{#ifNotEquals this.Account_Role__c 'ZCSP'}}
+            <div class="row cc_billing_shipping_info">
+               <div class="col-md-6 cc_personal_info">
+                   <div class="address_selection_display">
+                       <p class="cc_addr_company">{{this.Name}}</p>
+                        <span class="addr_line1 cc_addr_line">{{this.BillingStreet}}{{#if this.PO_BOX__c}}P.O. Box: {{this.PO_BOX__c}}{{/if}}</span><br/><!--Added PO Box for SCP-735 -->
+                        <span class="cc_addr_city">{{this.BillingCity}}</span>
+                        <span class="cc_addr_state">,&nbsp;{{this.BillingState}}</span>
+                        <span class="cc_addr_postal">&nbsp;{{this.BillingPostalCode}}</span><br>
+                        <span class="cc_addr_country">{{this.BillingCountry}}</span><br>
+                        <span class="cc_addr_extId"></span>
+                     </div>
+                     <br/>
+                </div>
+               <div class="col-md-6 cc_select">
+                <input type="button" value="Select Address" class="btn btn-default btn-sm shippingField cc_select_address" data-id="{{this.Id}}" onclick="updateShippingAddress('{{this.Id}}')" readonly="readonly">
+               </div>
+              </div>       
+           <hr>
+          {{/ifNotEquals}}
+       {{/each}}
+      </div>
+     </div>
+    </div>
+   </div>
+   {{/ifEquals}}
+
+  </script>
+        <script id="UserInfo-Desktop" type="text/template">
+   <div class="panel panel-default cc_panel cc_checkout_user_info">
+    <div class="panel-heading cc_heading">
+     <h3 class="panel-title cc_title">{{pageLabelMap 'CheckOut_ContactInformation'}}</h3>
+    </div>
+    <div class="panel-body cc_body">
+     <form id="mainform" class="cc_userInfo_form">
+      <div class="main-messagingSection-Error" style="display: none"></div>
+      <div class="form-group">
+       <label for="firstNameField" class="cc_contact_input_firstname_label">{{pageLabelMap 'CheckOut_FirstName'}}</label>
+       <input id="firstNameField" type="text" class="form-control contactInput cc_contact_input_firstname" name="buyerFirstName" maxlength=40 value="{{this.buyerFirstName}}" />
+      </div>
+      <div class="form-group">
+       <label for="lastNameField" class="cc_contact_input_lastname_label">{{pageLabelMap 'CheckOut_LastName'}}</label>
+       <input id="lastNameField" type="text" class="form-control contactInput cc_contact_input_lastname" name="buyerLastName" maxlength=40 value="{{this.buyerLastName}}" />
+      </div>
+      <div class="form-group">
+       <label for="homePhoneField" class="cc_contact_input_phone_label">{{pageLabelMap 'CheckOut_PrimaryPhone'}}</label>
+       <input id="homePhoneField" type="text" class="form-control contactInput cc_contact_input_phone" name="buyerPhone" maxlength=40 value="{{this.buyerPhone}}" />
+      </div>
+      <div class="form-group">
+       <label for="emailField" class="cc_contact_input_email_label">{{pageLabelMap 'CheckOut_Email'}}</label>
+       <input id="emailField" type="email" class="form-control contactInput cc_contact_input_email" name="buyerEmail" maxlength=80 value="{{this.buyerEmail}}" />
+      </div>
+     </form>
+     <div class="cc_address_entry_billing">
+      {{> addressEntry this.billingAddress}}
+     </div>
+     <div class="cc_address_entry_shipping">
+      {{> addressEntry this.shippingAddress}}
+     </div>
+     {{#ifDisplay 'Dspl.CCEmail'}}
+      <form id="ccEmailForm" class="cc_ccemail_new">
+       <div class="ccemail-messagingSection-Error" style="display: none"></div>
+       <h3 class="cc_ccemail_title">{{pageLabelMap 'CheckOut_ccEmailAddress'}}</h3>
+       <p class="cc_ccemail_helptext">{{{pageLabelMap 'CheckOut_ccEmailAddressHelpText'}}}</p>
+       <div class="form-group">
+        <label for="ccEmailAddress" class="cc_contact_input_cc_email_label">{{pageLabelMap 'CheckOut_ccEmailAddress'}}</label>
+        <input id="ccEmailAddress" type="text" class="form-control contactInput ccemail cc_contact_input_cc_email" name="ccEmailAddresses" maxlength=80 value="{{this.ccEmailAddresses}}" />
+       </div>
+      </form>
+     {{/ifDisplay}}
+
+     <form class="userInformation cc_user_information">
+      <p class="cc_user_information_helptext">{{{pageLabelMap 'Required_Fields'}}}</p>
+      <p class="link_button cc_link_button">
+       <input class="btn btn-default btn-sm processBack cc_process_back" type="button" value="{{pageLabelMap 'Back'}}" alt="{{pageLabelMap 'Back'}}" />
+       <input class="btn btn-default btn-sm  updateCartCustomFields  cc_process_user_info" type="button" value="{{pageLabelMap 'CheckOut_Continue'}}" alt="{{pageLabelMap 'CheckOut_Continue'}}" />
+      </p>
+     </form>
+    </div>
+   </div>
+  </script>
+  <div id="accListJSONData" style="display:none;">{!accListJSON}</div>
+  <div id="accListBillingJSONData" style="display:none;">{!accListBillingJSON}</div>
+  <div id="currentAccountJSONData" style="display:none;">{!currentAccountObj}</div>
+  <script>
+        var accountAddressMap = new Map();
+        var accountAddressMapBilling = new Map();
+        var selectedContactData = {};
+        var selectedContact = '';
+        var selectListHTML = '';
+        var defaultContactListHTML = '';
+        var accountCompanyName2 = '{!accountName2}';
+        var isViewRendered = false;
+        var isNewCart = {!newCart};
+        
+        var currentAccountObjList =  unescapedHtml($("#currentAccountJSONData").html());
+        var currentAccountObj = JSON.parse(currentAccountObjList);
+        
+       Handlebars.registerHelper("modifyData", function(currentObj,options) { 
+            this.buyerFirstName = CCRZ.currentUser.FirstName ? CCRZ.currentUser.FirstName : ''; 
+            this.buyerLastName = CCRZ.currentUser.LastName ? CCRZ.currentUser.LastName : '';
+           this.address3 = currentAccountObj.PO_BOX__c ? 'P.O. Box: '+currentAccountObj.PO_BOX__c : '';//Added for SCP-735
+            if(this.classPrefix == "billing"){
+                this.firstName = CCRZ.currentUser.FirstName;
+                this.lastName = CCRZ.currentUser.LastName;
+                if(typeof selectedContactData.billingCustomerNumber === 'undefined'){
+                    selectedContactData.billingCustomerNumber = this.SAPCustomerNumber;
+                    selectedContactData.billingcompanyName2 = this.companyName2;
+                }
+                /*else{
+                    this.SAPCustomerNumber = selectedContactData.billingCustomerNumber;
+                    this.CompanyName2 = selectedContactData.billingcompanyName2;
+                }*/
+            }else if(this.classPrefix == "shipping"){
+               if(typeof selectedContactData.shippingCustomerNumber === 'undefined'){
+                    selectedContactData.shippingCustomerNumber = this.SAPCustomerNumber;
+                    selectedContactData.shippingcompanyName2 = this.companyName2;
+                }
+                
+            }
+            debugger;
+            if(typeof this.companyName2 === 'undefined' || this.companyName2 === ''){
+               this.companyName2 = accountCompanyName2;
+            }
+            var accList = unescapedHtml($("#accListJSONData").html());
+            var accListArray = [];
+            if(accList  !== ""){
+                accListArray  = JSON.parse(accList);
+                for(i =0; i < accListArray.length; i++){
+                    accountAddressMap.set(accListArray[i].Id,accListArray[i]);
+                }
+            }
+            var accListBilling =  unescapedHtml($("#accListBillingJSONData").html());
+            var accListArrayBilling = [];
+            if(accListBilling !== ""){
+                accListArrayBilling = JSON.parse(accListBilling);
+                for(i =0; i < accListArrayBilling.length; i++){
+                    accountAddressMapBilling.set(accListArrayBilling[i].Id,accListArrayBilling[i]);
+                }
+            }
+            this.accListArrayBilling = accListArrayBilling;
+            this.accListArray  = accListArray;
+            if(typeof selectListHTML !== 'undefined'){
+                this.contactListHTML = selectListHTML ;
+            }
+            else{
+                this.contactListHTML = "<option value='' class=''>No Contact Found</option>";
+                selectListHTML = this.contactListHTML;
+            }
+            return options.fn(this);  
+        });
+        function updateShippingAddress(sfId){
+            $(".closeShipping").click();
+            var selectedAccount = accountAddressMap.get(sfId);
+            $(".shippingcompanyField").val(selectedAccount.Name);
+            $(".shippingcountry").val(selectedAccount.BillingCountryCode);
+            $(".shippingstate").val(selectedAccount.BillingStateCode);
+            $(".shippingCity").val(selectedAccount.BillingCity);
+            $(".shippingPostalCode").val(selectedAccount.BillingPostalCode);
+            $(".shippingAddress1").val(selectedAccount.BillingStreet);
+            $(".shippingAddress3").val(selectedAccount.PO_BOX__c ? 'P.O. Box: '+selectedAccount.PO_BOX__c : '');//Added for SCP-735
+            $("#shippingcompanyName2").val(selectedAccount.Account_Name2__c);
+            $(".shippingSAPCustomerNumber").val(selectedAccount.SAP_Customer_Number__c);
+            selectedContactData.shippingcompanyName2 = selectedAccount.Account_Name2__c;
+            selectListHTML = "<option value='' class=''>None</option>";
+            
+            if(typeof selectedAccount.Contacts !== 'undefined'){
+                selectedAccount.Contacts.records.sort(function (x, y) {//Added for SCP-830 fix move this sort for SCP-860
+                    let a = x.Name.toUpperCase(),
+                        b = y.Name.toUpperCase();
+                    return a == b ? 0 : a > b ? 1 : -1;
+                });
+                for(i = 0; i < selectedAccount.Contacts.records.length; i++){
+                    selectListHTML = selectListHTML + "<option class='"+selectedAccount.Id+"' value='"+selectedAccount.Contacts.records[i].SAP_Contact_Number__c+"'>"+selectedAccount.Contacts.records[i].Name+"</option>";
+                }
+            }else{
+                //selectListHTML = selectListHTML + "<option value='' class=''>No Contact Found</option>";
+                selectListHTML  = defaultContactListHTML ;
+            }
+            $("#contactList").html(selectListHTML);
+            selectedContact =$("#contactList").val();
+            selectedContactData.contactId = $("#contactList").val();
+            //selectedContactData.contactId = selectedAccount.Contacts.records[0].Id;
+            selectedContactData.contactName = $("#contactList").text();
+            selectedContactData.shippingCustomerNumber = selectedAccount.SAP_Account_ID__c;
+        }
+        function contactListChanged(){
+            selectedContact = $("#contactList").val();
+            selectedContactData.contactId = $("#contactList").val();
+            selectedContactData.contactName = $("#contactList").text();
+        }
+        function updateBillingAddress(sfId){
+            $(".closeBilling").click();
+            var selectedAccount = accountAddressMapBilling.get(sfId);
+            $(".billingcompanyField").val(selectedAccount.Name);
+            $(".billingcountry").val(selectedAccount.BillingCountryCode);
+            $(".billingstate").val(selectedAccount.BillingStateCode);
+            $(".billingCity").val(selectedAccount.BillingCity);
+            $(".billingPostalCode").val(selectedAccount.BillingPostalCode);
+            $(".billingAddress1").val(selectedAccount.BillingStreet);
+            $(".billingAddress3").val(selectedAccount.PO_BOX__c ? 'P.O. Box: '+selectedAccount.PO_BOX__c : '');//Added for SCP-735
+            $("#billingcompanyName2").val(selectedAccount.Account_Name2__c);
+            $(".billingSAPCustomerNumber").val(selectedAccount.SAP_Customer_Number__c);
+            selectedContactData.billingCustomerNumber = selectedAccount.SAP_Account_ID__c;
+            selectedContactData.billingcompanyName2 = selectedAccount.Account_Name2__c;
+        }
+       CCRZ.pubSub.on('view:AddressListing:refresh',function(){
+            debugger;
+            $(".countryListing").prop( "disabled", true);
+            $(".billingstate").prop( "disabled", true);
+            $(".shippingstate").prop( "disabled", true);
+          if(typeof CCRZ.cartCheckoutModel.attributes.shippingAddress.sfid === 'undefined' || isNewCart ){
+                 
+                $(".billingcompanyField").val(currentAccountObj.Name);
+                $(".billingAddress1").val(currentAccountObj.BillingStreet);
+                $(".billingcountry").val(currentAccountObj.BillingCountryCode);
+                $(".billingstate").val(currentAccountObj.BillingStateCode);
+                $(".billingCity").val(currentAccountObj.BillingCity);
+                $(".billingPostalCode").val(currentAccountObj.BillingPostalCode);
+                $(".billingSAPCustomerNumber").val(currentAccountObj.SAP_Customer_Number__c);
+                $(".shippingSAPCustomerNumber").val(currentAccountObj.SAP_Customer_Number__c);
+                $(".cc_copy_address").click();
+           }
+           selectedContactData.billingCustomerNumber = $(".billingSAPCustomerNumber").val();
+           selectedContactData.billingcompanyName2 = $("#billingcompanyName2").val();
+           selectedContactData.shippingCustomerNumber = $(".shippingSAPCustomerNumber").val();
+           selectedContactData.shippingcompanyName2 = $("#shippingcompanyName2").val();
+          if(!isViewRendered){
+            isViewRendered = true;
+            selectedContactData.billingCustomerNumber = $(".billingSAPCustomerNumber").val();
+            selectedContactData.billingcompanyName2 = $("#billingcompanyName2").val();
+            selectedContactData.shippingCustomerNumber = $(".shippingSAPCustomerNumber").val();
+            selectedContactData.shippingcompanyName2 = $("#shippingcompanyName2").val();
+            OmniCellBillingAddressController.getContactAddressContactList(
+                CCRZ.pagevars.remoteContext,CCRZ.cartCheckoutModel.attributes.shippingAddress.SAPContactID ? CCRZ.cartCheckoutModel.attributes.shippingAddress.SAPContactID : '',
+                function (response) {
+                    debugger;
+                      $(".shippingstate").prop( "disabled", true);
+                    if (response) {
+                        if(response.success) {
+                           debugger;
+                           selectListHTML = '';
+                           defaultContactListHTML = '';
+                            if(typeof response.data.contactList !== 'undefined'){
+                                selectListHTML = selectListHTML + "<option value='' class='' disabled selected value> </option>"; //B2B-123
+                                for(i = 0; i < response.data.contactList.length; i++){
+                                    selectListHTML = selectListHTML + "<option class='"+response.data.contactList[i].AccountId+"' value='"+response.data.contactList[i].SAP_Contact_Number__c+"'>"+response.data.contactList[i].Name+"</option>";
+                                }
+                            }else{
+                                selectListHTML = selectListHTML + "<option value='' class=''>No Contact Found</option>";
+                            }
+                            if(typeof response.data.defaultContactList !== 'undefined'){
+                                for(i = 0; i < response.data.defaultContactList.length; i++){
+                                    defaultContactListHTML = defaultContactListHTML + "<option class='"+response.data.defaultContactList[i].AccountId+"' value='"+response.data.defaultContactList[i].SAP_Contact_Number__c+"'>"+response.data.defaultContactList[i].Name+"</option>";
+                                }
+                            }
+                            $("#contactList").html(selectListHTML);
+                            if(typeof CCRZ.cartCheckoutModel.attributes.shippingAddress.SAPContactID != 'undefined' && CCRZ.cartCheckoutModel.attributes.shippingAddress.SAPContactID !== ''){
+                                $("#contactList").val(CCRZ.cartCheckoutModel.attributes.shippingAddress.SAPContactID);
+                            }
+                            if(typeof $("#contactList").val() === 'undefined' || $("#contactList").val() === '' || $("#contactList").val() === null){
+                                $("#contactList").val($("#contactList option:first").val());
+                            }
+                            selectedContact =$("#contactList").val();
+                            selectedContactData.contactId = $("#contactList").val();
+                            selectedContactData.contactName = $("#contactList").text();
+                            
+                         }
+                             
+                        
+                    } 
+                }
+            );
+           }
+            
+        });
+       CCRZ.pubSub.once("view:AddressListing:refresh", function (view) {
+           
+            var viewPrototype = Object.getPrototypeOf(view);       
+            if (viewPrototype != null) {
+               var _view = view;
+                viewPrototype.events = _.extend(viewPrototype.events, {
+                    "click .updateCartCustomFields": "updateCartCustomFields"
+                });
+                viewPrototype.updateCartCustomFields = function (event) {
+                var att = $("#attn").val(); // SCP-763
+                    var cfName = $("#cfname").val();//SCP-850
+                    var clName = $("#clname").val();//SCP-850
+                    var cPhone = $("#cphone").val();//SCP-850
+                    var ContComName1 = $(".shippingcompanyField").val();//SCP-860
+                    //B2B-123 start Commented out for SCP-846
+                    /*if(typeof $("#contactList").val() === 'undefined' || $("#contactList").val() === '' || $("#contactList").val() === null){
+                        var err = document.createElement("span");
+                        err.innerHTML = "Please Select a Contact";
+                        document.getElementById("error-msg").appendChild(err);
+                    
+                    }*///SCP-846 Start
+                    if(typeof $("#cfname").val() === 'undefined' || $("#cfname").val() === '' || $("#cfname").val() === null){
+                        var err = document.createElement("span");
+                        err.innerHTML = "Please Enter First Name";
+                        document.getElementById("error-msg-fn").innerHTML = "Please Enter First Name";//appendChild(err);
+                    }
+                    else if(typeof $("#clname").val() === 'undefined' || $("#clname").val() === '' || $("#clname").val() === null){
+                        var err = document.createElement("span");
+                        err.innerHTML = "Please Enter Last Name";
+                        document.getElementById("error-msg-fn").innerHTML = "";
+                        document.getElementById("error-msg-ln").innerHTML = "Please Enter Last Name";//appendChild(err);
+                    }
+                    else if(typeof $("#cphone").val() === 'undefined' || $("#cphone").val() === '' || $("#cphone").val() === null){
+                        var err = document.createElement("span");
+                        err.innerHTML = "Please Enter Contact Number";
+                        document.getElementById("error-msg-fn").innerHTML = "";
+                        document.getElementById("error-msg-ln").innerHTML = "";
+                        document.getElementById("error-msg-ph").innerHTML = "Please Enter Contact Number";//appendChild(err);
+                    } //SCP-846 End
+                    else{
+                    //B2B-123 end
+                 $('#contB').attr("disabled", true);
+                        selectedContactData.ConFname = cfName; //SCP-846 Start
+                        selectedContactData.ConLname = clName;
+                        selectedContactData.ConPhone = cPhone;
+                        selectedContactData.ConComName1 = ContComName1;//SCP-846 End
+                        selectedContactData.contactId = $("#contactList").val();
+                        OmniCellBillingAddressController.updateCartCustomFields(
+                            CCRZ.pagevars.remoteContext,JSON.stringify(selectedContactData),att, // SCP-763
+                            function (response) {
+                             $('#contB').attr("disabled", false);
+                                debugger;
+                                //isNewCart = false;  
+                                if (response) {
+                                    if(response.success) {
+                                        //CCRZ.cartCheckoutModel.attributes.referenceNumber = $("#referenceNumberField").val();
+                                        $(".updateCartCustomFields").addClass("processUserInfo");
+                                        $(".processUserInfo").removeClass("updateCartCustomFields");
+                                        $(".processUserInfo").click();
+                                     }
+                                         
+                                    
+                                } 
+                            }
+                        );
+                    }; 
+            } //B2B-123
+                    view.delegateEvents();
+                    view.render();
+            }         
+    });
+    function shippingStateChanged(){
+      setTimeout(function () {
+       $(".shippingstate").prop( "disabled", true);
+      }, 300)
+    }
+    function unescapedHtml(){
+        return jQuery("<span />", { html: arguments[0] }).text();
+     }
+   
+  </script>
+ <c:SCP_ShippingOptions ></c:SCP_ShippingOptions>
+ <c:SCP_CyberSourceComponent />
+</apex:page>

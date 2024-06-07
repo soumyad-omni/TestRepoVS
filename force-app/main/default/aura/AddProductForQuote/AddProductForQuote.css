@@ -1,0 +1,53 @@
+.THIS.slds-spinner_container {  
+  z-index: 10000;
+  position: fixed;   
+}
+.THIS .productCardHeight{
+    height: 40vh;
+}
+.THIS .quoteLineCardHeight{
+    height: 35vh;
+}
+.THIS .slds-tabs_scoped__content{
+    border-bottom: 0;
+    padding:0;
+}
+.THIS .btn{
+    margin-left: 20px;
+}
+
+.THIS .dynamic{
+    width: 200px;
+}
+
+.THIS .space{
+    margin-left: 10px;
+}
+
+.THIS .btn1{
+    float: left;width: fit-content;margin-left: 0px;
+}
+
+.THIS .tabs{
+    width: 100%; height: 40vh; overflow: auto;
+}
+
+.THIS .par{
+    margin-top:5px;
+}
+.THIS .allPar{
+    margin-top:5px;margin-left:20px;
+}
+.THIS .ImagePreview{
+    margin-top:5px;margin-left:20px;
+}
+.THIS.slds-modal__container{
+    height: 750px !important;
+    max-height: 100% !important;
+}
+.THIS .parA{
+    margin-top:16px;
+}
+.THIS .allParA{
+    margin-top:16px;margin-left:20px;
+}

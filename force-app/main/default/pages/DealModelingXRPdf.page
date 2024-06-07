@@ -1,0 +1,283 @@
+<apex:page standardController="Deal_Modeling_PDF__c" readOnly="true" applyHtmlTag="false" showHeader="false" renderAs="pdf" title="Deal Modeling Quote">
+    <head>
+        <style>
+            margin:0px; padding:0px; }
+            body {
+            font-family:serif,Lucida Grande; font-weight: normal; padding:0px; margin:0px; }
+            @page {
+            size: A4 landscape; /* ISO/JIS A4 (210mm×297mm) */ margin: 10mm;
+            margin-bottom : 15mm; @bottom-right {
+            content: element(footer); 
+            
+            } 
+            
+            }
+            div.footer {
+            display: block; position: running(footer); font-size: 10pt; }
+            .pagenumber:before {
+            content: counter(page); }
+            .pagecount:before {
+            content: counter(pages); }
+            table {
+            page-break-inside: auto;
+            }
+            .tableStyle {
+            width: 100%;
+            -fs-table-paginate: paginate;
+            } 
+        </style>
+    </head> 
+    <body>
+        <div class="footer">Page <span class="pagenumber"/> of <span class="pagecount"/></div>
+        <table border="0" widtd="100%">
+            <thead>
+                <tr>
+                    <td style="text-align:center">
+                        <span class="reportTitle">
+                            <!-- Using label in tde report -->
+                            <center><b> <apex:outputfield value="{!Deal_Modeling_PDF__c.Name}"/></b></center> 
+                        </span> 
+                    </td>   
+                    <td>
+                    </td> 
+                </tr> 
+            </thead> 
+        </table> <br/> 
+        <table cellspacing="0" class="tableStyle">
+            <tr>
+                <th colspan="6">Quote Details</th>
+            </tr>
+            <tr>
+                <td colspan="6"></td>
+            </tr>
+            <tr>
+                <td width="15%">Transaction No:</td><td width="15%"><apex:outputfield value="{!Deal_Modeling_PDF__c.Transaction_No__c}"/></td>
+                <td width="15%">Transaction Type:</td><td width="15%"><apex:outputfield value="{!Deal_Modeling_PDF__c.Transaction_Type__c}"/></td>
+                <td width="15%">Description:</td><td width="15%"><apex:outputfield value="{!Deal_Modeling_PDF__c.Description__c}"/></td>
+            </tr>
+            <tr>
+                <td width="15%">Business Partner:</td><td width="15%"><apex:outputfield value="{!Deal_Modeling_PDF__c.Business_Partner__c}"/></td>
+                <td width="15%">Employee Resp.:</td><td width="15%"><apex:outputfield value="{!Deal_Modeling_PDF__c.Employee_Responsible__c}"/></td>
+                <td width="15%">Status:</td><td width="15%"><apex:outputfield value="{!Deal_Modeling_PDF__c.Status__c}"/></td>
+            </tr>
+            <tr>
+                <td width="15%">Pricing Date:</td><td width="15%"><apex:outputfield value="{!Deal_Modeling_PDF__c.Pricing_Date__c}"/></td>
+                <td width="15%">GPO Price List:</td><td width="15%"><apex:outputfield value="{!Deal_Modeling_PDF__c.GPO_Price_List__c}"/></td>
+                <td width="15%">Service Level:</td><td width="15%"><apex:outputfield value="{!Deal_Modeling_PDF__c.Service_Level__c}"/></td>
+            </tr>
+            <tr>
+                <td width="15%">Currency:</td><td width="15%"><apex:outputfield value="{!Deal_Modeling_PDF__c.Currency__c}"/></td>
+                <td width="15%">IDN Price List:</td><td width="15%"><apex:outputfield value="{!Deal_Modeling_PDF__c.IDN_Price_List__c}"/></td>
+                <td></td><td></td>
+                <td></td><td></td>
+            </tr>
+        </table>
+        <br/><br/>
+        <table cellspacing="0" class="tableStyle">
+            <tr>
+                <th colspan="6">Service Details</th>
+            </tr>
+            <tr>
+                <td width="15%">Service Booking:</td>
+                <td width="15%">
+                    <apex:outputText value="{0, Number, ###,###,##0.00}">
+                        <apex:param value="{!Deal_Modeling_PDF__c.Service_Booking__c}" />
+                    </apex:outputText>
+                </td>
+                <td width="15%">Margin Service(%):</td>
+                <td width="15%">
+                    <apex:outputText value="{0, Number, ###,###,##0.00}%">
+                        <apex:param value="{!Deal_Modeling_PDF__c.Margin_Service_Percent__c}" />
+                    </apex:outputText>
+                </td>
+                <td width="15%">Service Cost:</td>
+                <td width="15%">
+                    <apex:outputText value="{0, Number, ###,###,##0.00}">
+                        <apex:param value="{!Deal_Modeling_PDF__c.Service_Cost__c}" />
+                    </apex:outputText>
+                </td>
+            </tr>
+            <tr>
+                <td width="15%">Service Discount:</td>
+                <td width="15%">
+                    <apex:outputText value="{0, Number, ###,###,##0.00}">
+                        <apex:param value="{!Deal_Modeling_PDF__c.Service_Discount__c}" />
+                    </apex:outputText>
+                </td>
+                <td></td><td></td>
+                <td></td><td></td>
+            </tr>
+        </table>
+        <br/><br/>
+        <table cellspacing="0" class="tableStyle">
+            <tr>
+                <th colspan="6">Product Details</th>
+            </tr>
+            <tr>
+                <td width="15%">USA List Price:</td>
+                <td width="15%">
+                    <apex:outputText value="{0, Number, ###,###,##0.00}">
+                        <apex:param value="{!Deal_Modeling_PDF__c.USA_List_Price__c}" />
+                    </apex:outputText>
+                </td>
+                <td width="15%">Discountable Parts Total:</td>
+                <td width="15%">
+                    <apex:outputText value="{0, Number, ###,###,##0.00}">
+                        <apex:param value="{!Deal_Modeling_PDF__c.Discountable_Parts_Total__c}" />
+                    </apex:outputText>
+                </td>         <!--Updated by Pavan palla as part of new XR2 & IVX changes IBA-1475---start-->
+                <td width="15%" style="display: {!IF((Deal_Modeling_PDF__c.Early_Adopter_Flag__c == false), 'none', 'block')};">Monthly&nbsp;Fee:</td>
+                <td width="15%" style="display: {!IF((Deal_Modeling_PDF__c.Early_Adopter_Flag__c == true), 'none', 'block')};">Monthly&nbsp;Fee (exc.&nbsp;Resident&nbsp;Operator):</td>
+                <td width="15%">
+                    <apex:outputText value="{0, Number, ###,###,##0.00}">
+                        <apex:param value="{!Deal_Modeling_PDF__c.Monthly_Fee__c}" />
+                    </apex:outputText>
+                </td>
+            </tr>
+         <!--Updated by Pavan palla as part of new XR2 & IVX changes IBA-1135 Nov-Release---start-->
+            <tr rendered="{! !(Deal_Modeling_PDF__c.Early_Adopter_Flag__c) }">
+                <td width="15%"></td>
+                <td width="15%">
+                </td>
+                <td width="15%"></td>
+                <td width="15%">
+                </td>
+                <td width="15%">Resident Operator:</td>
+                <td width="15%">
+                    <apex:outputfield value="{!Deal_Modeling_PDF__c.Resident_Operator__c}"/>
+                </td>
+            </tr>
+        <!--Updated by Pavan palla as part of new XR2 & IVX changes IBA-1135 Nov-Release---finish-->
+            <tr>
+                <td width="15%">Contract List Price:</td>
+                <td width="15%">
+                    <apex:outputText value="{0, Number, ###,###,##0.00}">
+                        <apex:param value="{!Deal_Modeling_PDF__c.Contract_List_Price__c}" />
+                    </apex:outputText>
+                </td>
+                <td>Total Margin:</td>
+                <td width="15%">
+                    <apex:outputText value="{0, Number, ###,###,##0.00}">
+                        <apex:param value="{!Deal_Modeling_PDF__c.Total_Margin__c}" />
+                    </apex:outputText>
+                </td>
+                <td width="15%">Total Bookings:</td>
+                <td width="15%">
+                    <apex:outputText value="{0, Number, ###,###,##0.00}">
+                        <apex:param value="{!Deal_Modeling_PDF__c.Booking_Price__c}"/>
+                    </apex:outputText>
+                </td>
+            </tr>
+            <tr>
+                <td width="15%">Discount:</td>
+                <td width="15%">
+                    <apex:outputText value="{0, Number, ###,###,##0.00}">
+                        <apex:param value="{!Deal_Modeling_PDF__c.Discount__c}" />
+                    </apex:outputText>
+                </td>
+                <td width="15%">Product Cost:</td>
+                <td width="15%">
+                    <apex:outputText value="{0, Number, ###,###,##0.00}">
+                        <apex:param value="{!Deal_Modeling_PDF__c.Total_Product_Cost__c}" />
+                    </apex:outputText>
+                </td>
+                <td width="15%">Margin Product(%):</td>
+                <td width="15%">
+                    <apex:outputText value="{0, Number, ###,###,##0.00}%">
+                        <apex:param value="{!Deal_Modeling_PDF__c.Margin_Product_Percentage__c}" />
+                    </apex:outputText>
+                </td>
+                
+            </tr>
+            <tr>
+                <td width="15%">Customer Value Price:</td>
+                <td width="15%">
+                    <apex:outputText value="{0, Number, ###,###,##0.00}">
+                        <apex:param value="{!Deal_Modeling_PDF__c.Customer_Value_Price__c}" />
+                    </apex:outputText>
+                </td>
+                <td width="15%">Labor:</td>
+                <td width="15%"> 
+                    <apex:outputText value="{0, Number, ###,###,##0.00}">
+                        <apex:param value="{!Deal_Modeling_PDF__c.Total_Labor__c}" />
+                    </apex:outputText>
+                </td>
+                <td width="15%">Professional Services:</td>
+                <td width="15%">
+                    <apex:outputText value="{0, Number, ###,###,##0.00}">
+                        <apex:param value="{!Deal_Modeling_PDF__c.Professional_Services__c}" />
+                    </apex:outputText>
+                </td>
+            </tr>
+            <tr>
+                <td width="15%">USA List Price(%):</td>
+                <td width="15%">
+                    <apex:outputText value="{0, Number, ###,###,##0.00}%">
+                        <apex:param value="{!Deal_Modeling_PDF__c.USA_List_Price_Percentage__c}" />
+                    </apex:outputText>
+                </td>
+                <td width="15%">Overhead:</td>
+                <td width="15%">
+                    <apex:outputText value="{0, Number, ###,###,##0.00}">
+                        <apex:param value="{!Deal_Modeling_PDF__c.Total_Overhead__c}" />
+                    </apex:outputText>
+                </td>
+                <td width="15%">Freight:</td>
+                <td width="15%">
+                    <apex:outputText value="{0, Number, ###,###,##0.00}">
+                        <apex:param value="{!Deal_Modeling_PDF__c.Freight__c}" />
+                    </apex:outputText>
+                </td>
+            </tr>
+            <tr>
+                <td width="15%">Contract List Price(%):</td>
+                <td width="15%">
+                    <apex:outputText value="{0, Number, ###,###,##0.00}%">
+                        <apex:param value="{!Deal_Modeling_PDF__c.Contract_List_Price_Percentage__c}" />
+                    </apex:outputText>
+                </td>
+                <td width="15%">Total Cost:</td>
+                <td width="15%">
+                    <apex:outputText value="{0, Number, ###,###,##0.00}">
+                        <apex:param value="{!Deal_Modeling_PDF__c.Total_Cost__c}" />
+                    </apex:outputText>
+                </td>
+                <td width="15%">Commission Value:</td>
+                <td width="15%">
+                    <apex:outputText value="{0, Number, ###,###,##0.00}">
+                        <apex:param value="{!Deal_Modeling_PDF__c.Comission_Value__c}" />
+                    </apex:outputText>
+                </td>
+            </tr>
+        </table>
+        <br/><br/>
+        <table cellspacing="0" class="tableStyle">
+            <tr>
+                <td width="50%" valign="top">
+                    <table width="100%">
+                        <tr><th colspan="2">Discount Calculation</th></tr>
+                        <tr><td>Additional Discount:</td><td><apex:outputfield value="{!Deal_Modeling_PDF__c.Additional_Discount__c}"/></td></tr>
+                        <tr>
+                            <td>Discount Amt.:</td>
+                            <td>
+                                <apex:outputText value="{0, Number, ###,###,##0.00}">
+                                    <apex:param value="{!Deal_Modeling_PDF__c.Discount_Amount__c}" />
+                                </apex:outputText>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Discount %:</td>
+                            <td>
+                                <apex:outputText value="{0, Number, ###,###,##0.00}%">
+                                    <apex:param value="{!Deal_Modeling_PDF__c.Discount_Percentage__c}" />
+                                </apex:outputText>
+                            </td>
+                            
+                        </tr>
+                    </table>
+                </td>
+                <td width="50%"></td>
+            </tr>
+        </table>
+    </body> 
+</apex:page>

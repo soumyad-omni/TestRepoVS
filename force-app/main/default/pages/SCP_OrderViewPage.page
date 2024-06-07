@@ -1,0 +1,5 @@
+<apex:page >
+<c:SCP_OrderViewComponent ></c:SCP_OrderViewComponent>
+<c:SCP_OrderItemsComponent />
+<c:SCP_Order_AttributeItems />
+</apex:page>

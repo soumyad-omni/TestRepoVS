@@ -1,0 +1,6 @@
+<aura:component implements="force:lightningQuickActionwithoutheader,force:hasRecordId,lightning:actionOverride" access="global" controller = "AccountTeamPopulationController">
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/> 
+    <aura:attribute name = "Message" type = "String"/>
+    <p> {!v.Message}  </p>
+   <!-- <ui:outputText value = "Updating Account Team"/>-->
+</aura:component>

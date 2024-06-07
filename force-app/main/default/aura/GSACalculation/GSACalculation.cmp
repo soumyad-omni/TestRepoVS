@@ -1,0 +1,44 @@
+<aura:component >
+	<aura:attribute name="dealModelWrapper" type="Object" /> 
+    <aura:attribute name="style" type="String" /> 
+    <lightning:layout multipleRows="true">
+        <lightning:layoutItem flexibility="auto" padding="around-small" size="10" smallDeviceSize="10" mediumDeviceSize="10" largeDeviceSize="10" >
+            <table style="width:100%;">  
+                <tr>      
+                    <td style="{!'text-align:left;width:50%;'+v.style}"><b>Order Net Price:</b></td>
+                    <td style="width:50%">&nbsp;&nbsp;<ui:outputNumber value ="{!v.dealModelWrapper.orderNetPrice}" format="###,###,###,##0.00" /></td> 
+                </tr>
+            </table>
+        </lightning:layoutItem>
+    </lightning:layout>
+    <lightning:layout multipleRows="true">
+        <lightning:layoutItem flexibility="auto" padding="around-small" size="10" smallDeviceSize="10" mediumDeviceSize="10" largeDeviceSize="10" >
+            <table style="width:100%;">  
+                <tr>      
+                    <td style="{!'text-align:left;width:50%;'+v.style}"><b>GSA Net Price:</b></td>
+                    <td style="width:50%">&nbsp;&nbsp;<ui:outputNumber value ="{!v.dealModelWrapper.gsaNetPrice}" format="###,###,###,##0.00" /></td>
+                </tr>
+            </table>
+        </lightning:layoutItem>
+    </lightning:layout>
+    <lightning:layout multipleRows="true">
+        <lightning:layoutItem flexibility="auto" padding="around-small" size="10" smallDeviceSize="10" mediumDeviceSize="10" largeDeviceSize="10" >
+            <table style="width:100%;">  
+                <tr>      
+                    <td style="{!'text-align:left;width:50%;'+v.style}"><b>GSA Difference Price:</b></td>
+                    <td style="width:50%">&nbsp;&nbsp;<ui:outputNumber value ="{!v.dealModelWrapper.gsaPrice}" format="###,###,###,##0.00" /></td>
+                </tr>
+            </table>
+        </lightning:layoutItem>
+    </lightning:layout>
+    <lightning:layout multipleRows="true">
+        <lightning:layoutItem flexibility="auto" padding="around-small" size="10" smallDeviceSize="10" mediumDeviceSize="10" largeDeviceSize="10" >
+            <table style="width:100%;">  
+                <tr>      
+                    <td style="{!'text-align:left;width:50%;'+v.style}"><b>Result:</b></td>
+                    <td style="width:50%">&nbsp;&nbsp;{!v.dealModelWrapper.result}</td>
+                </tr>
+            </table>
+        </lightning:layoutItem>
+    </lightning:layout>
+</aura:component>

@@ -1,0 +1,5 @@
+<apex:page id="OmniCellOrderConfirmation" applyHtmlTag="false" docType="html-5.0" sidebar="false" showHeader="false" standardStylesheets="false">  
+<c:SCP_OrderConfirmationComponent ></c:SCP_OrderConfirmationComponent>
+<c:SCP_OrderItemsComponent />
+<c:SCP_Order_AttributeItems />
+</apex:page>

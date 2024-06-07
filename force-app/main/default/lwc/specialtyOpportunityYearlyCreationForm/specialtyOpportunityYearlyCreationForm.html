@@ -1,0 +1,158 @@
+<template>    
+    <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+    aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+        <div class="slds-modal__container">
+            <!-- modal header start -->
+            <header class="slds-modal__header">
+                Create Yearly Specialty Opps
+            </header>
+
+            <!-- modal body start -->
+            <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                <lightning-accordion active-section-name="Opportunity Year 2" allow-multiple-sections-open>
+                    <template for:each={itemList} for:item="item" for:index="index">
+
+                        <lightning-accordion-section key={item.id} label={item.Name1} name={item.Name1}>
+                            <lightning-record-edit-form object-api-name="Opportunity">
+                                <lightning-messages> </lightning-messages>
+
+                                <lightning-layout-item>
+                                    <lightning-input-field field-name="Name" value={item.Name} required
+                                        onchange={handleNMChange} data-index={index}>
+                                    </lightning-input-field>
+                                </lightning-layout-item>
+
+                                <lightning-layout-item>
+                                    <lightning-input-field field-name="Specialty_Open_Date__c" required
+                                        onchange={handleSOpDChange} data-index={index}>
+                                    </lightning-input-field>
+                                </lightning-layout-item>
+
+                                <lightning-layout-item>
+                                    <lightning-input-field field-name="CloseDate" required onchange={handleCDChange}
+                                        data-index={index}>
+                                    </lightning-input-field>
+                                </lightning-layout-item>
+
+                                <lightning-layout-item padding="around-small">
+                                    <lightning-input-field field-name="StageName" required
+                                        onchange={handleStgChange} data-index={index}>
+                                    </lightning-input-field>
+                                </lightning-layout-item>
+
+                                <lightning-layout-item padding="around-small">
+                                    <lightning-input-field field-name="Pipeline_Category__c" required
+                                        onchange={handleFCChange} data-index={index}>
+                                    </lightning-input-field>
+                                </lightning-layout-item>
+
+                                <lightning-layout-item padding="around-small">
+                                    <lightning-input-field field-name="Forecast_Probability__c" required
+                                        onchange={handleFPChange} data-index={index}>
+                                    </lightning-input-field>
+                                </lightning-layout-item>
+
+                                <lightning-layout-item padding="around-small">
+                                    <lightning-input-field field-name="Legal_Resource_Required__c" required
+                                        onchange={handleLRChange} data-index={index}>
+                                    </lightning-input-field>
+                                </lightning-layout-item>
+
+                                <lightning-layout-item padding="around-small">
+                                    <lightning-input-field field-name="Compelling_Event__c" required
+                                        onchange={handleCEChange} data-index={index}>
+                                    </lightning-input-field>
+                                </lightning-layout-item>
+
+                                <lightning-layout-item padding="around-small">
+                                    <lightning-input-field field-name="Seismic_Restraint_Required__c" required
+                                        onchange={handleSRQChange} data-index={index}>
+                                    </lightning-input-field>
+                                </lightning-layout-item>
+
+                                <lightning-layout-item padding="around-small">
+                                    <lightning-input-field field-name="CAD_Drawings_Obtained_if_Carousel_XR2__c"
+                                        required onchange={handleCADChange} data-index={index}>
+                                    </lightning-input-field>
+                                </lightning-layout-item>
+                                <div class="slds-hide">
+                                    <lightning-layout-item padding="around-small">
+                                        <lightning-input-field data-accid field-name="AccountId" data-index={index}>
+                                        </lightning-input-field>
+                                    </lightning-layout-item>
+
+                                    <lightning-layout-item padding="around-small">
+                                        <lightning-input-field data-cust field-name="CustomerType__c"
+                                            data-index={index}>
+                                        </lightning-input-field>
+                                    </lightning-layout-item>
+
+                                    <lightning-layout-item padding="around-small">
+                                        <lightning-input-field data-asp field-name="Associated_Opportunity__c"
+                                            data-index={index}>
+                                        </lightning-input-field>
+                                    </lightning-layout-item>
+
+                                    <lightning-layout-item padding="around-small">
+                                        <lightning-input-field data-com field-name="Competitor__c"
+                                            data-index={index}>
+                                        </lightning-input-field>
+                                    </lightning-layout-item>
+
+                                    <lightning-layout-item padding="around-small">
+                                        <lightning-input-field data-oop field-name="Opportunity__c"
+                                            data-index={index}>
+                                        </lightning-input-field>
+                                    </lightning-layout-item>
+
+                                    <lightning-layout-item padding="around-small">
+                                        <lightning-input-field data-curr field-name="CurrencyIsoCode"
+                                            data-index={index}>
+                                        </lightning-input-field>
+                                    </lightning-layout-item>
+
+                                    <lightning-layout-item padding="around-small">
+                                        <lightning-input-field data-rec field-name="RecordTypeId"
+                                            data-index={index}>
+                                        </lightning-input-field>
+                                    </lightning-layout-item>
+
+                                    <lightning-layout-item padding="around-small">
+                                        <lightning-input-field data-yr field-name="How_many_contract_years__c"
+                                            data-index={index}>
+                                        </lightning-input-field>
+                                    </lightning-layout-item>
+
+                                    <lightning-layout-item padding="around-small" value={item.Contract_Year__c}>
+                                        <lightning-input-field data-contyr={item.id} field-name="Contract_Year__c"
+                                            data-index={index}>
+                                        </lightning-input-field>
+                                    </lightning-layout-item>
+                                </div>
+
+                            </lightning-record-edit-form>
+                        </lightning-accordion-section>
+
+                    </template>
+                </lightning-accordion>
+            </div>
+
+            <!-- modal footer start-->
+            <footer class="slds-modal__footer">
+                <lightning-layout style="float: right;">
+                    <div style="padding: 2px;">
+                        <lightning-button variant="Neutral" onclick={hideModalBox} name="Cancel"
+                        label="Cancel" disabled={prdSkipButton}>
+                        </lightning-button> 
+                    </div>
+                    <div style="padding: 2px;">                                                                      
+                        <lightning-button variant="Brand" onclick={saveHandler} name="Save" label="Save" disabled={splYrButton}>
+                        </lightning-button>
+                    </div>
+                </lightning-layout>                
+            </footer>
+
+        </div>
+    </section>
+    <div class="slds-backdrop slds-backdrop_open"></div>
+</template>

@@ -1,0 +1,92 @@
+<aura:component controller = "UserDetailsReportController" implements="force:appHostable,flexipage:availableForAllPageTypes" access="global">
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <aura:attribute name="UserDetails" type="Object[]"/>
+    <aura:attribute name="UserDetailsSize" type="Integer"/>
+    <aura:attribute name="spinner" type="Boolean"/>
+    
+    <aura:if isTrue="{!v.spinner}">
+        <div aura:id="spinnerId" class="slds-spinner_container">
+            <div class="slds-spinner-/-brand  slds-spinner slds-spinner-/-large slds-is-relative" role="alert">
+                <span class="slds-assistive-text">Loading...</span>
+                <div class="slds-spinner__dot-a"></div>
+                <div class="slds-spinner__dot-b"></div>
+            </div>
+        </div>
+    </aura:if>
+    
+    <div style="background-color:white;width:auto;">
+        <label class="slds-text-color_weak slds-align_absolute-center slds-text-title_bold" 
+               style="font-size:30px;color:#69BE28;">
+            Frozen Omnicell Salesforce Users
+        </label>
+        <br/>
+        <table style="width:95%">
+            <tr>
+                <td>
+                    &emsp;<p style="font-weight:bold;font-size:14px;">Number of Users: {!v.UserDetailsSize}</p>            
+                </td>
+                <td style="text-align:right;">
+                    <lightning:button label="Download CSV" onclick="{!c.downloadCSV}" class="slds-button slds-button_brand"/>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_col-bordered">
+            <thead>
+                <tr class="slds-line-height_reset">
+                    <th scope="col">User</th>
+                    <th scope="col">Manager</th>
+                    <th scope="col">User Profile</th>
+                    <th scope="col">Active</th>
+                    <th scope="col">SF Status</th>
+                    <th scope="col">Date Frozen</th>
+                    <th scope="col">Days Frozen</th>
+                    <th scope="col">Override</th>
+                    <th scope="col">AD Status</th>
+                    <th scope="col">Term Date</th>
+                    <th scope="col">Days from Term Date to Frozen Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                <aura:iteration items="{!v.UserDetails}" var="usr">
+                    <tr class="slds-hint-parent">
+                        <td  scope="col">
+                            <div class="slds-truncate"><a href="{!'/'+usr.UserId}" target="_blank">{!usr.Name}</a></div>
+                        </td>
+                        <td  scope="col">
+                            {!usr.ManagerName}
+                        </td>
+                        <td  scope="col">
+                            {!usr.ProfileName}
+                        </td>
+                        <td  scope="col">
+                            {!usr.isActive}
+                        </td>
+                        <td  scope="col">
+                            {!usr.isFrozen}
+                        </td>
+                        <td  scope="col">
+                            {!usr.dateFrozen}
+                        </td>
+                        <td  scope="col">
+                            {!usr.daysFrozen}
+                        </td>
+                        <td  scope="col">
+                            {!usr.doNotDeactivate}
+                        </td>
+                        <td  scope="col">
+                            {!usr.adstatus}
+                        </td>
+                        <td  scope="col">
+                            {!usr.termDate}
+                        </td>
+                        <td  scope="col">
+                            {!usr.termToFrozen}
+                        </td>
+                    </tr>
+                </aura:iteration>
+            </tbody>
+        </table>
+    </div>
+</aura:component>

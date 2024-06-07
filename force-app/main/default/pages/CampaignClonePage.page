@@ -1,0 +1,310 @@
+<apex:page docType="html-5.0" Standardcontroller="Campaign" tabStyle="Campaign" id="page1" extensions="CampaignCloneController" showQuickActionVfHeader="false" lightningStylesheets="true">  <!-- lightningStylesheets="true">  -->
+    <apex:slds />
+    <apex:form id="formid">
+        
+        <apex:pageBlock title="Campaign" id="block1">
+            
+            <apex:messages layout="block" id="messages"/>   
+            <style>
+                body .bPageBlock .pbBody .red .pbSubheader{
+                background-color:#c00000;
+                }
+                body .bPageBlock .pbBody .grey .pbSubheader{
+                background-color:#c0c0c0;
+                }
+                body .bPageBlock .pbBody .grey .pbSubheader h3{
+                color:#000;
+                }
+            </style>
+            <apex:pageBlockButtons location="bottom" rendered="true">
+                <apex:commandButton id="saveBtn" value="Save" action="{!save}" />
+                <apex:commandButton id="cancelBtn" value="Cancel" action="{!cancel}" />
+            </apex:pageBlockButtons>
+            
+            <apex:outputPanel styleClass="grey" layout="block">
+                
+                
+                
+                <apex:pageBlockSection title="Campaign Information" id="sec1" columns="2" >
+                    
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Campaign Name"/>
+                        
+                        <apex:outputPanel >
+                            <apex:inputField value="{!Campaign.Name}"/>
+                            
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                    
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Short Name"/>
+                        
+                        <apex:outputPanel >
+                            <apex:inputField value="{!Campaign.Short_Name__c}"/>
+                            
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                    
+                    
+                    <apex:pageBlockSectionItem >
+                    </apex:pageBlockSectionItem>
+                    
+                    
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Parent Campaign"/>
+                        
+                        <apex:outputPanel >
+                            <apex:inputField value="{!Campaign.parentid}"/>
+                            <apex:actionSupport event="onchange"
+                                action="{!updatetoplevelparent}"
+                                rerender="sec1"/>    
+                        </apex:outputPanel>
+                        
+                    </apex:pageBlockSectionItem>
+                    
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Top Level Parent"/>
+                        
+                        <apex:outputPanel >
+                            <apex:inputField value="{!Campaign.Top_Level_Parent__c}"/>
+                            
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                    
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Start Date"/>
+                        
+                        <apex:outputPanel >
+                            <apex:input type="date" value="{!strtdate}"/>
+                            <!--<apex:inputField value="{!Campaign.StartDate}"/>-->
+                            
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                    
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="End Date"/>
+                        
+                        <apex:outputPanel >
+                            <apex:input type="date" value="{!enddate}"/>
+                            <!--<apex:inputField value="{!Campaign.EndDate}"/>-->
+                            
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                   
+                    
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Campaign Request"/>
+                        
+                        <apex:outputPanel >
+                            <apex:inputField value="{!Campaign.Campaign_Approval__c}"/>
+                            
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                    
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Campaign Owner"/>
+                        
+                        <apex:outputPanel >
+                            <apex:inputField value="{!Campaign.OwnerId}"/>
+                            
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Market Portfolio Segment"/>
+                        
+                        <apex:outputPanel >
+                            <apex:inputField value="{!Campaign.Market_Portfolio_Segment__c}"/>
+                            
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Type"/>
+                        
+                        <apex:outputPanel >
+                            <apex:inputField value="{!Campaign.Type}"/>
+                            
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                    
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Campaign Sub Type"/>
+                        
+                        <apex:outputPanel >
+                            <apex:inputField value="{!Campaign.Campaign_sub_type__c}"/>
+                            
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                    
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Status"/>
+                        
+                        <apex:outputPanel >
+                            <apex:inputField value="{!Campaign.Status}"/>
+                            
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                    
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Campaign Region"/>
+                        
+                        <apex:outputPanel >
+                            <apex:inputField value="{!Campaign.Campaign_Region__c}"/>
+                        
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                    
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Active"/>
+                        
+                        <apex:outputPanel >
+                            <apex:inputField value="{!Campaign.IsActive}"/>
+                            
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                    
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Template"/>
+                        
+                        <apex:outputPanel >
+                            <apex:inputField value="{!Campaign.Template__c}"/>
+                            
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                    
+                </apex:pageBlockSection>
+                <apex:pageBlockSection title="Description Information" id="sec2" columns="2" >
+                    
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Description"/>
+                        
+                        <apex:outputPanel >
+                            <apex:inputField value="{!Campaign.Description}"/>
+                            
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                </apex:pageBlockSection>
+                <!--<apex:pageBlockSection title="Display on Public Calendar" id="sec3" columns="2" >
+                    
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Add To Calender?"/>
+                        
+                        <apex:outputPanel >
+                            <apex:inputField value="{!Campaign.Add_to_Calendar__c}"/>
+                            
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Calendar Start Date"/>
+                        
+                        <apex:outputPanel >
+                            <apex:inputField value="{!Campaign.Calendar_Start_Date__c}"/>
+                            
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Calendar End Date"/>
+                        
+                        <apex:outputPanel >
+                            <apex:inputField value="{!Campaign.Calendar_End_Date__c}"/>
+                            
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                </apex:pageBlockSection>
+                <apex:pageBlockSection title="Campaign Member Statistitcs" id="sec4" columns="2" >
+                    
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Expected Response (%)"/>
+                        
+                        <apex:outputPanel >
+                            <apex:inputField value="{!Campaign.ExpectedResponse}"/>
+                            
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Total # of Campaign Members in Hierarchy"/>
+                        
+                        <apex:outputPanel >
+                            <apex:inputField value="{!Campaign.HierarchyNumberOfCampaignMembers__c}"/>
+                            
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                    
+                </apex:pageBlockSection>-->
+            <apex:pageBlockSection title="Additional Information" id="sec5" columns="2" >
+                    
+                  <!--  <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Actual Cost in Campaign"/>
+                        
+                        <apex:outputPanel >
+                            <apex:inputField value="{!Campaign.ActualCost}"/>
+                            
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem> -->
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Budgeted Cost in Campaign"/>
+                        
+                        <apex:outputPanel >
+                            <apex:inputField value="{!Campaign.BudgetedCost}"/>
+                            
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                <!--<apex:pageBlockSectionItem >
+                        <apex:outputLabel value="RSVP Date"/>
+                        
+                        <apex:outputPanel >
+                            <apex:inputField value="{!Campaign.RSVP_Date__c}"/>
+                            
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>-->
+                <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Target Initiative"/>
+                        
+                        <apex:outputPanel >
+                            <apex:inputField value="{!Campaign.Target_Initiative__c}"/>
+                            
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Target Initiative 2"/>
+                        
+                        <apex:outputPanel >
+                            <apex:inputField value="{!Campaign.Target_Initiative_2__c}"/>
+                            
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Strategic Initiative"/>
+                        
+                        <apex:outputPanel >
+                            <apex:inputField value="{!Campaign.Strategic_Initiative__c}"/>
+                            
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                    
+                </apex:pageBlockSection>
+            
+            </apex:outputPanel>
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

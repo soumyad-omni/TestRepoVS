@@ -1,0 +1,205 @@
+<!--
+  @File Name          : ProductXRDetail.cmp
+  @Description        : 
+  @Author             : Jayvardhan Singh
+  @Created            : 6 August 2020
+-->
+<aura:component >
+	<aura:attribute name="dealModelWrapper" type="Object" /> 
+    <lightning:layout multipleRows="true" horizontalAlign="spread">
+        <lightning:layoutItem flexibility="auto" padding="around-small" size="10" smallDeviceSize="10" mediumDeviceSize="4" largeDeviceSize="4" >
+            <table style="width:100%;">  
+                <tr>      
+                    <td style="text-align:left; font-size:12px; width:50%;"><b>USA List Price:</b></td>
+                    <td style="width:50%">&nbsp;&nbsp;<ui:outputNumber value="{!v.dealModelWrapper.usaListPrice}" format="###,###,###,##0.00"/></td> 
+                </tr>
+            </table>
+        </lightning:layoutItem>        
+        <lightning:layoutItem flexibility="auto" padding="around-small" size="10" smallDeviceSize="10" mediumDeviceSize="4" largeDeviceSize="4" >
+            <table style="width:100%;">  
+                <tr>      
+                    <td style="text-align:left; font-size:12px;width:50%;"><b>Discountable Parts Total:</b></td>
+                    <td style="width:50%">&nbsp;&nbsp;<ui:outputNumber value ="{!v.dealModelWrapper.basediscount}" format="###,###,###,##0.00"/></td>
+                </tr>
+            </table>  
+        </lightning:layoutItem>        
+         <lightning:layoutItem flexibility="auto" padding="around-small" size="10" smallDeviceSize="10" mediumDeviceSize="4" largeDeviceSize="4" >
+            <table style="width:100%;">  
+                <tr>   <!--Added by Pavan palla as part of new XR2 & IVX changes IBA-1475 start--> 
+                    <aura:renderIf isTrue="{! !v.dealModelWrapper.earlyAdopterFlag}">
+                        	<td style="text-align:left; font-size:12px;width:50%;"><b>Monthly Fee(exc. Resident Operator):</b></td>
+                        </aura:renderIf>
+                        <aura:renderIf isTrue="{!v.dealModelWrapper.earlyAdopterFlag}">
+                    <td style="text-align:left; font-size:12px;width:50%;"><b>Monthly Fee:</b></td>
+                        </aura:renderIf> <!--Added by Pavan palla as part of new XR2 & IVX changes IBA-1475 End--> 
+                    <td style="width:50%">&nbsp;&nbsp;<ui:outputNumber value ="{!v.dealModelWrapper.monthly}" format="###,###,###,##0.00"/></td>
+                </tr>
+            </table>  
+        </lightning:layoutItem>        
+    </lightning:layout>    
+    <lightning:layout multipleRows="true">
+        <lightning:layoutItem flexibility="auto" padding="around-small" size="10" smallDeviceSize="10" mediumDeviceSize="4" largeDeviceSize="4" >
+            <table style="width:100%;">  
+                <tr>      
+                    <td style="text-align:left; font-size:12px;width:50%;"><b>Contract List Price:</b></td>
+                    <td style="width:50%">&nbsp;&nbsp;<ui:outputNumber value="{!v.dealModelWrapper.contractListPrice}" format="###,###,###,##0.00"/></td>
+                </tr>
+            </table>  
+        </lightning:layoutItem>
+        
+         <lightning:layoutItem flexibility="auto" padding="around-small" size="10" smallDeviceSize="10" mediumDeviceSize="4" largeDeviceSize="4" >
+            <table style="width:100%;">  
+                <tr>      
+                    <td style="text-align:left; font-size:12px;width:50%;"><b>Total Margin:</b></td>
+                    <td style="width:50%">&nbsp;&nbsp;<ui:outputCurrency value="{!v.dealModelWrapper.totalMargin}" format="###,###,###,##0.00"/></td>
+                </tr>
+            </table>  
+        </lightning:layoutItem>
+       
+        <!-- Updated by Pavan palla as part of new XR2 & IVX changes IBA-1135 Nov-Release-->
+        <aura:renderIf isTrue="{!!v.dealModelWrapper.earlyAdopterFlag}">
+            <lightning:layoutItem flexibility="auto" padding="around-small" size="10" smallDeviceSize="10" mediumDeviceSize="4" largeDeviceSize="4" >
+                <table style="width:100%;">  
+                    <tr>      
+                        <td style="text-align:left; font-size:12px;width:50%;"><b>Resident Operator:</b></td>
+                        <td style="width:50%">&nbsp;&nbsp;<ui:outputText value ="{!v.dealModelWrapper.residentOperator}"/></td>
+                    </tr>
+                </table>  
+            </lightning:layoutItem>
+        </aura:renderIf>
+       <!-- changes by pavan Palla IBA-1135 Nov-Release finish -->
+        
+        <lightning:layoutItem flexibility="auto" padding="around-small" size="10" smallDeviceSize="10" mediumDeviceSize="4" largeDeviceSize="4" >
+            <table style="width:100%;">  
+                <tr>      
+                    <td style="text-alligh:left;font-size:12px;width:50%;"><b>Total Bookings:</b></td>
+                    <td style="width:50%">&nbsp;&nbsp;<ui:outputNumber value="{!v.dealModelWrapper.bookingPrice}" format="###,###,###,##0.00"/></td>
+                </tr>
+            </table>  
+        </lightning:layoutItem>
+        
+       
+        
+       
+    </lightning:layout>
+    <lightning:layout multipleRows="true">
+        <lightning:layoutItem flexibility="auto" padding="around-small" size="10" smallDeviceSize="10" mediumDeviceSize="4" largeDeviceSize="4" >
+            <table style="width:100%;">  
+                <tr>      
+                    <td style="text-align:left; font-size:12px;width:50%;"><b>Discount:</b></td>
+                    <td style="width:50%">&nbsp;&nbsp;<ui:outputNumber value="{!v.dealModelWrapper.discount}" format="###,###,###,##0.00"/></td>
+                </tr>
+            </table>  
+        </lightning:layoutItem>
+        
+        <lightning:layoutItem flexibility="auto" padding="around-small" size="10" smallDeviceSize="10" mediumDeviceSize="4" largeDeviceSize="4s" >
+            <table style="width:100%;">  
+                <tr>      
+                    <td style="text-align:left; font-size:12px;width:50%;"><b>Product Cost:</b></td>
+                    <td style="width:50%">&nbsp;&nbsp;<ui:outputNumber value="{!v.dealModelWrapper.totalMaterial}" format="###,###,###,##0.00"/></td>
+                </tr>
+            </table>
+        </lightning:layoutItem>
+        <lightning:layoutItem flexibility="auto" padding="around-small" size="10" smallDeviceSize="10" mediumDeviceSize="4" largeDeviceSize="4" >
+            <table style="width:100%;">  
+                <tr>      
+                    <td style="text-align:left; font-size:12px;width:50%;"><b>Margin Product(%):</b></td>
+                    <td style="width:50%">&nbsp;&nbsp;<ui:outputNumber value ="{!v.dealModelWrapper.marginProduct}" format="###,###,###,##0.00"/></td>
+                </tr>
+            </table>  
+        </lightning:layoutItem>
+       
+    </lightning:layout>
+    <lightning:layout multipleRows="true">
+        <lightning:layoutItem flexibility="auto" padding="around-small" size="10" smallDeviceSize="10" mediumDeviceSize="4" largeDeviceSize="4" >
+            <table style="width:100%;">  
+                <tr>      
+                    <td style="text-align:left; font-size:12px;width:50%;"><b>Customer Value Price:</b></td>
+                    <td style="width:50%">&nbsp;&nbsp;<ui:outputNumber value= "{!v.dealModelWrapper.customerValuePrice}" format="###,###,###,##0.00"/></td>
+                </tr>
+            </table>  
+        </lightning:layoutItem>
+       
+         <lightning:layoutItem flexibility="auto" padding="around-small" size="10" smallDeviceSize="10" mediumDeviceSize="4" largeDeviceSize="4" >
+            <aura:renderIf isTrue="{!!$Browser.isPhone}">
+                <table style="width:100%;">  
+                    <tr>      
+                        <td style="text-align:left; font-size:12px;width:50%;"><b>Labor:</b></td>
+                        <td style="width:50%">&nbsp;&nbsp;<ui:outputNumber value="{!v.dealModelWrapper.totalLabor}" format="###,###,###,##0.00"/></td>
+                    </tr>
+                </table>
+            </aura:renderIf>
+        </lightning:layoutItem>
+        
+         <lightning:layoutItem flexibility="auto" padding="around-small" size="10" smallDeviceSize="10" mediumDeviceSize="4" largeDeviceSize="4" >
+            <table style="width:100%;">  
+                    <tr>
+                        <td style="text-align:left; font-size:12px;width:50%;"><b>Professional Services:</b></td>
+                        <td style="width:50%">&nbsp;&nbsp;<ui:outputCurrency value="{!v.dealModelWrapper.professionalServicesValue}" format="###,###,###,##0.00"/></td>
+                    </tr>
+             </table> 
+        </lightning:layoutItem>
+        
+       
+    </lightning:layout>
+    <lightning:layout multipleRows="true">
+        <lightning:layoutItem flexibility="auto" padding="around-small" size="10" smallDeviceSize="10" mediumDeviceSize="4" largeDeviceSize="4" >
+            <table style="width:100%;">  
+                <tr>      
+                    <td style="text-align:left; font-size:12px;width:50%;"><b>% Discount off USA List:</b></td>
+                    <td style="width:50%">&nbsp;&nbsp;<ui:outputCurrency value="{!v.dealModelWrapper.USAListPricePercentage}" format="###,###,###,##0.00"/></td>
+                </tr>
+            </table>  
+        </lightning:layoutItem>
+        
+         <lightning:layoutItem flexibility="auto" padding="around-small" size="10" smallDeviceSize="10" mediumDeviceSize="4" largeDeviceSize="4" >
+            <aura:renderIf isTrue="{!!$Browser.isPhone}">
+                <table style="width:100%;">  
+                    <tr>
+                        <td style="text-align:left; font-size:12px;width:50%;"><b>Overhead:</b></td>
+                        <td style="width:50%">&nbsp;&nbsp;<ui:outputCurrency value="{!v.dealModelWrapper.totalOverhead}" format="###,###,###,##0.00"/></td> 
+                    </tr>
+                </table>  
+            </aura:renderIf>
+        </lightning:layoutItem>
+        <lightning:layoutItem flexibility="auto" padding="around-small" size="10" smallDeviceSize="10" mediumDeviceSize="4" largeDeviceSize="4" >
+            <table style="width:100%;">  
+                <tr>      
+                    <td style="text-align:left; font-size:12px;width:50%;"><b>Freight:</b></td>
+                    <td style="width:50%">&nbsp;&nbsp;<ui:outputCurrency value="{!v.dealModelWrapper.freight}" format="###,###,###,##0.00"/></td>
+                </tr>
+            </table>  
+        </lightning:layoutItem>
+        
+    </lightning:layout>
+    <!-- ========== Added to display the USA List Price Percentage, Contract List Price Percentage ============== -->
+    <lightning:layout multipleRows="true">
+        <lightning:layoutItem flexibility="auto" padding="around-small" size="10" smallDeviceSize="10" mediumDeviceSize="4" largeDeviceSize="4" >
+            <table style="width:100%;">  
+                <tr>      
+                    <td style="text-align:left; font-size:12px;width:50%;"><b>% Discount off Contract List:</b></td>
+                    <td style="width:50%">&nbsp;&nbsp;<ui:outputNumber value ="{!v.dealModelWrapper.ContractListPricePercentage}" format="###,###,###,##0.00"/></td>
+                </tr>
+            </table>  
+        </lightning:layoutItem>        
+        <lightning:layoutItem flexibility="auto" padding="around-small" size="10" smallDeviceSize="10" mediumDeviceSize="4" largeDeviceSize="4" >
+            <aura:renderIf isTrue="{!!$Browser.isPhone}">
+                <table style="width:100%;">  
+                    <tr>
+                        <td style="text-align:left; font-size:12px;width:50%;"><b>Total Cost:</b></td>
+                        <td style="width:50%">&nbsp;&nbsp;<ui:outputCurrency value="{!v.dealModelWrapper.totalProductCost}" format="###,###,###,##0.00"/></td>
+                    </tr>
+                </table>  
+            </aura:renderIf>
+        </lightning:layoutItem>
+       
+        <lightning:layoutItem flexibility="auto" padding="around-small" size="10" smallDeviceSize="10" mediumDeviceSize="4" largeDeviceSize="4" >
+            <table style="width:100%;">  
+                <tr>      
+                    <td style="text-align:left; font-size:12px;width:50%;"><b>Commission Value:</b></td>
+                    <td style="width:50%">&nbsp;&nbsp;<ui:outputCurrency value="{!v.dealModelWrapper.commissionValue}" format="###,###,###,##0.00"/></td>
+                </tr>
+            </table>  
+        </lightning:layoutItem>
+    </lightning:layout>
+</aura:component>

@@ -1,0 +1,7 @@
+<aura:component implements="force:lightningQuickActionwithoutheader,force:hasRecordId" controller="RenderCreateContractController">
+    <aura:attribute name="Contract" type = "Contracts__c" />
+    <aura:handler name="init" value="this" action="{!c.doInit}"/>
+    <aura:attribute name="message" type="String"/>
+    
+    <p align="center">{!v.message}</p>
+</aura:component>

@@ -1,0 +1,159 @@
+<aura:component implements="lightning:actionOverride,force:hasRecordId,force:hasSObjectName" 
+                controller = "CampaignLayoutOverrideController">
+    <aura:attribute name="componentRecord" type="Campaign" />
+    <aura:attribute name="record" type="Campaign" />
+    <aura:attribute name="recordError" type="String" />
+    <aura:attribute name = "checkUser" type = "boolean" default="false"/>
+    <aura:handler name="init" value="this" action="{!c.doInit}"/>
+    <force:recordData 
+                      aura:id="recordLoader" 
+                      recordId="{!v.recordId}" 
+                      layoutType="FULL" 
+                      mode="EDIT"
+                      targetRecord="{!v.record}"
+                      targetFields="{!v.componentRecord}"
+                      targetError="{!v.recordError}" />
+    
+   <lightning:recordEditForm aura:id="Edit" recordId="{!v.recordId}" 
+                             							objectApiName="Campaign" onsubmit="{!c.onSave}" >
+    
+        <!-- Page Header -->
+        <div class="slds-page-header">
+            <div class="slds-media">
+                <div class="slds-media__figure">
+                    <lightning:icon iconName="custom:custom67" />
+                </div>
+                <div class="slds-media__body">
+                    <p class="slds-text-body_small slds-line-height_reset">Campaign Edit</p>
+                    <h1 class="slds-page-header__title slds-truncate slds-align-middle" 
+                        title="{!v.componentRecord.Name}">{!v.componentRecord.Name}
+                    </h1>
+                </div>   
+                <!-- Buton Group save/cancel-->            
+                <lightning:buttonGroup>            
+                    <lightning:button label="Save" onclick="{!c.submit}" />
+                    <lightning:button label="Cancel" onclick="{!c.onCancel}" />
+                </lightning:buttonGroup>
+                
+            </div>
+        </div>
+        
+        <div class="slds-p-around--large">
+            <div class = "slds-page-header" style = "cursor: pointer;">
+            <section class = "slds-clearfix">
+                    <div class = "slds-m-left-large">Campaign Information</div>
+            </section>
+            </div>
+            <lightning:layout>
+                <lightning:layoutItem class="slds-col slds-size--1-of-2">
+                    <lightning:InputField fieldName="Name"/>
+                    <lightning:InputField required="true" fieldName="Short_Name__c"/>
+                    <lightning:InputField aura:id="marketPSId" fieldName="Market_Portfolio_Segment__c"/>
+                    <lightning:InputField aura:id="typeId" fieldName="Type"/>
+                    <lightning:InputField aura:id="campSubTypeId" fieldName="Campaign_sub_type__c"/> 
+                    <lightning:InputField fieldName="StartDate"/> 
+                    <lightning:InputField fieldName="ParentId"/>
+                    <lightning:InputField fieldName="Top_Level_Parent__c"/>
+                    <lightning:InputField fieldName="Campaign_Approval__c"/>
+                </lightning:layoutItem>
+                <lightning:layoutItem class="slds-col slds-size--1-of-2">
+                    <lightning:InputField fieldName="Project_Owner__c"/>
+                    <lightning:InputField fieldName="Status"/>
+                    <lightning:InputField fieldName="EndDate"/>
+                    <lightning:InputField fieldName="Target_Audience__c"/>
+                    <lightning:InputField aura:id="campRegId" fieldName="Campaign_Region__c"/>
+                    <br/>
+                    <lightning:InputField fieldName="IsActive"/>
+                    <br/>
+                    <lightning:InputField fieldName="Template__c"/>
+                </lightning:layoutItem>
+            </lightning:layout>
+            <div class = "slds-page-header" style = "cursor: pointer;">
+            <section class = "slds-clearfix">
+                    <div class = "slds-m-left-large">Display on Public Calender</div>
+            </section>
+            </div>
+            <lightning:layout>
+                <lightning:layoutItem class="slds-col slds-size--1-of-2">
+                    <lightning:InputField fieldName="Add_to_Calendar__c"/>       
+                    <lightning:InputField fieldName="Campaign_Tour_Date__c"/>
+                </lightning:layoutItem>
+                
+                <lightning:layoutItem class="slds-col slds-size--1-of-2">
+                    <lightning:InputField fieldName="Calendar_Start_Date__c"/>
+                    <lightning:InputField fieldName="Calendar_End_Date__c"/>
+                </lightning:layoutItem>
+            </lightning:layout>
+            
+            <div class = "slds-page-header" style = "cursor: pointer;" >
+            <section class = "slds-clearfix">
+                    <div class = "slds-m-left-large">Description Information</div>
+            </section>
+            </div>
+            <lightning:layout>
+            	<lightning:layoutItem class="slds-col slds-size--1-of-2">
+                	<lightning:InputField fieldName="Description"/>       
+            	</lightning:layoutItem>
+            </lightning:layout>
+            <div class = "slds-page-header" style = "cursor: pointer;">
+            <section class = "slds-clearfix">
+                    <div class = "slds-m-left-large">Campaign Member Statastics</div>
+            </section>
+            </div>
+            <lightning:layout>
+                <lightning:layoutItem class="slds-col slds-size--1-of-2">
+                    
+                </lightning:layoutItem>
+                
+                <lightning:layoutItem class="slds-col slds-size--1-of-2">
+                    <lightning:InputField fieldName="HierarchyNumberOfCampaignMembers__c"/>
+                </lightning:layoutItem>
+            </lightning:layout>
+            <div class = "slds-page-header" style = "cursor: pointer;">
+            <section class = "slds-clearfix">
+                    <div class = "slds-m-left-large">Additional Information</div>
+            </section>
+            </div>
+            
+            <lightning:layout>
+                
+                <lightning:layoutItem class="slds-col slds-size--1-of-2">
+                    <aura:if isTrue="{!v.checkUser}">
+                        <lightning:InputField fieldName="ActualCost"/>
+                        <lightning:InputField fieldName="BudgetedCost"/>
+                    </aura:if>     
+                </lightning:layoutItem>
+                
+                <lightning:layoutItem class="slds-col slds-size--1-of-2">
+                    <lightning:InputField fieldName="ExpectedResponse"/>
+                    <lightning:InputField fieldName="RSVP_Date__c"/>
+                    <lightning:InputField fieldName="Target_Initiative__c"/>
+                    <lightning:InputField fieldName="Target_Initiative_2__c"/>
+                    <lightning:InputField fieldName="Strategic_Initiative__c"/>
+                </lightning:layoutItem>
+            </lightning:layout>  
+            <lightning:button aura:id="submit" label="Save" variant="brand" onclick="{!c.submit}"/>
+        </div>
+     <!--  <aura:set attribute="else">
+            <div class="slds-page-header">
+                <div class="slds-media">
+                    <div class="slds-media__figure">
+                        <lightning:icon iconName="custom:custom67" />
+                    </div>
+                    <div class="slds-media__body">
+                        <p class="slds-text-body_small slds-line-height_reset">Campaign Edit</p>
+                        <h1 class="slds-page-header__title slds-truncate slds-align-middle" 
+                            title="{!v.componentRecord.Name}">{!v.componentRecord.Name}</h1>
+                    </div>    
+                    <lightning:buttonGroup>            
+                        <lightning:button label="back" onclick="{!c.onCancel}" />
+                    </lightning:buttonGroup>
+                </div>
+            </div>
+            <div class="slds-text-heading_large slds-error-color">
+                <p><strong>You Cannot Edit this record</strong></p>
+            </div>
+        </aura:set>
+        </aura:if>-->
+    </lightning:recordEditForm>
+</aura:component>

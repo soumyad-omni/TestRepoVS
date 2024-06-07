@@ -1,0 +1,8 @@
+<apex:page id="OCB_MyAccountPage" standardStylesheets="false" showHeader="false">
+<c:OCB_MyOrdersComponent />
+<c:OCB_MyInvoiceComponent />
+<c:SCP_MyAccountEffAccount /> 
+<c:SCP_MySubscriptionComponent /><!-- Override Added for SCP-825 -->
+ <!-- added as part of SCP -787 -->
+<c:OCB_MyWallet />
+</apex:page>

@@ -1,0 +1,182 @@
+<aura:component implements="flexipage:availableForAllPageTypes,force:hasRecordId" access="global" 
+                controller="QuoteParController">
+    <aura:attribute name="quoteNumber" type="string" default="NNN"/>
+    <aura:attribute name="parList" type="list" default="[]"/>
+    <aura:attribute name="newParList" type="list" default="[]"/>
+    <aura:attribute name="isAddParModalOpen" type="boolean" default="false"/>
+    <aura:attribute name="renamePar" type="object" />
+    <aura:attribute name="renameParIndex" type="integer" />
+    <aura:attribute name="isRenameModalOpen" type="boolean" default="false"/>
+    <aura:attribute name="isCopyParModalOpen" type="boolean" default="false"/>
+    <aura:attribute name="selectedPar" type="string"/>
+    <aura:attribute name="selectedParForQuote" type="string"/>
+    <aura:attribute name="deletePar" type="object" />
+    <aura:attribute name="isDeleteModalOpen" type="boolean" default="false"/>
+    <aura:attribute name="isCopyConfigModalOpen" type="boolean" default="false"/>
+    
+    <aura:attribute name="showSpinner" type="boolean" default="true"/>
+    
+    <aura:handler name="DeleteRowEvt" event="c:RemovePar" action="{!c.deleteRow}"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <div class="container">
+        
+        <!--<header class="slds-modal__header">
+            <div class='parent'>                            
+                <div style="float: left;">   <img src="{!$Resource.omnicelllogo}" style="height:32px;widht:100px;"/></div>
+                <div style="padding-left:-20px"><h2 class="slds-text-heading_medium slds-hyphenate">Add Products</h2></div>
+            </div>
+        </header>-->
+        <lightning:card title="">   
+                <div class="slds-text-align_left">
+                    <div class="slds-text-heading_medium" >
+                        <div class="slds-text-color_error"><b>XT Select is not available for Acudose-Rx on XT customer</b> </div>
+                    </div>
+                </div>
+            <aura:set attribute="actions">
+               
+                <lightning:button label="Save and back to Quote" onclick="{!c.navigateToQuote}"/>
+                <lightning:button label="Copy Configuration from Quote" variant="brand" onclick="{!c.copyConfigFromQuote}"/>
+                <!--
+                <lightning:button label="Deal Calculator" variant="brand" onclick="{!c.dealCalculator}"/>
+                <lightning:button label="Mass Change Product" variant="brand" onclick="{!c.massChangeProduct}"/> -->
+                <lightning:button label="Add Par" variant="brand" onclick="{!c.openModel}"/>
+            </aura:set>
+            <lightning:layout verticalAlign="stretch">
+                <lightning:layoutItem size="3" class="custom-box">
+                    <!--Par rows -->
+                    <div style="height:400px;">
+                    <lightning:card title="{!'Quote Number : '+v.quoteNumber}">
+                        <table class="slds-table slds-table_bordered slds-table_fixed-layout" role="grid"> 
+                            <thead>
+                                <tr class="slds-text-title_caps">
+                                    <!--
+                                    <th scope="col">
+                                        <div class="slds-truncate">S.No</div>
+                                    </th>
+              						-->
+                                    <th scope="col" width="60%">
+                                        <div class="slds-truncate" title="Par Name">Par Name</div>
+                                    </th>
+                                    <th scope="col" width="40%">
+                                        <div class="slds-truncate" title="Actions">Actions</div>
+                                    </th>
+                                </tr>
+                            </thead>   
+                            <tbody>         
+                                <aura:iteration items="{!v.parList}" var="item" indexVar="index">
+                                    <tr class="">
+                                        <!--
+                                    <td scope="row"> 
+                                        {!index + 1}
+                                    </td>
+                                    -->
+                                        <td scope="row" width="60%" class="slds-select slds-truncate slds-hyphenate">
+                                            <ui:outputText class="" value="{!item.Par__c}" aura:id="{!item.Par__c}" click="{!c.navigateToRecord}"/>
+                                        </td>
+                                        <td scope="row" width="40%">
+                                            <lightning:buttonIcon iconName="utility:edit" size="small" variant="brand" title="Rename Par" name="{!index}" onclick="{!c.renamePar}"/>
+                                            <lightning:buttonIcon iconName="utility:delete" size="small" variant="brand" title="Delete Par" name="{!index}" onclick="{!c.deletePar}"/> 
+                                            <lightning:buttonIcon iconName="utility:copy" size="small" variant="brand" title="Copy Par" name="{!index}" onclick="{!c.copyPar}"/>
+                                            <lightning:buttonIcon iconName="utility:share" size="small" variant="brand" title="Move Par" name="{!index}" onclick="{!c.movePar}"/>
+                                        </td>
+                                    </tr>	
+                                </aura:iteration>
+                            </tbody>
+                        </table>
+                        <aura:set attribute="footer">
+                            <div class="slds-float_left">
+                                <b>Note:</b>
+                            </div>
+                            <p>
+                                <ul>
+                                    <li>Only Standard Configuration products are shown for selection and the summary on the lower right.</li>
+                                </ul>
+                            </p>
+                            <div class="slds-p-top_xx-large">
+                                <div class="slds-text-align_left">
+                                    <div class="slds-text-heading_medium" >
+                                        <div class="slds-text-color_error"><b> <lightning:formattedUrl value="https://omnicell.seismic.com/Link/Content/DCPV5oEM1V7k-eRGUgvRmxyQ" label="XT Select Product Catalog"/> </b></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </aura:set>
+                    </lightning:card>
+                    </div>
+                </lightning:layoutItem>
+                <lightning:layoutItem size="9" class="custom-box">
+                    <!--Par Details -->
+                        <c:AddProductForQuote recordId="{!v.recordId}" selectedParForQuote="{!v.selectedParForQuote}" parListFromParent="{!v.parList}" aura:id="addProductForQuoteCmp"/>
+                </lightning:layoutItem>
+            </lightning:layout>
+            
+        </lightning:card>
+            
+    </div>
+    <c:ModalComp title="Add Par" submitButtonLabel="Save" showModal="{!v.isAddParModalOpen}" aura:id="addParModalCmp"
+                 closeModal="{!c.closeModel}" submitModal="{!c.savePar}">
+        <lightning:card title="Quote Number: NNNNN">
+            <aura:set attribute="actions">
+                <lightning:button label="Add Par" variant="brand" onclick="{!c.addRow}"/>
+            </aura:set>
+            <table class="slds-table slds-table_bordered slds-table_cell-buffer"> 
+                <thead>
+                    <tr class="slds-text-title_caps">
+                        <th scope="col">
+                            <div class="slds-truncate">S.No</div>
+                        </th>
+                        <th scope="col">
+                            <div class="slds-truncate" title="Par Name">Par Name</div>
+                        </th>
+                        <th scope="col">
+                            <div class="slds-truncate" title="Delete">Delete</div>
+                        </th>
+                    </tr>
+                </thead>   
+                <tbody>         
+                    <aura:iteration items="{!v.newParList}" var="item" indexVar="index">
+                        <tr class="slds-text-title_caps">
+                            <td> 
+                                {!index + 1}
+                            </td>
+                            <td>
+                                <lightning:input value="{!item.Par__c}" aura:id="parName" maxlength="34" messageWhenTooLong="Par Name is too long, Max length is 35 characters"/>
+                            </td>
+                            <td>
+                                <lightning:buttonIcon iconName="utility:delete" iconClass="dark" 
+                                                      size="medium" onclick="{!c.removeRow}" 
+                                                      name="{!index}"/>
+                            </td> 
+                        </tr>
+                    </aura:iteration>
+                </tbody>
+            </table>
+        </lightning:card>
+    </c:ModalComp>    
+    
+    <c:ModalComp title="Rename Quote Par" submitButtonLabel="Save" showModal="{!v.isRenameModalOpen}" aura:id="renameModalCmp"
+                 closeModal="{!c.closeModel}" submitModal="{!c.renameSavePar}">
+        <lightning:card title="">
+            <lightning:input value="{!v.renamePar.Par__c}" label="Par Name"/>
+        </lightning:card>
+    </c:ModalComp>
+    
+    
+    
+    <c:ModalComp title="Delete Quote Par" submitButtonLabel="Delete" showModal="{!v.isDeleteModalOpen}" aura:id="deleteModalCmp"
+                 closeModal="{!c.closeModel}" submitModal="{!c.deleteParConfirm}">
+        <lightning:card title="Do you want to delete the Quote Par">
+            <lightning:input value="{!v.deletePar.Par__c}" disabled="true"/>
+        </lightning:card>
+    </c:ModalComp>
+    
+    <c:CopyMoveToPar isCopyMoveModalOpen="{!v.isCopyParModalOpen}" aura:id="CopyMovePar" 
+                     quoteId="{!v.recordId}" parLocation="{!v.selectedPar}"
+                     quotePars="{!v.parList}" copyMove="Copy" title="Copy To Par"/>
+    
+    <c:CopyConfigFromQuote isCopyConfigModalOpen="{!v.isCopyConfigModalOpen}" aura:id="CopyConfigFromQuote" 
+                     sourceQuoteId="{!v.recordId}"/>
+    
+    <aura:if isTrue="{!v.showSpinner}">
+        <lightning:spinner alternativeText="Loading" size="small" />
+    </aura:if>
+</aura:component>

@@ -1,0 +1,6 @@
+<template>
+    <lightning-card if:true={us_canada_non_specialty}>
+        <img class="dashboard" alt="Dashboard" src={forecasting_core_Image} if:true={us_canada_CORE}/>
+        <img class="dashboard" alt="Dashboard" src={forecasting_advs_Image} if:true={us_canada_advanced_services}/>
+    </lightning-card>
+</template>

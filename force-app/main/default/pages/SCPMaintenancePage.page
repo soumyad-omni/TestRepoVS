@@ -1,0 +1,65 @@
+<apex:page applyHtmlTag="false" docType="html-5.0" sidebar="false" showHeader="false" standardStylesheets="false">
+
+  <BR></br>
+  <br></br>
+  <BR></br>
+  <br></br>
+  <!-- Begin Default Content REMOVE THIS -->
+  <h1 class="headerTitle" >Under Maintenance</h1> 
+  <BR></br>
+  <br></br>
+  <h3>The site is currently down for maintenance. Please check back later.  </h3>
+
+  <br></br>
+  <br></br>
+  <br></br>
+  <br></br>
+  <br></br>
+  <br></br>
+  <br></br>
+  <br></br>
+  <br></br>
+  <br></br>
+  <br></br>
+  <br></br>
+  <br></br>
+  <br></br>
+  <br></br>
+    <br></br>
+  <BR></br>
+  <br></br>
+<style>
+
+.headerTitle{
+    font-family: lato;
+    font-size: 46px;
+    font-weight: 600;
+    color: #fff!important;
+    text-align: center;
+    background: #1E3A2E;
+    display: block;
+    margin:0;
+}
+
+@bottom-left {
+
+content: element(footer);
+
+}
+div.footer {
+
+display: block;
+
+
+position: running(footer);
+
+}
+</style>
+
+<div class="footer">
+
+  <apex:include pageName="communityFooterdemo2"/>
+
+</div>
+ 
+</apex:page>

@@ -1,0 +1,13 @@
+.THIS {
+}
+.THIS .custom-box {
+    border: 1px solid #d8dde6;
+}
+
+.THIS.changeStyle {
+    background-color:lightgrey;
+}
+
+.THIS .setSelected{
+    background-color: #EEE;
+}

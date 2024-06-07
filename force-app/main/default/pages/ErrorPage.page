@@ -1,0 +1,66 @@
+<apex:page applyHtmlTag="false" docType="html-5.0" sidebar="false" showHeader="false" standardStylesheets="false">
+
+  <BR></br>
+  <br></br>
+  <BR></br>
+  <br></br>
+  <!-- Begin Default Content REMOVE THIS -->
+  <h1 class="headerTitle" >Access Denied</h1> 
+  <BR></br>
+  <br></br>
+  <h3>Your access to the shopping site is being activated. Please try again in a few minutes. For assistance, email CSN_help@omnicell.com.   </h3>
+  <br></br>
+  <h3>Shop Omnicell is not available to International Customers at this time</h3><!-- Remove or Omnicell Employees for IBA-2315 -->
+  <br></br>
+  <h3>Omnicell employees - create an IT Helpdesk ticket for access. Please send an email requesting the access to ithelpdesk@omnicell.com</h3> <!-- IBA-2835 -->
+  <br></br>
+  <br></br>
+  <br></br>
+  <br></br>
+  <br></br>
+  <br></br>
+  <br></br>
+  <br></br>
+  <br></br>
+  <br></br>
+  <br></br>
+  <br></br>
+  <br></br>
+  <br></br>
+  <BR></br>
+  <br></br>
+<style>
+
+.headerTitle{
+    font-family: lato;
+    font-size: 46px;
+    font-weight: 600;
+    color: #fff!important;
+    text-align: center;
+    background: #1E3A2E;
+    display: block;
+    margin:0;
+}
+
+@bottom-left {
+
+content: element(footer);
+
+}
+div.footer {
+
+display: block;
+
+
+position: running(footer);
+
+}
+</style>
+
+<div class="footer">
+
+  <apex:include pageName="communityFooterdemo2"/>
+
+</div>
+ 
+</apex:page>

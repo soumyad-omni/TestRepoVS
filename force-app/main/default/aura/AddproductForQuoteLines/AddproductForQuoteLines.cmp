@@ -1,0 +1,62 @@
+<aura:component>    
+    <aura:attribute name="item" type="object"/>
+    <aura:attribute name="parList" type="List"/>
+    <tr>
+        <th scope="row">
+            <div class="slds-truncate" title="{!v.item.quoteline.Par_Location__c}">
+                <!--<p style="font-size: 12px;">{!v.item.Par_Location__c}</p>-->
+                <lightning:select value="{!v.item.quoteline.Par_Location__c}" aura:id="selectedPar" variant="label-hidden">       
+                    <aura:iteration items="{!v.parList}" var="items" indexVar="index">
+                        <option value="{!items}" selected="{!items == v.item.Par_Location__c}">{!items}</option>
+                    </aura:iteration>
+                </lightning:select>
+            </div>
+        </th>
+        <th scope="row">
+            <div class="slds-truncate" style="overflow: initial;" title="{!v.item.quoteline.Product_Code__c}">
+                <c:Lookup objectName="Product2"
+                          field_API_text="ProductCode"
+                          field_API_val="Id"
+                          limit="4" 
+                          field_API_search="ProductCode"
+                          lookupIcon="standard:product" 
+                          sellItemId="{!v.item.quoteline.Product_Code__c}"
+                          fieldId="{!v.item.quoteline.Product__c}"                            
+                          placeholder="Enter space after text to search products"
+                          />
+            </div>
+            
+        </th>                                    
+        <th scope="row">
+            <div class="slds-truncate" title="{!v.item.quoteline.Conga_Unit_Price__c}">
+                <p style="font-size: 12px;">
+                    <!--{!v.item.quoteline.Conga_Unit_Price__c}-->
+                    <lightning:formattedNumber value="{!v.item.quoteline.Conga_Extended_Price__c/v.item.quoteline.Quantity__c}" 
+                                               style="currency" 
+                                               currencyCode="USD"
+                                               maximumFractionDigits="2"/>
+                </p>
+            </div>
+        </th>
+        <th>
+            <div class="slds-truncate">
+                <lightning:input type="text" value="{!v.item.quoteline.Serial_Number__c}"/>
+            </div>
+        </th>        
+        <th scope="row">
+            <div class="slds-truncate" title="{!v.item.quoteline.Conga_Extended_Price__c}">
+                <p style="font-size: 12px;">
+                    {!v.item.quoteline.Conga_Extended_Price__c}
+                </p>
+            </div>
+        </th>
+        <th scope="row">
+            <div style="width:50px;">
+                <ui:inputNumber value="{!v.item.quoteline.Quantity__c}" aura:id="{!v.item.quoteline.Id}"/>
+            </div>
+        </th> 
+        <th scope="row">
+            <ui:inputCheckbox text ="" value="{!v.item.isSelectedQuote}" aura:id="chkBoxId" change="{!c.changeValue}"/>
+        </th>
+    </tr>
+</aura:component>

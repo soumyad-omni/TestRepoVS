@@ -1,0 +1,63 @@
+<apex:page applyHtmlTag="false" docType="html-5.0" sidebar="false" showHeader="false" standardStylesheets="false" lightningStylesheets="true">
+<style>
+.myCls {
+  color:#fff;
+  font-size: 14px;
+  padding: 0px;
+  border-right: 0px solid #fff;
+    padding-right: 10px;
+    padding-left: 0;
+    clear: both;
+    display: inline-block;
+    overflow: hidden;
+    white-space: nowrap;
+    vertical-align: middle;
+}
+
+.myCls1{
+    padding: 10px 0 0px;
+    background-color: #001000;
+    margin-right: auto;
+    margin-left: auto;
+}
+
+
+
+.myCls3{
+    height: 11;
+    width: 39;
+}
+
+.cCenterPanel {
+  min-height: calc(100vh - 90px);
+}
+.cFooterPanel {
+  height: 10px;
+}
+</style>
+       <!-- <div class="cCenterPanel"></div> -->
+    <!-- FOOTER -->
+<footer role="contentinfo"  class="slds-p-around_large">
+  <!-- LAYOUT GRID -->
+  <div>
+    <table class="myCls1">
+        <tr>
+            <td rowspan="2"> <img src="{!$Resource.OmniFooterlogo}" class="myCls" height="45" width="46" alt="{{pageLabelMap 'FooterLogo_Alt'}}" /></td>
+            <td><a href="https://www.omnicell.com/privacy-notice" title="Privacy Notice" target="_blank" class="myCls">Privacy Notice</a></td>
+            <td><a href="https://www.omnicell.com/privacy-notice/terms" title="Terms" target="_blank" class="myCls">Terms </a></td>
+            <td><a href="https://www.omnicell.com/privacy-notice/legal-notices" title="Legal Notices" target="_blank" class="myCls">Legal Notices</a></td>
+            <td><a href="https://www.omnicell.com/privacy-notice/hipaa-statement" title="HIPAA Statement" target="_blank" class="myCls">HIPAA Statement</a></td>
+            <td style="width:100%"></td>
+            <td><a href="https://www.facebook.com/omnicellinc" target="_blank" class="myCls"><img src="{!$Resource.OmniFacebookLogo}"/> </a></td>
+            <td> <a href="http://www.twitter.com/Omnicell" target="_blank" class="myCls"><img src="{!$Resource.OmniTwitterLogo}"/></a></td>
+            <td><a href="http://www.linkedin.com/company/omnicell" target="_blank" class="myCls"><img src="{!$Resource.OmniLinkedInLogo}"/></a></td>
+        </tr>
+    </table>      
+    
+
+  </div>
+  <!-- / LAYOUT GRID -->
+</footer>
+<!-- / FOOTER -->
+
+</apex:page>

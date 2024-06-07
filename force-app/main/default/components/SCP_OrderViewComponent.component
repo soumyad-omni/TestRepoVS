@@ -1,0 +1,341 @@
+<!--
+  @description       : 
+  @author            : ChangeMeIn@UserSettingsUnder.SFDoc
+  @group             : 
+  @last modified on  : 07-30-2021
+  @last modified by  : ChangeMeIn@UserSettingsUnder.SFDoc
+  Modifications Log 
+  Ver   Date         Author                               Modification
+  1.0   07-30-2021   ChangeMeIn@UserSettingsUnder.SFDoc   Initial Version
+-->
+<apex:component controller="SCP_OrderView">
+<style> 
+    .cc_order_shipments_table {
+        box-sizing: unset;
+    }
+    .cc_order_shipments_table th, td {
+        padding-right: 5%;
+        margin-right: 10%;
+    }
+    /*.cc_order_shipments_table tbody {
+    display: table-header-group;
+    }*/
+</style>
+ <script id="OrderDetails-View-Desktop" type="text/template"> 
+   <div class="cc_order_details">
+    {{#if this.isConfirmation}}
+     <div class="panel panel-default cc_panel cc_order_confirmation">
+      <div class="panel-heading cc_heading">
+       <h3 class="panel-title cc_title">{{pageLabelMap 'OrderConfirmation_Title'}}</h3>
+      </div>
+      <div class="panel-body cc_body">
+       <p class="cc_order_confirmation_date">
+        {{pageLabelMap 'OrderConfirmation_PlacedOrder' this.name this.orderDateStr}}
+       </p>
+       {{#unless this.userIsGuest}}
+       <p class="cc_order_confirmation_status">
+        <span class="cc_order_status_info">{{pageLabelMap 'OrderConfirmation_StatusInfo'}}&#160;</span>
+        <span class="cc_order_history"><a href="#" class="orderHistory cc_order_history">{{pageLabelMap 'OrderConfirmation_OrderHistory'}}</a>.</span>
+       </p>
+       {{/unless}}
+       <p class="cc_order_confirmation_guidingtext1">
+        {{pageLabelMap 'OrderConfirmation_GuidingText'}}
+       </p>
+       <p class="cc_order_confirmation_guidingtext2">
+        {{pageLabelMap 'OrderConfirmation_GuidingText2'}}
+       </p>
+       <div class="cc_order_confirmation_payments">
+        {{#each this.payments}}
+         {{#ifEquals paymentMethod "PO Number"}}
+          <p class="cc_order_confirmation_payment">{{pageLabelMap 'CheckOut_POGuidingText'}}</p>
+         {{/ifEquals}}
+        {{/each}}
+       </div>
+      </div>
+     </div>
+    {{else}}
+     <div class="panel panel-default cc_panel cc_order_information">
+      <div class="panel-heading cc_heading">
+       <h3 class="panel-title cc_title">{{pageLabelMap 'OrderInformation'}}</h3>
+      </div>
+      <div class="panel-body cc_body">
+       <p class="cc_order_information_number">
+        <span class="cc_order_number">{{pageLabelMap 'OrderView_OrderNumber'}}&#58;&#160;</span>
+        <span class="cc_order_name">{{this.SAPOrderNumber}}</span>
+        {{#ifDisplay 'OD.DsplExtOrderNumber'}}
+         <span class="cc_order_ext_number">{{pageLabelMap 'ExternalOrderID'}}&#58;&#160;</span>
+         <span class="cc_order_ext_id">{{this.externalOrderId}}</span>
+        {{/ifDisplay}}
+       </p>
+       <p class="cc_order_information_number">
+        <span class="cc_reference_number">Reference Number&#58;&#160;</span>
+        <span class="cc_order_name">{{this.referenceNumber}}</span>
+       </p>
+       <p class="cc_order_information_date">
+        <span class="cc_order_date_label">{{pageLabelMap 'MyOrdersInc_OrderDate'}}&#58;&#160;</span>
+        <span class="cc_order_date">{{this.orderDateStr}}</span>
+       </p>
+       <p class="cc_order_information_status">
+        <span class="cc_order_status_label">{{pageLabelMap 'MyOrdersInc_Status'}}&#160;</span>
+        <span class="cc_order_status">{{pageLabelMap this.status}}</span>
+       </p>
+       <!-- IBA-4972 start -->
+       <p class="cc_invoice_link">
+          <span id="Invoice-label">Invoice Links : &#160;</span>
+          <span id="Invoice-link" style="color:#F3F3F3;">{{invPdfLink}}</span>
+       </p>
+       <!-- IBA-4972 end -->
+       <p class="pull-right">
+        <a href="#" class="orderHistory cc_order_history">{{pageLabelMap 'OrderConfirmation_OrderHistory'}}</a>
+       </p>
+       <div class="cc_order_information_payments">
+        {{#each this.payments}}
+         {{#ifEquals paymentMethod "PO Number"}}
+          <p class="cc_order_information_payment">{{pageLabelMap 'CheckOut_POGuidingText'}}</p>
+         {{/ifEquals}}
+        {{/each}}
+       </div>
+      </div>
+     </div>
+    {{/if}}
+    <div class="well cc_well cc_order_information">
+     <h4 class="cc_order_information_title">{{pageLabelMap 'CheckOut_GeneralInformation'}}</h4>
+      <div class="row">
+       <div class="col-xs-12 col-md-4">
+        <h5 class="cc_buyer_information">{{pageLabelMap 'CheckOut_BuyerInformation'}}</h5>
+        <p class="cc_buyer">
+         <span class="cc_buyer_firstname">{{this.buyerFirstName}} {{this.buyerLastName}}</span>
+         <span class="cc_buyer_phone">{{this.buyerPhone}}</span>
+         <span class="cc_buyer_email">{{this.buyerEmail}}</span>
+        </p>
+        <h5 class="cc_shipping_information">{{pageLabelMap 'CheckOut_ShippingInformation'}}</h5>
+        <p class="cc_shipping">
+         {{#if this.shippingMethod}}
+          <p class="cc_shipping_method_section">
+           <span class="cc_shipping_method_label">{{pageLabelMap 'CheckOut_ShippingMethod'}}&#58;&#160;</span>
+           <span class="cc_shipping_method">{{this.shippingMethod}}</span>
+          </p>
+         {{/if}}
+         {{#if this.shippingInst}}
+          <p class="cc_shipping_notes_section">
+           <span class="cc_shipping_notes_label">{{pageLabelMap 'CheckOut_ShippingNotes'}}&#58;&#160;</span>
+           <span class="cc_shipping_notes">{{this.shippingInst}}</span>
+          </p>
+         {{/if}}
+         <!--{{#if this.requestedDate}}
+          <p class="cc_shipping_delivery_section">
+           <span class="cc_shipping_delivery_date_label">{{pageLabelMap 'Checkout_RequestedDeliveryDt'}}&#58;&#160;</span>
+           <span class="cc_shipping_delivery_date">{{this.requestedDateStr}}</span>
+          </p>
+         {{/if}}IBA-3736 -->
+        </p>
+       </div>
+       <div class="col-xs-12 col-md-4">
+        <h5 class="cc_billing_address_label">{{pageLabelMap 'CheckOut_BillingAddress'}}</h5>
+        <p class="cc_billing">
+         <span class="cc_billing_address">{{> addressDisplay this.billingAddress}}</span>
+        </p>
+        <h5 class="cc_payment_information">{{pageLabelMap 'CheckOut_PaymentInformationLeg'}}</h5>
+        <p class="cc_payment">
+         {{#each this.payments}}
+          {{#ifEquals paymentMethod "Credit Card"}}
+           <span class="cc_payment_information_cc_type">{{cardType}}&#160;</span>
+           <span class="cc_payment_information_cc_number_label">{{pageLabelMap 'CheckOut_CCCardNumber'}}&#58;&#160;</span>
+           <span class="cc_payment_information_cc_number">************{{cardNumber}}</span>
+           <span class="cc_payment_information_cc_expdate_label">{{pageLabelMap 'CheckOut_CCExpDate'}}&#58;&#160;</span>
+           <span class="cc_payment_information_cc_expdate">{{expMonth}}/{{expYear}}</span>
+          {{else}}
+           <span class="cc_payment_information_payment_method_label">{{pageLabelMap paymentMethod}}&#58;&#160;</span>
+           <span class="cc_payment_information_payment_method">{{accountNumber}}</span>
+          {{/ifEquals}}
+          {{/each}}
+          <span class="cc_payment_information_transaction_payments">{{pageLabelMapMultiString 'PaymentDisplay_' this.transactionPayments.[0].accountType this.transactionPayments.[0].accountType this.transactionPayments.[0].accountNumber this.transactionPayments.[0].subAccountNumber (pageLabelMapMultiString 'PaymentType_' this.transactionPayments.[0].paymentType) (pageLabelMapMultiString 'PaymentExpMonth_' this.transactionPayments.[0].expirationMonth) (pageLabelMap this.transactionPayments.[0].expirationYear)}}</span>
+          <!-- SCP-769 start -->
+          <span id="att-msg"></span>
+          <div id="atid" style="color:#F3F3F3;">{{attachmentid}}</div>
+          <!-- SCP-769 end -->
+        </p>
+       </div>
+       <div class="col-xs-12 col-md-4">
+        <h5 class="cc_shipping_address_label">{{pageLabelMap 'CheckOut_ShippingAddress'}}</h5>
+        <p class="cc_shipping">
+         <span class="cc_shipping_address">{{> addressDisplay this.shippingAddress}}</span>
+        </p>
+       </div>
+       <div class="col-xs-12 col-md-4">
+      <!-- {{this.Ordernumber}}-->
+       <!--{{#if this.Ordernumber}}-->
+       
+        {{#if this.hasCoupon }}
+        {{#if {!isParentOrder}}}
+         <h5 class="cc_coupon_label">{{pageLabelMap 'CartInc_AppliedCoupon'}}</h5>
+         <p class="cc_coupon_section">
+          <span class="cc_coupon">{{this.couponName}}</span>
+         </p>
+        {{/if}}
+        {{/if}}
+        <!--{{/if}}-->
+       </div>
+      </div>
+     </div>
+     {{> orderItemsDesktop}}
+     <div class="cc_totals_section">
+      {{> totalsSection}}
+     </div>
+     {{#if this.shipments}}
+      <table class="shopping_cart orderShipments cc_order_shipments_table">
+       <tr class="cc_tr">
+        <th class="cc_th_tracking_url">&#160;</th>
+        <th class="cc_th_date">{{pageLabelMap 'OrderShipment_ShipmentDate'}}</th>
+        <th class="cc_th_carrier">{{pageLabelMap 'OrderShipment_Carrier'}}</th>
+        <th class="cc_th_method">{{pageLabelMap 'OrderShipment_ShipmentMethod'}}</th>
+        <th class="cc_th_tracking_num">{{pageLabelMap 'OrderShipment_TrackingNumber'}}</th>
+        <!--<th class="cc_th_deliver_date">{{pageLabelMap 'OrderShipment_DeliveryDate'}}</th>-->
+       </tr>
+       {{#each this.shipments}}
+        <tr class="cc_tr_values {{sfid}}">
+         <td class="cc_td_tracking_url"><a target="shiptracking" href="{{{trackingUrl}}}">{{pageLabelMap 'OrderShipment_Track'}}</a></td>
+         <td class="cc_td_date">{{shipmentDateStr}}</td>
+         <td class="cc_td_carrier">{{carrier}}</td>
+         <td class="cc_td_method">{{shippingMethod}}</td>
+         <td class="cc_td_tracking_num">{{trackingNo}}</td>
+         <!--<td class="cc_td_deliver_date">{{deliveryDateStr}}</td>-->
+        </tr>
+        {{#each this.items}}
+         <tr class="cc_tr_details">
+          <td ></td>
+          <td colspan="5" class="cc_td_detail_line {{sfid}}">
+           <span class="cc_sku_label">{{pageLabelMap 'CartInc_SKU'}}</span>&#160;<span class="cc_sku_value">{{sku}}</span>, <span class="cc_qty_label">{{pageLabelMap 'CartInc_Qty'}}</span>&#58;&#160;<span class="cc_qty">{{quantity}}</span>
+          </td>
+         </tr>
+        {{/each}}
+       {{/each}}
+      </table>
+     {{/if}}
+    </div>
+   </div>
+  </script>
+  <script id="AddressDisplay" type="text/template">
+  <div class="address_selection_display">
+   {{#ifDisplay 'SO.DsplAddrName'}}
+    {{#if this.firstName }}
+     <p class="cc_addr_name">
+      <span class="cc_firstname">{{this.firstName}}</span>
+      {{#if this.lastName }}
+       <span class="cc_lastname">{{this.lastName}}</span>
+      {{/if}}
+     </p>
+    {{else}}
+     {{#if this.lastName }}
+      <p class="cc_addr_name">
+       <span class="cc_lastname">{{this.lastName}}</span>
+      </p>
+     {{/if}}
+    {{/if}}
+
+   {{/ifDisplay}}
+   {{#ifDisplay 'SO.DsplAddrCompany'}}
+    {{#if this.companyName}}
+     <p class="cc_addr_company">{{this.companyName}}</p>
+    {{/if}}
+   {{/ifDisplay}}
+   {{#if this.address1}}
+    <span class="addr_line1 cc_addr_line">{{this.address1}}</span><br/>
+   {{else}}
+    {{#if this.addressFirstline}}
+     <span class="addr_line1 cc_addr_line">{{this.addressFirstline}}</span><br/>
+    {{/if}}
+   {{/if}}
+
+   {{#if this.address2}}
+    <span class="addr_line2 cc_addr_line">{{this.address2}}</span><br/>
+   {{else}}
+    {{#if this.addressSecondline}}
+     <span class="addr_line1 cc_addr_line">{{this.addressSecondline}}</span><br/>
+    {{/if}}
+   {{/if}}
+
+   {{#if this.address3}}
+    <span class="addr_line3 cc_addr_line">{{this.address3}}</span><br/>
+   {{else}}
+    {{#if this.addressThirdline}}
+     <span class="addr_line1 cc_addr_line">{{this.addressThirdline}}</span><br/>
+    {{/if}}
+   {{/if}}
+   <span class="cc_addr_city">{{this.city}}</span>
+   {{#if this.state}}
+    <span class="cc_addr_state">&#44;&#160;{{this.state}}</span>
+   {{else}}
+    {{#if this.stateCode}}
+     <span class="cc_addr_state">&#44;&#160;{{this.stateCode}}</span>
+    {{else}}
+     {{#if this.stateISOCode}}
+      <span class="cc_addr_state">&#44;&#160;{{this.stateISOCode}}</span>
+     {{/if}}
+    {{/if}}
+   {{/if}}
+   <span class="cc_addr_postal">&#160;{{this.postalCode}}</span><br/>
+   <span class="cc_addr_country">{{this.country}}</span><br/>
+   <span class="cc_addr_extId">{{this.partnerId}}</span>
+  </div>
+ </script>
+    <script id="TotalSection" type="text/template">
+  <div class="total cc_total row">
+   <div class="col-md-8"></div>
+   <div class="col-md-4">
+    <p class="cc_subTotal">
+     <span class="cc_subTotal_label">{{pageLabelMap 'CartInc_Subtotal'}}&#58;&#160;</span>
+     <span class="cc_subTotal">{{price this.subTotal this.currencyCode}}</span>
+    </p>
+    {{#ifStoreSetting 'Skip_Tax_Calculation__c'}}
+     &#160;
+    {{else}}
+     <!--{{#if this.tax }}-->
+      <p class="cc_taxes">
+       <span class="cc_tax_label">{{pageLabelMap 'CheckOut_EstimatedTax'}}&#58;&#160;</span>
+       <span class="cc_tax">{{price this.tax this.currencyCode}}</span>
+      </p>
+     <!--{{/if}}-->
+    {{/ifStoreSetting}}
+    {{#ifStoreSetting 'Skip_Shipping_Calculation__c'}}
+     &#160;
+    {{else}}
+     <p class="cc_shipping">
+      <span class="cc_shipping_label">{{pageLabelMap 'CartInc_Shipping'}}&#58;&#160;</span>
+      <span class="cc_shipping_charge">{{price this.shippingCharge this.currencyCode}}</span>
+     </p>
+    {{/ifStoreSetting}}
+    {{#ifDisplay 'OR.ShowTotalSurcharge' }}
+     {{#if this.surchargeAmount }}
+      <p class="cc_surcharge">
+       <span class="cc_surcharge_label">{{pageLabelMap 'CartInc_Surcharge'}}&#58;&#160;</span>
+       <span class="cc_surcharge_amount">{{price this.surchargeAmount this.currencyCode}}</span>
+      </p>
+     {{/if}}
+    {{/ifDisplay}}
+    <p class="cc_grand_total">
+     <span class="cc_total_label">{{pageLabelMap 'CartInc_GrandTotal'}}&#58;&#160;</span>
+     <span class="cc_total_amount">{{sum this.subTotal this.tax this.shippingCharge this.adjustment this.surchargeAmount this.currencyCode}}</span>
+    </p>
+   </div>
+  </div>
+ </script>
+
+  <script>
+    
+    CCRZ.pubSub.on('view:OrderDetailView:refresh',function(){
+	
+	
+        if($("#atid").text() != '' && $("#atid").text() != null){
+		
+            document.getElementById("att-msg").insertAdjacentHTML("afterend",
+                    '<a href="{!URLFOR($Action.Attachment.Download, attachmentid)}" style="font-size:12px">View Attachment</a>');
+        }
+       
+        if('{!invPdfLink}' != ''){	// IBA-4972 changes
+            document.getElementById("Invoice-link").insertAdjacentHTML("afterend",'{!invPdfLink}');
+        }
+    });
+    
+  </script>
+</apex:component>

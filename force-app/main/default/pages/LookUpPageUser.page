@@ -1,0 +1,26 @@
+<apex:page controller="LookUpPageUserController" sidebar="false" docType="html-5.0">
+  <apex:form >
+   <apex:pageBlock >
+		<apex:pageBlockSection title="Details">
+			<apex:pageBlockTable value="{!listUsers}" var="a">
+			<apex:column headerValue="Name">
+                <apex:outputLink value="#" onclick="fillIn('{!JSENCODE(a.Name)}','{!a.id}')">{!a.Name}</apex:outputLink>
+            </apex:column>
+			</apex:pageBlockTable>
+			</apex:pageBlockSection>
+	</apex:pageBlock>
+  </apex:form>
+    <script>    
+		function fillIn(name, id){
+			var winMain=window.opener;
+			if (null==winMain){
+				winMain=window.parent.opener;
+			}
+			var ele=winMain.document.getElementById('{!$CurrentPage.parameters.namefield}');
+			ele.value=name;
+			ele=winMain.document.getElementById('{!$CurrentPage.parameters.idfield}');
+			ele.value=id;
+			winMain.closeLookupPopup();
+		}
+</script>
+</apex:page>

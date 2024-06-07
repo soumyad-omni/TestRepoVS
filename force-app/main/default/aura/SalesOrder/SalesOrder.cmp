@@ -1,0 +1,22 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickAction" access="global" controller="OmnicellSendSalesOrderToCastIron_Class">
+<aura:attribute name="qte" type="Quote" />
+<aura:attribute name="recordError" type = "String" />
+<aura:attribute name="isButtonShow" type="boolean" default="false"/>
+<force:recordData aura:id="record"
+    layoutType="FULL"
+    recordId="{!v.recordId}"
+    targetError="{!v.recordError}"
+    targetFields ="{!v.qte}"
+    mode="VIEW"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <div align="Left">
+        <!--added by Sam on 31-JAN-2019-->
+        <!--IBA-1270 offline build request-->
+        <!--IBA-1702 advanced services - added E0024-->
+        <!--<aura:if isTrue="{!and((v.qte.Status == 'E0013' || v.qte.Status == 'E0023' || v.qte.Status == 'E0019' || v.qte.Status == 'E0024'), !v.qte.SAP_Sales_Order_Number__c)}">-->
+        <aura:if isTrue="{!v.isButtonShow}">
+              <lightning:button label="Create Sales Order" variant="brand" onclick="{!c.buttonAction}" class="customButton" name="sales" aura:id="enablebuttonid"/>
+       </aura:if>
+    </div>
+    
+</aura:component>

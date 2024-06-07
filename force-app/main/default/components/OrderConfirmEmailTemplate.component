@@ -1,0 +1,215 @@
+<apex:component controller="OrderConfirmEmailTemplatectrl" access="global">
+    <apex:attribute name="OrdId" type="Id" description="Id of the account" assignTo="{!OrderId}"/>
+    <style type="text/css">
+
+    
+    body {
+    background-color:#FFFFFF;
+}
+
+
+
+th{
+    color: #46B555;
+    font-family: ProximaNovaBold, Arial, Helvetica, sans-serif;
+}
+p{
+    color: #46B555;
+    font-family: ProximaNovaBold, Arial, Helvetica, sans-serif;
+}
+
+</style>
+           <!-- <p><img src="{!$Resource.OmnicellLogo_PDF}"/></p> -->
+               <!--<p><apex:image url="{!$Resource.OmnicellLogo_PDF}"/> </p>-->
+               <p><apex:image id="Headerlogo" value="{!$Label.Omnicell_img_Servlet_URL}"/></p>
+
+            <table style="width:580px; border: 2px solid;">
+            <apex:repeat value="{!OrderList}" var="ord">
+                <tr>
+                    <th style="text-align: left">{!ord.Owner.Name} placed an order. Current order status is: {!ord.ccrz__OrderStatus__c}</th>    
+                </tr>
+                <tr><th style="text-align: left">Order Number :&nbsp;{!ord.SAP_Order_Number__c}</th></tr>
+                 </apex:repeat> 
+            </table>
+            <br/>
+            <table style="width:500px;   border: 2px solid;">
+                <tr >
+                    <th style="padding-bottom: 20px; text-align: left;">Billing and Shipping Address</th><th></th>                         
+                </tr>
+                 <tr>
+                    <th style="color:#000;width:100px; text-align: left;font-size: 13px; ">Bill To  </th>
+                    <th style="color:#000;width:100px; text-align: left;font-size: 13px; ">Ship To</th>
+                     
+                </tr>
+                <br/>
+                <apex:repeat value="{!OrderList}" var="ord">
+                <tr>
+                    <td style="color:#000;width:100px; text-align: left;font-size: 13px; ">
+                        <!--{!ord.ccrz__BillTo__r.ccrz__AddressSecondline__c} <br/>
+                        {!ord.ccrz__BillTo__r.ccrz__AddressThirdline__c} <br/>-->
+                         <!--{!ord.ccrz__BillTo__r.ccrz__FirstName__c}  {!ord.ccrz__BillTo__r.ccrz__LastName__c}<br/> --> 
+                        {!ord.ccrz__BillTo__r.ccrz__CompanyName__c} <br/>
+                        {!ord.ccrz__BillTo__r.ccrz__AddressFirstline__c} <br/>
+                        {!ord.ccrz__BillTo__r.ccrz__City__c} <br/>
+                        {!ord.ccrz__BillTo__r.ccrz__StateISOCode__c} <br/>
+                        {!ord.ccrz__BillTo__r.ccrz__Country__c} <br/>
+                        {!ord.ccrz__BillTo__r.ccrz__PostalCode__c}
+                    </td>
+                    <td style="color:#000;width:100px;padding-right: 50px;font-size: 13px;text-align: left;">
+                    <!--{!ord.ccrz__ShipTo__r.ccrz__AddressSecondline__c} <br/>
+                    {!ord.ccrz__ShipTo__r.ccrz__AddressThirdline__c} <br/> -->
+                    <!--{!ord.ccrz__ShipTo__r.ccrz__FirstName__c}  {!ord.ccrz__ShipTo__r.ccrz__LastName__c}<br/> --> 
+                    {!ord.ccrz__ShipTo__r.ccrz__CompanyName__c} <br/>
+                    {!ord.ccrz__ShipTo__r.ccrz__AddressFirstline__c} <br/>
+                    {!ord.ccrz__ShipTo__r.ccrz__City__c} <br/>
+                    {!ord.ccrz__ShipTo__r.ccrz__StateISOCode__c} <br/>
+                    {!ord.ccrz__ShipTo__r.ccrz__Country__c} <br/>
+                    {!ord.ccrz__ShipTo__r.ccrz__PostalCode__c}
+                    </td>
+                </tr>
+                </apex:repeat> 
+            </table>
+            <br/>
+         
+            <table style="width:500px; border: 2px solid;">
+           
+                <tr>
+                    <th style=" padding-bottom: 20px;text-align: left;">Payment Information</th> <th></th>  
+                </tr>
+                <tr>
+                   <!-- <th style="color:#000;width:100px; text-align: left; font-size: 13px; ">Payment Method</th> --> 
+                </tr>
+                 
+                 <apex:repeat value="{!OrderList}" var="ord">
+                 <tr>
+                    <!--<td style="color:#000;width:100px; text-align: left; font-size: 13px; font-weight: bold;">Payment Method</td>-->
+                    <th style="color:#000;width: 100px;;font-size: 13px;text-align: left;">Payment Method</th>
+                      <apex:repeat value="{!TranscList}" var="Trasc"> 
+                          <!-- IBA-5834 Start -->
+                          <apex:outputPanel rendered="{!Trasc.ccrz__AccountType__c == 'sopcc'}">
+                             <td style="color:#000;width:100px; text-align: left;font-size: 13px; ">Credit Card</td>
+                          </apex:outputPanel>
+                          <apex:outputPanel rendered="{!Trasc.ccrz__AccountType__c != 'sopcc'}">
+                             <td style="color:#000;width:100px; text-align: left;font-size: 13px; ">{!Trasc.ccrz__AccountType__c}</td>
+                          </apex:outputPanel>
+                          <!-- IBA-5834 End -->
+                       </apex:repeat> 
+                 </tr> 
+                   </apex:repeat> 
+                   <tr>
+                    <!--<th style="color:#000;width:100px;font-size: 13px;padding-right: 50px;text-align: left;">Credit card</th>  -->
+                </tr>
+                   <apex:repeat value="{!TranscList}" var="Trasc">
+                   <tr>
+                   <td style="color:#000;width:100px;font-size: 13px;padding-right: 50px;text-align: left;font-weight: bold;">Credit card/PO</td>
+                    <td style="color:#000;width:100px;font-size: 13px;padding-right: 50px;text-align: left;">{!Trasc.ccrz__AccountNumber__c }</td>                   
+                </tr>
+                 </apex:repeat> 
+                <tr>
+                  
+                    <!--<th style="color:#000;width:100px; text-align: left;font-size: 13px; ">Estimated Delivery Date  </th> -->
+                </tr>
+                <!-- //IBA-3736
+                <apex:repeat value="{!OrderList}" var="ord">
+                 <tr>
+                    <td style="color:#000;width:100px; text-align: left;font-size: 13px;font-weight: bold; ">Estimated Delivery Date  </td> 
+                    <td style="color:#000;width:100px;font-size: 13px;padding-right: 50px;text-align: left;"> {!ReqDate} </td>
+                </tr>
+                </apex:repeat> -->
+            </table>
+
+          
+           <br/>
+            <table style="width:500px; border: 2px solid;">
+                <tr>
+                    <td style="width:100%; text-align: left;color: #46B555; font-family: ProximaNovaBold, Arial, Helvetica, sans-serif;"><b>Order Items</b></td> 
+                    <th></th> 
+                    <th></th> 
+                    <th></th> 
+                    <th></th> 
+                    <th></th>
+                </tr>
+                <br/>
+                <br/>
+                <tr>
+                    <th style="color:#000;width: 830px;font-size: 13px;text-align: left;">Product</th>
+                    <th style="color:#000;width:100px;font-size: 13px;padding-right: 10px;text-align: left;">Price</th>
+                    <th style="color:#000;width:100px;font-size: 13px;padding-right: 15px;text-align: left;">Qty</th>
+                    <th style="color:#000;width:100px;font-size: 13px;padding-right: 15px;text-align: left;">Status</th>
+                    <th style="color:#000;width:100px;font-size: 13px;padding-right: 15px;text-align: left;">Total</th>  
+                    <th style="color:#000;width:100px;font-size: 13px;padding-right: 15px;text-align: left;">Est. Delivery Date</th>  <!-- IBA-3736 -->
+                </tr>
+               
+             <apex:repeat value="{!OrderItemsList}" var="orditem">
+                  <tr>
+                    <apex:outputPanel rendered="{!AND(orditem.ccrz__PricingType__c != 'attrGroup',orditem.ccrz__OrderLineType__c != 'Minor')}">
+                        <td style="padding-left: 0px;width: 830px;text-align: left;font-size: 13px;">{!orditem.ccrz__Product_Name__c}</td>
+                        <td style="width:100px;padding-right: 10px;text-align: left;font-size: 13px;">${!orditem.ccrz__Price__c} </td>
+                        <td style="width:100px;padding-right: 15px;text-align: left;font-size: 13px;">{!orditem.ccrz__Quantity__c} </td>
+                        <td style="width:100px;padding-right: 15px;text-align: left;font-size: 13px;">{!orditem.ccrz__OrderItemStatus__c} </td>
+                        <td style="width:100px;padding-right: 15px;text-align: left;font-size: 13px;">${!orditem.ccrz__ItemTotal__c} </td>
+                        <td style="width:100px;padding-right: 15px;text-align: left;font-size: 13px;">{!orditem.Estimated_Delivery_DateText__c} </td> <!-- IBA-3736 -->
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!orditem.ccrz__OrderLineType__c == 'Minor'}">
+                        <td style="padding-left: 0px;width: 830px;text-align: left;font-size: 13px;">{!orditem.ccrz__Product_Name__c} ({!orditem.ccrz__PrimaryAttr__r.ccrz__DisplayName__c} {!orditem.ccrz__SecondaryAttr__r.ccrz__DisplayName__c} {!orditem.ccrz__TertiaryAttr__r.ccrz__DisplayName__c} {!orditem.DrugCodes__r.Brand_Name__c} {!orditem.DrugCodes__r.Drug_Strength__c})</td>
+                        <td style="width:100px;padding-right: 10px;text-align: left;font-size: 13px;">${!orditem.ccrz__Price__c} </td>
+                        <td style="width:100px;padding-right: 15px;text-align: left;font-size: 13px;">{!orditem.ccrz__Quantity__c} </td>
+                        <td style="width:100px;padding-right: 15px;text-align: left;font-size: 13px;">{!orditem.ccrz__OrderItemStatus__c} </td>
+                        <td style="width:100px;padding-right: 15px;text-align: left;font-size: 13px;">${!orditem.ccrz__ItemTotal__c} </td>
+                        <td style="width:100px;padding-right: 15px;text-align: left;font-size: 13px;">{!orditem.Estimated_Delivery_DateText__c} </td> <!-- IBA-3736 -->
+                    </apex:outputPanel>
+                  </tr>
+            </apex:repeat>
+            </table>
+            <br/>
+            
+            <table style="width:500px; border: 2px solid;">
+            <apex:repeat value="{!OrderList}" var="ord">
+                <tr><th style=" text-align: left;width: 100%;">Totals</th>
+                    <th></th>
+                </tr>
+                
+                <tr>
+                     <td style="padding-left: 270px;font-family: ProximaNovaBold, Arial, Helvetica, sans-serif;font-size: 13px; font-weight: bold;text-align: left;">Subtotal </td>
+                     <td >${!ord.ccrz__SubtotalAmount__c} </td>
+               
+                </tr>
+                <tr>
+                    <td style="padding-left: 270px;font-family: ProximaNovaBold, Arial, Helvetica, sans-serif;font-size: 13px; font-weight: bold;text-align: left;">Estimated Shipping </td>
+                <td >${!ord.ccrz__ShipAmount__c }  </td>  
+                </tr>
+                <tr>
+                   <td style="padding-left: 270px;font-family: ProximaNovaBold, Arial, Helvetica, sans-serif;font-size: 13px; font-weight: bold;text-align: left;">Estimated Tax  </td>
+                <td >${!ord.ccrz__TaxAmount__c} </td> 
+                </tr>
+                <tr>
+                    <td style="padding-left: 270px;font-family: ProximaNovaBold, Arial, Helvetica, sans-serif;font-size: 13px; font-weight: bold;text-align: left;">Grand Total </td>
+                <td > ${!ord.ccrz__TotalAmount__c} </td>  
+                </tr>
+                </apex:repeat>
+            </table>
+            <p>Thank You!</p>
+            <tr><td style="color:#000;width: 830px;font-size: 13px;text-align: left;">{!$Label.B2BOrderC}</td> </tr>
+    
+            <br/>
+
+            <apex:outputPanel rendered="{!OrderCassetteitem[0] > 0}">
+                <table style="width:500px; border: 2px solid;">
+                    <tr><th style="color:#000;width: 830px;font-size: 13px;text-align: left;">Have a question on Cassette Order?</th></tr>
+                    <tr><th style="color:#000;width: 830px;font-size: 13px;text-align: left;">Contact us</th></tr>
+                    <tr><th style="color:#000;width: 830px;font-size: 13px;text-align: left;">OnDemandCassettes@omnicell.com</th></tr>
+                    <tr><th style="color:#000;width: 830px;font-size: 13px;text-align: left;">727-310-3585</th></tr>
+                </table>
+            </apex:outputPanel>
+            <br/>
+            <apex:outputPanel rendered="{!OrderCanisteritem[0] > 0}">
+                <table style="width:500px; border: 2px solid;">
+                    <tr><th style="color:#000;width: 830px;font-size: 13px;text-align: left;">Have a question on Canister Order?</th></tr>
+                    <tr><th style="color:#000;width: 830px;font-size: 13px;text-align: left;">Contact us</th></tr>
+                    <tr><th style="color:#000;width: 830px;font-size: 13px;text-align: left;">PacmedCalibration-Aesynt@omnicell.com</th></tr>
+                    <tr><th style="color:#000;width: 830px;font-size: 13px;text-align: left;">724-741-7735</th></tr>
+                </table>
+            </apex:outputPanel>
+            <br/>
+            <p><apex:image id="regardslogo" value="{!$Label.Omnicell_img_Servlet_URL}"/></p>
+</apex:component>

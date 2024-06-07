@@ -1,0 +1,144 @@
+<apex:component >
+    <script id="Cart-OrderAttributeItems" type="text/template">
+    	<div> <!-- custom order attribute for PacMed -->
+      		<div id="order_attribute_items{{this.itemID}}" class="modal fade cc_modal cc_order_attribute_items_modal" tabindex="-1" role="dialog" aria-hidden="true">
+       			<div class="modal-dialog modal-lg" role="document">
+        			<div class="modal-content cc_modal_content">
+         				<div class="modal-header">
+          					<button type="button" class="close cc_close" data-dismiss="modal" aria-label="{{pageLabelMap 'Modal_Aria_Close'}}"><span aria-hidden="true">&#215;</span></button>
+          					<h3 id="myModalLabel">{{this.mockProduct.name}}:&#160;{{pageLabelMap 'CheckOut_AttributeItems'}}</h3>
+         				</div>
+         				<div class="modal-body cc_modal-body">
+          					<div class="table-responsive">
+           						<table class="cart_figures table table-striped table-condensed cc_table cc_included_items">
+            						<thead class="cc_table_header">
+            							<th class="cc_name">Operation</th><!--{{pageLabelMap 'CheckOut_AttributeSku'}}-->
+            							<th>Material</th>
+            							{{#each this.topAttributes}}
+             								<th class="cc_attribute_name">{{{this.displayName}}}</th>
+            							{{/each}}
+            							<th>Brand</th>
+                                        <th>Generic Name</th>
+                                        <th>Manufacturer</th>
+                                        <th>Strength</th>
+            							<th class="">{{pageLabelMap 'CheckOut_AttributeQuantity'}}</th><!-- remove class cc_attribute_qty for css-->
+            							<th>Status</th>
+            							<th class="cc_total">{{pageLabelMap 'CartInc_Price'}}</th>
+            							<th class="cc_total">{{pageLabelMap 'CartInc_Total'}}</th>
+            							<th>Availability</th>
+            							<th>Est. Delivery Date</th><!-- IBA-3736 -->
+            						</thead>
+            						<tbody>
+             							{{#each this.minorLines}}
+              								<tr>
+               									<td class="cc_sku text-nowrap">
+                                                    {{#if extSKU}}
+                                                        {{extSKU}}
+                                                    {{else}}
+                                                        {{mockProduct.sku}}
+                                                    {{/if}}
+               									</td>
+            								 	<td><span class="cc_attr_display">{{this.material}}</span></td>
+                                              	<!-- {{#if primaryAttr}}<td><span class="cc_attr_display">{{{primaryAttr.displayName}}}</span></td>{{/if}}
+                                               	{{#if secondaryAttr}}<td><span class="cc_attr_display">{{{secondaryAttr.displayName}}}</span></td>{{/if}}
+                                               	{{#if tertiaryAttr}}<td><span class="cc_attr_display">{{{tertiaryAttr.displayName}}}</span></td>{{/if}}
+               									{{#if primaryAttr}}<td><span class="cc_attr_display">{{this.machine}}</span></td>{{/if}}-->
+               									<td><span class="cc_attr_display">{{this.machinesR.machineName}}</span></td>
+            									<td><span class="cc_attr_display">{{this.machineType}}</span></td><!-- {{#if secondaryAttr}}{{/if}} secon att is not coming in json-->
+               									<!--{{#if tertiaryAttr}}{{/if}}Need to uncomment after dataload in cc attribute-->
+            									<td><span class="cc_attr_display">{{this.drugCodesR.drugCodes}}</span></td>
+            <!--{{#if brandName}}{{/if}}{{#if manufacturerName}}{{/if}} {{#if genericDrugName}}{{/if}}-->
+               									<td><span class="cc_attr_display">{{this.drugCodesR.brandName}}</span></td>
+                                                <td><span class="cc_attr_display">{{this.drugCodesR.genericDrugName}}</span></td>
+                                                <td><span class="cc_attr_display">{{this.drugCodesR.manufacturerName}}</span></td>
+                                                <td><span class="cc_attr_display">{{this.drugCodesR.drugStrength}}</span></td>
+            									<td style="text-align:center"><span class="cc_attr_qty">{{quantity}}</span></td> 
+               									<td><span class="">{{orderLineStatus}}</span></td>
+                                                <td><span class="cc_attr_price">{{price this.price this.currencyCode}}</span></td>
+                                                <td><span class="cc_attr_line_total">{{price this.SubAmount this.currencyCode}}</span></td>
+            									<td>
+            										{{#ifEquals this.availabilityMessage 'Available'}}
+                                                       <span id="{{this.itemID}}" style="color:green">{{this.availabilityMessage}}</span>
+                                                      {{else}}
+                                                          <span id="{{this.itemID}}" style="color:red">{{this.availabilityMessage}}</span>
+                                                    {{/ifEquals}}
+            									</td>
+            									<td><span class="normal">{{this.estimatedDeliveryDateText}}</span></td><!-- IBA-3736 -->
+              								</tr>
+             							{{/each}}
+            						</tbody>
+           						</table>
+          					</div>
+          					<hr>
+          					<div class="row">
+           						<div class="col-md-12">
+            						<span class="pull-right">{{pageLabelMap 'CartInc_Total'}}&#58;&#160;{{price this.SubAmount}}</span>
+           						</div>
+          					</div>
+         				</div>
+        			</div>
+       			</div>
+      		</div>
+       </div>
+       <!-- below code for standard -->   
+       <!--
+       <div> 
+      		<div id="order_attribute_items{{this.itemID}}" class="modal fade cc_modal cc_order_attribute_items_modal" tabindex="-1" role="dialog" aria-hidden="true">
+       			<div class="modal-dialog modal-lg" role="document">
+        			<div class="modal-content cc_modal_content">
+         				<div class="modal-header">
+          					<button type="button" class="close cc_close" data-dismiss="modal" aria-label="{{pageLabelMap 'Modal_Aria_Close'}}"><span aria-hidden="true">&#215;</span></button>
+          					<h3 id="myModalLabel">{{this.mockProduct.name}}:&#160;{{pageLabelMap 'CheckOut_AttributeItems'}}</h3>
+         				</div>
+         				<div class="modal-body cc_modal-body">
+          					<div class="table-responsive">
+           						<table class="cart_figures table table-striped table-condensed cc_table cc_included_items">
+            						<thead class="cc_table_header">
+            							<th class="cc_name">{{pageLabelMap 'CheckOut_AttributeSku'}}</th>
+            							{{#each this.topAttributes}}
+             								<th class="cc_attribute_name">{{{this.displayName}}}</th>
+            							{{/each}}
+            							<th class="cc_attribute_qty">{{pageLabelMap 'CheckOut_AttributeQuantity'}}</th>
+            							<th class="cc_total">{{pageLabelMap 'CartInc_Price'}}</th>
+            							<th class="cc_total">{{pageLabelMap 'CartInc_Total'}}</th>
+            						</thead>
+            						<tbody>
+             							{{#each this.minorLines}}
+              								<tr>
+               									<td class="cc_sku text-nowrap">
+                                                    {{#if extSKU}}
+                                                        {{extSKU}}
+                                                    {{else}}
+                                                        {{mockProduct.sku}}
+                                                    {{/if}}
+               									</td>
+                                              	{{#if primaryAttr}}<td><span class="cc_attr_display">{{{primaryAttr.displayName}}}</span></td>{{/if}}
+                                               	{{#if secondaryAttr}}<td><span class="cc_attr_display">{{{secondaryAttr.displayName}}}</span></td>{{/if}}
+                                               	{{#if tertiaryAttr}}<td><span class="cc_attr_display">{{{tertiaryAttr.displayName}}}</span></td>{{/if}}
+               									<td><span class="cc_attr_qty">{{quantity}}</span></td>
+                                               <td><span class="cc_attr_price">{{price this.price this.currencyCode}}</span></td>
+                                               <td><span class="cc_attr_line_total">{{price this.SubAmount this.currencyCode}}</span></td>
+              								</tr>
+             							{{/each}}
+            						</tbody>
+           						</table>
+          					</div>
+          					<hr>
+          					<div class="row">
+           						<div class="col-md-12">
+            						<span class="pull-right">{{pageLabelMap 'CartInc_Total'}}&#58;&#160;{{price this.SubAmount}}</span>
+           						</div>
+          					</div>
+         				</div>
+        			</div>
+       			</div>
+      		</div>
+       </div>
+       -->
+    </script>
+    <script>
+    	jQuery(function($){
+            //alert();
+        });
+    </script>
+</apex:component>

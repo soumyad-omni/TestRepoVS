@@ -1,0 +1,21 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickAction" access="global" controller="UpdateLockedCheckBox_Class">
+<aura:attribute name="qte" type="Quote" />
+<aura:attribute name="recordError" type = "String" />
+<aura:attribute name="HigherLevel" type = "Decimal"/>
+<aura:attribute name="BaseURL" type = "String"/>
+<aura:attribute name="legCrDate" type="DateTime" />
+<aura:handler name="init" value="{!this}" action="{!c.doinit}"/>
+<force:recordData aura:id="record"
+    layoutType="FULL"
+    recordId="{!v.recordId}"
+    targetError="{!v.recordError}"
+    targetFields ="{!v.qte}"
+    mode="VIEW"/>
+    
+    <div align="left">
+       <aura:if isTrue="{!not(empty(v.qte.Quote_Number__c))}">
+              <lightning:button label="Configurator" variant="brand" onclick="{!c.buttonAction}" class="customButton" name="cincom" aura:id="enablebuttonid"/>
+       </aura:if>
+    </div>
+    
+</aura:component>

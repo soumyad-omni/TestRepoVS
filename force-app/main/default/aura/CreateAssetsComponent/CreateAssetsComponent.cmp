@@ -1,0 +1,13 @@
+<aura:component implements="force:hasRecordId,flexipage:availableForAllPageTypes,force:lightningQuickAction" access="global" controller="CreateAssetsComponentController">
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="myWrapper" type="object" /> 
+    <aura:attribute name="disableUploadBtn" type="Boolean" default="true" />
+    <aura:attribute name="disableDownloadBtn" type="Boolean" default="true" />
+     <aura:attribute name="myText" type="String" />
+    <div>
+        <input type="file" class="file" aura:id="file" onchange="{!c.showfiledata}"/>
+        <lightning:button label="Upload" onclick="{!c.CreateRecord}" class="slds-button slds-button--brand" disabled="{!v.disableUploadBtn}"/>
+        <lightning:button label="Download Result CSV" onclick="{!c.downloadCsv}" class="slds-button slds-button--brand" disabled="{!v.disableDownloadBtn}"/>        
+    </div>
+    <ui:outputText value="{!v.myText}"/>
+</aura:component>

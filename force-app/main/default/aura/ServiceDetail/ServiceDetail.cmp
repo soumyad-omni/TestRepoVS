@@ -1,0 +1,40 @@
+<aura:component >
+	<aura:attribute name="dealModelWrapper" type="Object" /> 
+    <lightning:layout multipleRows="true">
+        <lightning:layoutItem flexibility="auto" padding="around-small" size="10" smallDeviceSize="10" mediumDeviceSize="4" largeDeviceSize="4" >
+            <table style="width:100%;">  
+                <tr>      
+                    <td style="text-align:left body; font-size:12px; width:50%;"><b>Service Booking:</b></td>
+                    <td style="width:50%;">&nbsp;&nbsp;<ui:outputCurrency value="{!v.dealModelWrapper.data.ES_MARGIN_HDR.SERVICE_BOOKING}" format="###,###,###,##0.00"/></td>
+                </tr>
+            </table>
+        </lightning:layoutItem>
+        <lightning:layoutItem flexibility="auto" padding="around-small" size="10" smallDeviceSize="10" mediumDeviceSize="4" largeDeviceSize="4" >
+            <table style="width:100%;">  
+                <tr>      
+                    <td style="text-align:left body; font-size:12px; width:50%;"><b>Margin Service(%):</b></td>
+                    <td style="width:50%;">&nbsp;&nbsp;<ui:outputCurrency value="{!v.dealModelWrapper.data.ES_MARGIN_HDR.MARGIN_SERVICE}" format="###,###,###,##0.00"/></td>
+                </tr>
+            </table>
+        </lightning:layoutItem>
+        <lightning:layoutItem flexibility="auto" padding="around-small" size="10" smallDeviceSize="10" mediumDeviceSize="4" largeDeviceSize="4s" >
+            <table style="width:100%;">  
+                <tr>      
+                    <td style="text-align:left body; font-size:12px; width:50%;"><b>Service Cost:</b></td>
+                    <td style="width:50%;">&nbsp;&nbsp;<ui:outputCurrency value="{!v.dealModelWrapper.data.ES_MARGIN_HDR.SERVICE_COST}" format="###,###,###,##0.00"/></td>
+                </tr>
+            </table>
+        </lightning:layoutItem>
+    </lightning:layout>
+    
+    <lightning:layout multipleRows="true">
+        <lightning:layoutItem flexibility="auto" padding="around-small" size="10" smallDeviceSize="10" mediumDeviceSize="4" largeDeviceSize="4" >
+            <table style="width:100%;">  
+                <tr>      
+                    <td style="text-align:left body; font-size:12px; width:50%;"><b>Service Discount:</b></td>
+                    <td style="width:50%;">&nbsp;&nbsp;<ui:outputCurrency value="{!v.dealModelWrapper.data.ZCRMFM_MARGIN_OVERCAST.SERV_DISC}" format="###,###,###,##0.00"/></td>
+                </tr>
+            </table>  
+        </lightning:layoutItem>
+    </lightning:layout>
+</aura:component>

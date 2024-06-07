@@ -1,0 +1,10 @@
+<aura:component controller="PrintFormButtonController" implements="force:lightningQuickAction,flexipage:availableForRecordHome,force:hasRecordId" access="global">
+	    <aura:attribute name="isButtonShow" type="boolean" default="false"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:if isTrue="{!v.isButtonShow}">
+        <lightning:button variant="brand"
+                          label="Print WalkThrough Form"
+                          title="Print Form"
+                          onclick="{! c.navigateToFormPrintPage }" />
+    </aura:if>
+</aura:component>

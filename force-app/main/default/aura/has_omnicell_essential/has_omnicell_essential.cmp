@@ -1,0 +1,10 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction,force:hasSObjectName" access="global" controller="has_omnicell_essential_controller" >
+  <aura:attribute name="rendered" type="boolean" default="false"/>
+    <aura:attribute name="error" type="boolean" default="true"/>
+    <aura:attribute name="sobjecttype" type="String" default="{!v.sObjectName}"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+      
+    <aura:renderIf isTrue="{!v.rendered}">
+      <div class="slds-text-color_destructive">{!v.error}</div>
+    </aura:renderIf>
+</aura:component>

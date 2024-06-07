@@ -1,0 +1,141 @@
+<apex:component >
+            <script id="EffAcctSel-Head-View-Desktop" type="text/template">
+    <ul class="list-inline navbar-nav cc_navbar-nav">
+    {{#setBillingAddressMyAccountData this}}{{/setBillingAddressMyAccountData}} 
+     {{#if this.ro}}
+      <li class="effAccount cc_eff_account">
+       <a href="#">
+        {{pageLabelMap 'SELECTED_ACCOUNT' workingEffAccount.name workingEffAccount.extrinsic.csnNumber workingEffAccount.billingAddress.address1 workingEffAccount.billingAddress.city workingEffAccount.billingAddress.state workingEffAccount.billingAddress.countryCode}}
+       </a>
+      </li>
+     {{else}}
+      <li class="effAccount cc_eff_account" data-toggle="modal" data-target="#effAccounts">
+       <a href="#">
+        {{#if this.workingEffAccount }}
+         {{pageLabelMap 'SELECTED_ACCOUNT' workingEffAccount.name workingEffAccount.extrinsic.csnNumber workingEffAccount.billingAddress.address1 workingEffAccount.billingAddress.city workingEffAccount.billingAddress.state workingEffAccount.billingAddress.countryCode}}
+        {{else}}
+         {{pageLabelMap 'SELECT_ACCOUNT' }}
+        {{/if}}
+        <span class="launchSel cc_launch_sel" aria-hidden="true"></span>
+       </a>
+      </li>
+     {{/if}}
+    </ul>
+    <div class="modal fade cc_modal cc_effective_accounts_modal" id="effAccounts" tabindex="-1" role="dialog" aria-labelledby="effAccountsLabel">
+     <div class="modal-dialog" role="document">
+      <div class="modal-content cc_modal_content">
+       <div class="modal-header cc_modal_header">
+        <button type="button" class="close cc_close" data-dismiss="modal" aria-label="{{pageLabelMap 'Modal_Aria_Close'}}"><span aria-hidden="true">&#215;</span></button>
+        <h4 class="modal-title cc_modal_title" id="effAccountsLabel">{{pageLabelMap 'EFFECTIVE_ACCOUNT_TITLE'}}</h4>
+       </div>
+       <div class="modal-body cc_modal_body">
+        <div class="table-responsive">
+         <table class="table table-hover cc_table">
+          <thead class="cc_thead">
+           <tr class="cc_tr">
+            <th class="cc_th_name">{{{pageLabelMap 'Name'}}}</th>
+			<th class="cc_th_name">{{{pageLabelMap 'SCP_AccountCSNNumber'}}}</th>
+            <th class="cc_th_account_number">{{{pageLabelMap 'ACCOUNT_NUMBER'}}}</th>
+            <th class="cc_th_address">{{{pageLabelMap 'Address'}}}</th>
+            <th class="cc_th_picked"></th>
+           </tr>
+          </thead>
+          <tbody class="cc_tbody">
+           {{#each this.effectiveList}}
+           {{#setBillingAddressMyAccountData this}}{{/setBillingAddressMyAccountData}} 
+           <tr class="cc_tr_values">
+            <td class="cc_td_name">{{{name}}}</td>
+			<td class="cc_td_name">{{extrinsic.csnNumber}}</td>
+            <td class="cc_td_account_number">{{{accountNumber}}}</td>
+            <td class="cc_td_address">{{{pageLabelMap 'ADDRESS_FORMAT' billingAddress.address1 billingAddress.city billingAddress.state billingAddress.postalCode billingAddress.countryCode}}}</td>
+            <td><a href="#"><i class="pickSel pickAccount cc_pick_account fa fa-chevron-right" data-id="{{sfid}}" aria-hidden="true"></i><span class="sr-only">{{pageLabelMap 'EffectiveAccount_SelectAccount'}}</span></a></td>
+           </tr>
+           {{/each}}
+          </tbody>
+         </table>
+        </div>
+       </div>
+      </div>
+     </div>
+    </div>
+   </script>
+            <script id="EffAcctSel-Widget-View-Desktop" type="text/template">
+    <div class="panel panel-default cc_panel cc_effective_accounts">
+     <div class="panel-heading cc_heading">
+      <h3 class="panel-title cc_title">{{pageLabelMap 'EFFECTIVE_ACCOUNT_TITLE'}}</h3>
+     </div>
+     <div class="panel-body cc_body">
+      {{#setBillingAddressMyAccountData this}}{{/setBillingAddressMyAccountData}} 
+      {{#if this.ro}}
+       <p class="effAccount cc_eff_account">
+        {{pageLabelMap 'SELECTED_ACCOUNT_WIDGET' workingEffAccount.name workingEffAccount.extrinsic.csnNumber workingEffAccount.billingAddress.address1 workingEffAccount.billingAddress.city workingEffAccount.billingAddress.state workingEffAccount.billingAddress.countryCode}}
+       </p>
+      {{else}}
+       <p class="effAccount cc_eff_account" >
+        {{#if this.workingEffAccount }}
+         {{pageLabelMap 'SELECTED_ACCOUNT_WIDGET' workingEffAccount.name workingEffAccount.extrinsic.csnNumber workingEffAccount.billingAddress.address1 workingEffAccount.billingAddress.city workingEffAccount.billingAddress.state workingEffAccount.billingAddress.countryCode}}
+        {{else}}
+         {{pageLabelMap 'SELECT_ACCOUNT' }}
+        {{/if}}
+       </p>
+       <div class="actions cc_actions">
+        <button class="btn btn-default btn-sm cc_pick_account" data-toggle="modal" data-target="#effAccounts" aria-hidden="true">{{pageLabelMap 'PICK_ACCOUNT'}}</button>
+        <button class="btn btn-default btn-sm saveData cc_save_data">{{pageLabelMap 'Save'}}</button>
+       </div>
+      {{/if}}
+     </div>
+    </div>
+    <div class="modal fade cc_effective_accounts_modal" id="effAccounts" tabindex="-1" role="dialog" aria-labelledby="effAccountsLabel">
+     <div class="modal-dialog  cc_modal_dialog" role="document">
+      <div class="modal-content cc_modal_content">
+       <div class="modal-header cc_modal_header">
+        <button type="button" class="close cc_close" data-dismiss="modal" aria-label="{{pageLabelMap 'Modal_Aria_Close'}}"><span aria-hidden="true">&#215;</span></button>
+        <h4 class="modal-title cc_modal_title" id="effAccountsLabel">{{pageLabelMap 'EFFECTIVE_ACCOUNT_TITLE'}}</h4>
+       </div>
+       <div class="modal-body cc_modal_body">
+        <div class="table-responsive">
+         <table class="table table-hover cc_table">
+          <thead class="cc_thead">
+           <tr class="cc_tr">
+            <th class="cc_th_name">{{{pageLabelMap 'Name'}}}</th>
+			<th class="cc_th_name">{{{pageLabelMap 'SCP_AccountCSNNumber'}}}</th>
+            <th class="cc_th_account_number">{{{pageLabelMap 'ACCOUNT_NUMBER'}}}</th>
+            <th class="cc_th_address">{{{pageLabelMap 'Address'}}}</th>
+            <th class="cc_th_picked"></th>
+           </tr>
+          </thead>
+          <tbody class="cc_tbody">
+           {{#each this.effectiveList}}
+            {{#setBillingAddressMyAccountData this}}{{/setBillingAddressMyAccountData}} 
+            <tr class="cc_tr">
+             <td class="cc_td_name">{{decodeHTML name}}</td>
+			 <td class="cc_td_name">{{extrinsic.csnNumber}}</td>
+             <td class="cc_td_account_number">{{{accountNumber}}}</td>
+             <td class="cc_td_address">{{{pageLabelMap 'ADDRESS_FORMAT' billingAddress.address1 billingAddress.city billingAddress.state billingAddress.postalCode billingAddress.countryCode}}}</td>
+             <td class="cc_td_picked"><a href="#" class="cc_pick_account"><i class="pickSel pickAccount fa fa-chevron-right" data-id="{{sfid}}" aria-hidden="true"></i><span class="sr-only">{{pageLabelMap 'EffectiveAccount_SelectAccount'}}</span></a></td>
+            </tr>
+           {{/each}}
+          </tbody>
+         </table>
+        </div>
+       </div>
+      </div>
+     </div>
+    </div>
+   </script>
+      <script>
+       Handlebars.registerHelper("setBillingAddressMyAccountData", function(currentObj,options) {  
+        debugger;
+        if(typeof this.workingEffAccount === 'undefined'){
+            this.billingAddress.address1 = this.extrinsic.poBox ? this.billingAddress.address1 + ',' + this.extrinsic.poBox : this.billingAddress.address1;
+            this.shippingAddress.address1  = this.extrinsic.poBox ? this.shippingAddress.address1 + ',' + this.extrinsic.poBox : this.shippingAddress.address1;   
+        }
+        else{ 
+            this.workingEffAccount.billingAddress.address1 = this.workingEffAccount.extrinsic.poBox ? this.workingEffAccount.billingAddress.address1 + ',' + this.workingEffAccount.extrinsic.poBox : this.workingEffAccount.billingAddress.address1;
+            this.workingEffAccount.shippingAddress.address1  = this.workingEffAccount.extrinsic.poBox ? this.workingEffAccount.shippingAddress.address1 + ',' + this.workingEffAccount.extrinsic.poBox : this.workingEffAccount.shippingAddress.address1;   
+        }
+        return options.fn(this);  
+    });
+
+</script>     
+</apex:component>

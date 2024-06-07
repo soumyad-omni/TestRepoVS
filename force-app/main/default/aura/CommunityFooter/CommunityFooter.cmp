@@ -1,0 +1,30 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global">
+  <!--<div class="cCenterPanel"></div>-->
+    <div class="slds-align--absolute-left footerstyle">
+      <table>
+          <br />
+          
+      <tr>
+            <td rowspan="2"> <img src= "{!$Resource.OmniFooterlogo}" class="footerstyle" height="45" width="46" alt="{{pageLabelMap 'FooterLogo_Alt'}}" /></td>
+            <td><a href= "{!$Label.c.SCP_Privacy_Notice}" title="Privacy Notice" Style="color:white; Padding: 18px; font-style:Unitext Light" target="_blank" class="myCls"> Privacy Notice </a></td>
+            <td><a href= "{!$Label.c.SCP_Terms}" title="Terms" Style="color:white; Padding: 10px;font-style:Unitext Light" target="_blank" class="myCls"> Terms </a></td>
+            <td><a href= "{!$Label.c.SCP_Legal_Notices}" title="Legal Notices" Style="color:white; Padding: 10px; font-style:Unitext Light" target="_blank" class="myCls"> Legal Notices </a></td>
+            <td><a href= "{!$Label.c.SCP_HIPAA_Statement}" title="HIPAA Statement" Style="color:white; Padding: 10px;font-style:Unitext Light" target="_blank" class="myCls"> HIPAA Statement </a></td>
+          	
+          <td style="width:55%"></td>
+            <br/>
+            <br/>
+            <br/>
+          
+            <td><a href="{!$Label.c.SCP_Facebook_Link}" style = "Padding: 10px" target="_blank"><img src="{!$Resource.OmniFacebookLogo}"/> </a></td>
+            <td> <a href="{!$Label.c.SCP_Twitter_Link}" style = "Padding: 10px" target="_blank" ><img src="{!$Resource.OmniTwitterLogo}"/></a></td>
+            <td><a href="{!$Label.c.SCP_Linkedin_Link}"  style = "Padding: 10px" target="_blank" ><img src="{!$Resource.OmniLinkedInLogo}"/></a></td>
+        </tr>
+       <tr>
+           
+            <td colspan="6"  Style="color:white; font-size:14px; margin-right: 14px; padding-bottom: 10px;font-style:Lato ">  &nbsp; &nbsp;&nbsp;&nbsp; &#169; 2021 Omnicell,&nbsp;Inc.&nbsp;&nbsp;All rights reserved.</td>
+        </tr>
+         <br />
+          </table>
+        </div>
+</aura:component>

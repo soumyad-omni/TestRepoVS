@@ -1,0 +1,20 @@
+.card_style {
+    padding-left: 20px;
+    padding-right: 20px;;
+}
+
+.card_header {
+    background-color: #f3f3f3;
+    padding: 1rem 1rem;
+    border-bottom: 1px solid #d8d8d8;
+}
+
+.card_style .slds-card__header{
+    background-color: #f3f3f3; 
+}
+
+.slds-card__header.slds-grid {
+    background-color: #f3f3f3;
+    padding: .75rem 1rem;
+    border-bottom: 1px solid #d8d8d8;
+}

@@ -1,0 +1,148 @@
+<apex:component controller="OCB_MySubscriptionComponentController"> <!-- Controller Added and whole Template override for SCP-825 -->
+    <script src="{!$Resource.dataTableJs}"></script>
+    <script id="MyAccount-MySubscriptions-Desktop-New" type="text/template">
+        <div>
+              <button class="btn btn-default" onclick="openSub('MySubscription')">My Subscriptions</button>
+              <button class="btn btn-default" onclick="openSub('AllSubscription')">All Subscriptions</button>
+        </div>
+        <div id="AllSubscription" class="w3-container subView" style="display:none"><!-- All Subscriptions start here -->
+            <h2>All Subscriptions</h2>
+            <table id="AllsubscriptionTable" class="display" width="100%">
+            	<colgroup>
+                   <col style="width: 17%;">
+                   <col style="width: 25%;">
+                   <col style="width: 10%;">
+                   <col style="width: 10%;">
+                   <col style="width: 11%;">
+                   <col style="width: 10%;">
+                   <col style="width: 22%;">
+                </colgroup>     
+            </table>
+        </div><!-- All Subscriptions End here -->
+        
+        
+        <div id="MySubscription" class="w3-container subView"><!-- My Subscriptions start here -->
+               <div class="panel panel-default cc_panel cc_myaccount_mysubscriptions">
+                <div class="panel-heading cc_heading">
+                 <h3 class="panel-title cc_title">{{pageLabelMap 'MyAccount_MySubscriptions'}}</h3>
+                </div>
+                <div class="panel-body cc_body cc_myaccount_content">
+                 <div class="messagingSection-subscription-Error" style="display: none"></div>
+                 <div class="messagingSection-subscription-Info" role="alert" style="display: none">
+                  <button type="button" class="close cc_close" data-dismiss="alert" aria-label="{{pageLabelMap 'Modal_Aria_Close'}}"><span aria-hidden="true">&#215;</span></button>
+                 </div>
+                 <div class="orderPaginationSec" ></div>
+                 <div class="table-responsive ">
+                  <table id="subscriptionTable" class="table table-hover cc_table cc_mysubscriptions_table">
+                   <tr class="cc_table_header_row">
+                    <th class="cc_table_header">
+                     <span class="cc_table_header_subscription_id">{{pageLabelMap 'MyAccount_MySubscription_Id'}}</span>
+                    </th>
+                    <th class="cc_table_header">
+                     <span class="cc_table_header_subscription_prod_name">{{pageLabelMap 'MyAccount_MySubscription_Product'}}</span>
+                    </th>
+                    <th class="cc_table_header">
+                     <span class="cc_table_header_subscription_recurring_price">{{pageLabelMap 'MyAccount_MySubscription_RecurringPrice'}}</span>
+                    </th>
+                    <th class="cc_table_header">
+                     <span class="cc_table_header_subscription_status">{{pageLabelMap 'MyAccount_MySubscription_Status'}}</span>
+                    </th>
+                                            {{#ifDisplay 'shact.subs'}}
+                    <th class="cc_table_header">
+                     <span class="cc_table_header_subscription_actions">{{pageLabelMap 'MyAccount_MySubscription_Actions'}}</span>
+                    </th>
+                    {{/ifDisplay}}
+                   </tr>
+                   {{#each this.subscriptionList}}
+                    <tr class="myAccOrderRows cc_table_row">
+                     <td class="cc_table_col">
+                      <span class="cc_col_subscription_id"><a href="#" data-id="{{sfid}}" class="gotoSubscriptionDetails cc_goto_subscription_details">{{name}}</a></span>
+                     </td>
+                     <td class="cc_table_col">
+                      <span class="cc_col_subscription_prod_name">
+                       {{productLink subProduct 'cc_prod_link'}}
+                      </span>
+                     </td>
+                     <td class="cc_table_col">
+                      <span class="cc_col_subscription_recurring_price"><a href="#" data-id="{{sfid}}" class="gotoSubscriptionDetails cc_goto_subscription_details">{{price topRecurringPrice currencyIsoCode}}</a></span>
+                     </td>
+                     <td class="cc_table_col">
+                      <span class="cc_col_subscription_status"><a href="#" data-id="{{sfid}}" class="gotoSubscriptionDetails cc_goto_subscription_details">{{pageLabelPrefixMap 'SUBSST_' subStatus}}</a></span>
+                     </td>
+                                                {{#ifDisplay 'shact.subs'}}
+                     <td class="cc_table_col" nowrap="true">
+                      {{#if canCancel }}
+                       <input type="button" class="promptCancel btn btn-default btn-sm cc_prompt_cancel" data-id="{{@index}}" data-mode="Cancel" value="{{pageLabelMap 'MyAccount_MySubscriptions_Cancel'}}"/>&#160;
+                      {{/if}}
+                     </td>
+                     {{/ifDisplay}}
+                    </tr>
+                   {{/each}}
+                  </table>
+                  <div id="modalSec"></div>
+                 </div>
+                </div>
+               </div>
+        </div><!-- My Subscriptions End here -->
+    </script>
+    <script>
+    	
+        function openSub(subList) {
+          var i;
+          var x = document.getElementsByClassName("subView");
+          for (i = 0; i < x.length; i++) {
+            x[i].style.display = "none";  
+          }
+          document.getElementById(subList).style.display = "block";
+        }
+    	CCRZ.pubSub.on('view:mySubscriptionsNewView:refresh',function(){
+            var subdataSet = [];
+                OCB_MySubscriptionComponentController.getAllSubscriptions(
+                    CCRZ.pagevars.remoteContext,
+                    function (response) {
+                        debugger;
+                        if (response) {
+                            if(response.success) {
+                                debugger;
+                                if(typeof response.data.AllSubList !== 'undefined'){
+                                    for(i = 0; i < response.data.AllSubList.length; i++){
+                                        var arrData = [];
+                                        arrData.push('<a href="#" data-id="' + response.data.AllSubList[i].Id + '" class="gotoSubscriptionDetails cc_goto_subscription_details">'+ response.data.AllSubList[i].Name +' </a>'); 
+                                        arrData.push(response.data.AllSubList[i].ccrz__SubscriptionProduct__r.Name); 
+                                        arrData.push('$'+response.data.AllSubList[i].ccrz__RecurringPrice__c); 
+                                        arrData.push(response.data.AllSubList[i].ccrz__SubscriptionStatus__c);
+                                        arrData.push(response.data.AllSubList[i].ccrz__CCOrder__r.ccrz__BuyerFirstName__c+' '+response.data.AllSubList[i].ccrz__CCOrder__r.ccrz__BuyerLastName__c);
+                                        arrData.push(response.data.AllSubList[i].ccrz__Account__r.SAP_Customer_Number__c);
+                                        arrData.push(response.data.AllSubList[i].ccrz__Account__r.Name);
+                                        subdataSet.push(arrData);
+                                    }
+                                }
+                                
+                                $('#AllsubscriptionTable').DataTable( {
+                                    data: subdataSet,
+                                    "aaSorting": [],
+                                    "pagingType": "simple_numbers",
+                                     dom: "<'row'<'col-xs-4'f>>"+ 
+                                     "<'row box'<'col-sm-4'i><'col-sm-5'p><'col-sm-3'l>>" +
+                                     "<'row'<'col-sm-12'>>"+
+                                     "<'row'<'col-sm-12'tr>>",
+                    				retrieve: true,
+                                    columns: [
+                                        { title: "Subscription Id" },
+                                        { title: "Product" },
+                                        { title: "Next Installment" },
+                                        { title: "Subscription Status" },
+                                        { title: "Buyer Name"},
+                                        { title: "Account CSN"},
+                         				{ title: "Account Name"}
+                                    ]
+                                } );
+                             } 
+                        } 
+                    }
+                    
+                );
+        	
+            });
+    </script>
+</apex:component>

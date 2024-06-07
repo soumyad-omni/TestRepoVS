@@ -1,0 +1,90 @@
+<template>
+    <lightning-card title="Lightning Record Form to create a Opportunity">
+        <div class="wholeModal">
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container" style="width: 70%; max-width: 840px">
+                    <header class="slds-modal__header">
+                        <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" value="Close" onclick={closeModal}>
+                            <lightning-icon icon-name="utility:close" size="medium"></lightning-icon>
+                            <span class="slds-assistive-text">Close</span>
+                        </button>
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">New Opportunity: {getRecordTypeName}</h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        <lightning-record-edit-form object-api-name="Opportunity" id="US_Core" onsubmit={handleSubmit}  density="comfy"> 
+                            <lightning-messages></lightning-messages>
+                            <lightning-layout>
+                                <lightning-layout-item class="form_Item">
+                                    <lightning-input-field field-name="Name" required></lightning-input-field>
+                                    <lightning-input-field field-name="Competitor__c"></lightning-input-field>
+                                    <lightning-combobox label="Opportunity Group" value={selectedOppGrpValue}
+                                        options={OppGroupPicklistOptions} onchange={handleoppGrpChange} required>
+                                    </lightning-combobox>
+                                    <lightning-input-field field-name="OpportunityGroup__c"
+                                        style="display: none;"></lightning-input-field>
+                                    <lightning-input-field field-name="StageName"></lightning-input-field>
+                                    <lightning-input-field field-name="Pipeline_Category__c" required ></lightning-input-field>
+                                    <lightning-input-field field-name="ExpectedInstallDate__c"></lightning-input-field>
+                                    <lightning-input-field field-name="Compelling_Event__c" required class="focus_red"  onchange={handleSelectionChange}></lightning-input-field>
+                                    <span style="color: #ba0517;" if:true={noValSelect}>Complete this field.</span>
+                                </lightning-layout-item>
+                                <lightning-layout-item class="form_Item">
+                                    <lightning-input-field field-name="AccountId" value={getAccountId} required></lightning-input-field>
+                                    <lightning-combobox label="Opportunity Type" value={selectedOppTypeValue}
+                                        options={OppTypePicklistOptions} onchange={handleoppTypeChange} required>
+                                    </lightning-combobox>
+                                    <lightning-input-field field-name="Opportunity__c"
+                                        style="display: none;"></lightning-input-field>
+                                    <lightning-input-field field-name="Associated_Opportunity__c" if:true={changeOrderTypeFlag}></lightning-input-field><!-- IBA-6428 Sourav-->
+                                    <lightning-input-field field-name="CloseDate" required></lightning-input-field>
+                                    <lightning-input-field field-name="CAD_Drawings_Obtained_if_Carousel_XR2__c" required ></lightning-input-field>
+                                    <lightning-input-field field-name="Seismic_Restraint_Required__c" required></lightning-input-field>
+                                    <lightning-input-field field-name="Forecast_Probability__c" required ></lightning-input-field>
+                                    <lightning-input-field field-name="Legal_Resource_Required__c" required ></lightning-input-field>
+                                    <!--<lightning-input-field field-name="Services_Enablement_Owner__c"></lightning-input-field> Commented as a part of IBA-5944 -->                                   
+                                </lightning-layout-item>                                  
+                            </lightning-layout>                  
+                        </lightning-record-edit-form>
+                    </div> 
+                    <footer class="slds-modal__footer">
+                        <lightning-layout style="float: right;">
+                            <div class="button-gap">
+                                <lightning-button variant="brand-outline" onclick={closeModal} label="Cancel"></lightning-button>
+                            </div>
+                            <div class="button-gap">
+                                <lightning-button label="Next" disabled={coreButton} variant="brand" onclick={handleOppSave}></lightning-button>
+                            </div>
+                        </lightning-layout>
+                    </footer>                       
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </div>
+        <template if:true={isToastVisible}>
+            <div class="toastContainer slds-notify_container slds-is-relative toast">
+                <div role="alertdialog" aria-describedby="toastDescription1207:0" data-key="error" class="slds-theme--error slds-notify--toast slds-notify slds-notify--toast forceToastMessage CustomtoastContent" data-aura-class="forceToastMessage">
+                    <lightning-icon icon-name="utility:error" class="slds-icon-utility-error toastIcon slds-m-right--small slds-no-flex slds-align-top slds-icon_container" data-data-rendering-service-uid="415" data-aura-rendered-by="1211:0">
+                        <span style="--sds-c-icon-color-background: var(--slds-c-icon-color-background, transparent)" part="boundary">
+                            <lightning-primitive-icon size="small" variant="inverse">
+                                <svg style="fill:white;" class="slds-icon slds-icon_small" focusable="false" data-key="error" aria-hidden="true" viewBox="0 0 520 520" part="icon">
+                                    
+                                </svg>
+                            </lightning-primitive-icon>
+                            <span class="slds-assistive-text">Error</span>
+                        </span>
+                    </lightning-icon>
+                    <div class="toastContent" >
+                        <div class="slds-align-middle slds-hyphenate" >
+                            <div id="toastLabel1207:0" class="toastTitle slds-text-heading--small">Error</div>
+                            <div id="toastDescription1207:0" >
+                                <span class="toastMessage forceActionsText" data-aura-class="forceActionsText">{errorMsg}</span>
+                            </div>
+                        </div>
+                    </div>                    
+                    <lightning-icon icon-name='utility:close' onclick={closeToast} class="errorIcon">
+                    </lightning-icon>
+                </div>
+            </div>
+        </template>
+    </lightning-card>
+</template>

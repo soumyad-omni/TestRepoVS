@@ -1,0 +1,38 @@
+.search-input {
+    width: 100%; /* Set the width to 100% */
+    padding: 0.5rem; /* Add padding */
+    border: 1px solid #d8dde6; /* Add border */
+    border-radius: 4px; /* Add border radius */
+    background-color: #f3f4f6; /* Add background color */
+    box-sizing: border-box; /* Include padding and border in width */
+}
+
+/* Custom CSS for the dropdown menu */
+.slds-dropdown {
+    width: calc(100% - 2px); /* Adjust the dropdown width */
+    margin-top: 0; /* Remove default margin */
+}
+
+.table {
+    display: table;
+    width: 100%;
+    border-collapse: collapse;
+}
+.row {
+    display: table-row;
+    width: 100%;
+}
+.cell {
+    display: table-cell;
+    border: 1px solid #ddd;
+    padding: 8px;
+    width: 50%;
+}
+.header {
+    font-weight: bold;
+    background-color: #f2f2f2;
+}
+
+.button-gap {
+    padding: 2px; /* Adjust the width of the gap as needed */
+}

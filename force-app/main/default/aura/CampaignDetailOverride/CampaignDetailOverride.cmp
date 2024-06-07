@@ -1,0 +1,206 @@
+<aura:component implements="flexipage:availableForRecordHome,force:hasrecordId" 
+                controller = "CampaignLayoutOverrideController">
+    <aura:attribute name="userId" type="Id"/>
+    <aura:attribute name="checkUser" type ="boolean"/>
+    <!--<aura:attribute name="campaignOwnerId" type="Id"/> -->
+    <aura:attribute name = "ownerids" type = "CampaignShare[]" />
+    <aura:handler name="init" value="this" action="{!c.doInit}"/>
+    <lightning:recordViewForm recordId="{!v.recordId}" objectApiName="Campaign">
+        <div >
+            
+            <div class = "slds-section__title test-id__section-header-button slds-section__title-action"
+                		style = "cursor: pointer;" onclick = "{!c.section1}">
+                <section class = "slds-clearfix">
+                    <div class = "slds-float--left">
+                        <lightning:icon class="slds-show" aura:id="articleOne" iconName="utility:chevrondown" size="x-small" alternativeText="Indicates add"/>
+                        <lightning:icon class="slds-hide" aura:id="articleOne" iconName="utility:chevronup" size="x-small" alternativeText="Indicates dash"/>	
+                    </div>
+                    <div class = "slds-m-left--large">Campaign Information</div>
+                </section>
+            </div>
+            <div class = "slds-show slds-p-around--medium" aura:id="articleOne">
+            <lightning:layout>
+                <lightning:layoutItem class="slds-col slds-size--1-of-2">
+                    <lightning:outputField fieldName="Name"/>
+                    <lightning:outputField fieldName="Short_Name__c"/>   
+                    <lightning:outputField fieldName="Market_Portfolio_Segment__c"/>    
+                    <lightning:outputField fieldName="Type"/>
+                    <lightning:outputField fieldName="Campaign_sub_type__c"/>
+                    <lightning:outputField fieldName="StartDate"/>
+                    <lightning:outputField fieldName="EndDate"/>
+                    <lightning:outputField fieldName="Target_Audience__c"/>
+                    <lightning:outputField fieldName="ParentId"/>
+                    <lightning:outputField fieldName="Top_Level_Parent__c"/>
+                    <lightning:outputField fieldName="Campaign_Approval__c"/>
+                   <!-- <lightning:outputField fieldName="Top_Level_Parent_Id__c"/> -->
+                </lightning:layoutItem>
+                
+                <lightning:layoutItem class="slds-col slds-size--1-of-2">
+                    <label for="OwnerId">Campaign Owner</label>
+                    <lightning:outputField fieldName="OwnerId" variant="label-hidden">
+                        <button onclick="{!c.inlineEditName}" class="slds-button slds-button_icon slds-cell-edit__button slds-m-left_x-small" tabindex="0" title="Edit Name">
+                      <lightning:icon iconName="utility:edit" size="xx-small" alternativeText="edit"/>
+                    </button>
+                    </lightning:outputField>
+                   	<lightning:outputField fieldName="IsActive"/>
+                    <!--<lightning:outputField fieldName="Project_Owner__c"/>-->
+                    <lightning:outputField fieldName="Status"/>
+                    <lightning:outputField fieldName="Campaign_Region__c"/>
+                    <lightning:outputField fieldName="Template__c"/>
+                </lightning:layoutItem>
+            </lightning:layout>
+           </div>
+            <div class = "slds-section__title test-id__section-header-button slds-section__title-action" 
+                 style = "cursor: pointer;" onclick = "{!c.section2}">
+                <section class = "slds-clearfix">
+                    <div class = "slds-float--left">
+                        <lightning:icon class="slds-show" aura:id="articleTwo" iconName="utility:chevrondown" size="x-small" alternativeText="Indicates add"/>
+                        <lightning:icon class="slds-hide" aura:id="articleTwo" iconName="utility:chevronup" size="x-small" alternativeText="Indicates dash"/>	
+                    </div>
+                    <div class = "slds-m-left--large">Display on Public calender</div>
+                </section>
+            </div>
+            <div class = "slds-show slds-p-around--medium" aura:id="articleTwo">
+            <lightning:layout>
+                <lightning:layoutItem class="slds-col slds-size--1-of-2">
+                    <lightning:outputField fieldName="Add_to_Calendar__c"/>       
+                    <lightning:outputField fieldName="Campaign_Tour_Date__c"/>
+                </lightning:layoutItem>
+                
+                <lightning:layoutItem class="slds-col slds-size--1-of-2">
+                    <lightning:outputField fieldName="Calendar_Start_Date__c"/>
+                    <lightning:outputField fieldName="Calendar_End_Date__c"/>
+                </lightning:layoutItem>
+            </lightning:layout>    
+            </div>
+            <div class = "slds-section__title test-id__section-header-button slds-section__title-action" 
+                 style = "cursor: pointer;" onclick = "{!c.section3}">
+                <section class = "slds-clearfix">
+                    <div class = "slds-float--left">
+                        <lightning:icon class="slds-show" aura:id="articleThree" iconName="utility:chevrondown" size="x-small" alternativeText="Indicates add"/>
+                        <lightning:icon class="slds-hide" aura:id="articleThree" iconName="utility:chevronup" size="x-small" alternativeText="Indicates dash"/>	
+                    </div>
+                    <div class = "slds-m-left--large">Description Information</div>
+                </section>
+            </div>
+            
+            <div class = "slds-show slds-p-around--medium" aura:id="articleThree">
+            <lightning:layout>
+            <lightning:layoutItem class="slds-col slds-size--1-of-2">
+                <lightning:outputField fieldName="Description"/>       
+            </lightning:layoutItem>    
+            
+                <lightning:layoutItem class="slds-col slds-size--1-of-2">
+            		<a href="javascript:void()" onclick = "{!c.navigateToReport}">View All Campaign Members Report</a>
+                </lightning:layoutItem>    
+            </lightning:layout>
+                </div>
+            
+            <div class = "slds-section__title test-id__section-header-button slds-section__title-action" 
+                 style = "cursor: pointer;" onclick = "{!c.section4}">
+                <section class = "slds-clearfix">
+                    <div class = "slds-float--left">
+                        <lightning:icon class="slds-show" aura:id="articleFour" iconName="utility:chevrondown" size="x-small" alternativeText="Indicates add"/>
+                        <lightning:icon class="slds-hide" aura:id="articleFour" iconName="utility:chevronup" size="x-small" alternativeText="Indicates dash"/>	
+                    </div>
+                    <div class = "slds-m-left--large">Campaign Member Statastics</div>
+                </section>
+            </div>
+            
+            <div class = "slds-show slds-p-around--medium" aura:id="articleFour">
+            <lightning:layout>
+                <lightning:layoutItem class="slds-col slds-size--1-of-2">
+                    <lightning:outputField fieldName="NumberOfContacts"/>       
+                    <lightning:outputField fieldName="NumberOfConvertedLeads"/>
+                    <lightning:outputField fieldName="NumberOfLeads"/>
+                    <lightning:outputField fieldName="NumberOfResponses"/>
+                    <lightning:outputField fieldName="Responses_Contacts_in_Hierarchy__c"/>
+                    <lightning:outputField fieldName="Total_of_Campaign_Members__c"/>
+                </lightning:layoutItem>
+                
+                <lightning:layoutItem class="slds-col slds-size--1-of-2">
+                    <lightning:outputField fieldName="Responses_Leads_in_Hierarchy__c"/>
+                    <lightning:outputField fieldName="HierarchyNumberOfCampaignMembers__c"/>
+                </lightning:layoutItem>
+            </lightning:layout>
+            </div>
+            <div class = "slds-section__title test-id__section-header-button slds-section__title-action" 
+                 style = "cursor: pointer;" onclick = "{!c.section5}">
+                <section class = "slds-clearfix">
+                    <div class = "slds-float--left">
+                        <lightning:icon class="slds-show" aura:id="articleFive" iconName="utility:chevrondown" size="x-small" alternativeText="Indicates add"/>
+                        <lightning:icon class="slds-hide" aura:id="articleFive" iconName="utility:chevronup" size="x-small" alternativeText="Indicates dash"/>	
+                    </div>
+                    <div class = "slds-m-left--large">Opportunity Information</div>
+                </section>
+            </div>
+            
+            
+            <div class = "slds-show slds-p-around--medium" aura:id="articleFive">
+            <lightning:layoutItem class="slds-col slds-size--1-of-2">
+                <lightning:outputField fieldName="NumberOfOpportunities"/>       
+                <lightning:outputField fieldName="AmountAllOpportunities"/>
+                <lightning:outputField fieldName="AmountWonOpportunities"/>
+                <lightning:outputField fieldName="NumberOfWonOpportunities"/>
+            </lightning:layoutItem>    
+            </div>
+            <div class = "slds-section__title test-id__section-header-button slds-section__title-action" 
+                 style = "cursor: pointer;" onclick = "{!c.section6}">
+                <section class = "slds-clearfix">
+                    <div class = "slds-float--left">
+                        <lightning:icon class="slds-show" aura:id="articleSix" iconName="utility:chevrondown" size="x-small" alternativeText="Indicates add"/>
+                        <lightning:icon class="slds-hide" aura:id="articleSix" iconName="utility:chevronup" size="x-small" alternativeText="Indicates dash"/>	
+                    </div>
+                    <div class = "slds-m-left--large">Additional Information</div>
+                </section>
+            </div>
+            <div class = "slds-show slds-p-around--medium" aura:id="articleSix">
+            <lightning:layout>
+                
+                <lightning:layoutItem class="slds-col slds-size--1-of-2">
+                    <aura:if isTrue="{!v.checkUser}">
+                        <ui:outputText value = "{!v.checkUser}"/>
+                        <lightning:outputField fieldName="ActualCost"/>
+                        <lightning:outputField fieldName="BudgetedCost"/>
+                    </aura:if>     
+                    <lightning:outputField fieldName="HierarchyActualCost"/>
+                    <lightning:outputField fieldName="HierarchyBudgetedCost"/>
+                </lightning:layoutItem>
+                
+                <lightning:layoutItem class="slds-col slds-size--1-of-2">
+                    <lightning:outputField fieldName="ExpectedResponse"/>
+                    <lightning:outputField fieldName="RSVP_Date__c"/>
+                    <lightning:outputField fieldName="Target_Initiative__c"/>
+                    <lightning:outputField fieldName="Target_Initiative_2__c"/>
+                    <lightning:outputField fieldName="Strategic_Initiative__c"/>
+                </lightning:layoutItem>
+            </lightning:layout>  
+            </div>
+            <div class = "slds-section__title test-id__section-header-button slds-section__title-action" 
+                 style = "cursor: pointer;" onclick = "{!c.section7}">
+                <section class = "slds-clearfix">
+                    <div class = "slds-float--left">
+                        <lightning:icon class="slds-show" aura:id="articleSeven" iconName="utility:chevrondown" size="x-small" alternativeText="Indicates add"/>
+                        <lightning:icon class="slds-hide" aura:id="articleSeven" iconName="utility:chevronup" size="x-small" alternativeText="Indicates dash"/>	
+                    </div>
+                    <div class = "slds-m-left--large">System Information</div>
+                </section>
+            </div>
+            
+            <div class = "slds-show slds-p-around--medium" aura:id="articleSeven">
+            <lightning:layout> 
+                <lightning:layoutItem class="slds-col slds-size--1-of-2">
+                    <lightning:outputField fieldName="CreatedById"/>
+                    
+                </lightning:layoutItem>
+                
+                <lightning:layoutItem class="slds-col slds-size--1-of-2">
+                    <lightning:outputField fieldName="LastModifiedById"/>
+                </lightning:layoutItem>
+            </lightning:layout> 
+            </div>
+           
+            
+        </div>
+    </lightning:recordViewForm>
+</aura:component>

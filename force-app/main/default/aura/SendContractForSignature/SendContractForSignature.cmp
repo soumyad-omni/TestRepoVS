@@ -1,0 +1,8 @@
+<aura:component implements="force:lightningQuickAction,flexipage:availableForAllPageTypes,force:hasRecordId" controller="RenderCreateContractController">
+    <aura:handler name="init" value="this" action="{!c.doInit}"/>
+    <aura:attribute name="message" type="String"/>
+    <aura:attribute name = "disabled" type = "boolean" default = "false"/>
+    <span>
+        <lightning:button variant="brand" label="Send for Signature" onclick="{!c.sendforsignature}" disabled = "{!v.disabled}"/><p align="left">{!v.message}</p>
+    </span>
+</aura:component>

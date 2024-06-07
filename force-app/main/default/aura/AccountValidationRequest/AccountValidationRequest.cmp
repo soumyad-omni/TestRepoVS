@@ -1,0 +1,41 @@
+<aura:component implements='force:lightningQuickAction,force:hasRecordId'  access="global" controller="AccountValidationRequestController"> 
+    
+    <aura:attribute name='obj' type='Object'/>
+    <aura:attribute name="Submitdisabled" type="Boolean" default="false" />
+    
+     
+    <!--<aura:attribute name='account' type='Account'/>
+	<lightning:inputField fieldName="Request_Type__c" value="Account Hierarchy Updation request"/>
+    <lightning:input type="text" name="input1" value="{!v.comment}" label="Enter a date" />-->
+	<aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+<!--<div aura:id="MainDiv" class="slds-modal__container">-->
+      <!--Added By Abhilash for SF-BUG-562 Account change request-->
+    <lightning:select name="RequestType" label="Request Type" value="{!v.obj.acc.Request_Type__c}">
+        <aura:iteration items="{!v.obj.pickListValuesList}" var="option">
+            <option text="{!option}" value="{!option}" selected="{!option == v.obj.acc.Request_Type__c}"/>
+        </aura:iteration>
+    </lightning:select>
+    <lightning:textarea name="RequestComment" label="Request Comment" value="{!v.obj.acc.Request_Comment__c}" />
+    <br/><br/>
+    <lightning:button label="Submit" title="Neutral action" onclick="{!c.onRecordSubmit }" disabled="{!v.Submitdisabled}"/>
+    <!--</div>-->
+    
+    <!--<aura:attribute name='account' type='Account'/>
+    <lightning:recordEditForm aura:id="editForm" recordId="{!v.recordId}" objectApiName="Account" onsubmit="{!c.onRecordSubmit}" onsuccess="{!c.onRecordSuccess}"> 
+        <lightning:layout>
+            <lightning:messages /> 
+        </lightning:layout>
+        
+        <lightning:layout>
+            <lightning:layoutitem class='slds-col slds-size-1-of-1'>
+                <lightning:inputField fieldName="Request_to_Update_Account_Hierarchy__c" aura:id="inputCmp" class="slds-hidden"/>
+                <lightning:inputField fieldName="Request_Flag__c" class="slds-hidden"/>
+                <lightning:inputField fieldName="Request_Type__c" value="Account Hierarchy Updation request"/>
+                <lightning:inputField fieldName="Request_Comment__c" required="TRUE"/>
+            </lightning:layoutitem>
+        </lightning:layout>
+        <br/>
+        <br/>
+        <lightning:button label='Submit' onClick="createRecord" type="Submit"/>
+    </lightning:recordEditForm>-->
+</aura:component>

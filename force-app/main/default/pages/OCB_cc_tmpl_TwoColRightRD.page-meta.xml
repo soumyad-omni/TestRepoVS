@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ApexPage xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>51.0</apiVersion>
+    <availableInTouch>false</availableInTouch>
+    <confirmationTokenRequired>false</confirmationTokenRequired>
+    <description>Extended cc_tmpl_TwoColRightRD in order to customize PLP widget arrangements in left column</description>
+    <label>OCB_cc_tmpl_TwoColRightRD</label>
+</ApexPage>

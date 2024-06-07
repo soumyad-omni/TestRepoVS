@@ -1,0 +1,103 @@
+<apex:page controller="LookupPageController" title="Lookup Page" showHeader="false">
+<apex:form title="Lookup" id="one">
+<apex:pageBlock title="Details" rendered="{!render1}">
+<apex:pageMessages ></apex:pageMessages>
+<apex:pageBlockTable value="{!Records}" var="record">
+<apex:column headerValue="Name">
+<apex:outputLink value="#" onclick="fillIn('{!JSENCODE(record.Name)}','{!record.id}')">{!record.Name}</apex:outputLink> </apex:column>
+<apex:column headerValue="Address">
+        <apex:outputText value="{!record.billingStreet},{!record.billingCity},{!record.billingState},{!record.billingPostalCode},{!record.billingCountry}"/>
+    
+</apex:column>
+    <apex:column headerValue="SAP CSN Number">
+        <apex:outputText value="{!record.SAP_Customer_Number__c}"/> 
+</apex:column>
+
+</apex:pageBlockTable>
+</apex:pageBlock>
+<apex:pageBlock title="Details" rendered="{!render2}">
+<apex:pageMessages ></apex:pageMessages>
+<apex:pageBlockTable value="{!SAPSalesOrgRecords}" var="record">
+<apex:column headerValue="Name">
+<apex:outputLink value="#" onclick="fillIn('{!JSENCODE(record.Name)}','{!record.id}')">{!record.Name}</apex:outputLink> </apex:column>
+<apex:column headerValue="Sales Org">
+    <apex:outputField value="{!record.Sales_Org__c}"/>    
+</apex:column>
+
+</apex:pageBlockTable>
+</apex:pageBlock>
+<apex:pageBlock title="Details" rendered="{!render3}">
+<apex:pageMessages ></apex:pageMessages>
+<apex:pageBlockTable value="{!ACTMRecords}" var="record">
+<apex:column headerValue="Name">
+<apex:outputLink value="#" onclick="fillIn('{!record.User.Name}','{!record.userid}')">{!record.User.Name}</apex:outputLink> </apex:column>
+<apex:column headerValue="Account Team Role">
+        <apex:outputText value="{!record.TeamMemberRole}"/>
+    
+</apex:column>
+
+</apex:pageBlockTable>
+</apex:pageBlock>
+<apex:pageBlock title="Details" rendered="{!render4}">
+<apex:pageMessages ></apex:pageMessages>
+<apex:pageBlockTable value="{!quotes}" var="record">
+<apex:column headerValue="Name">
+<apex:outputLink value="#" onclick="fillIn('{!JSENCODE(record.Name)}','{!record.id}')">{!record.Name}</apex:outputLink> </apex:column>
+
+</apex:pageBlockTable>
+</apex:pageBlock>
+<apex:pageBlock title="Details" rendered="{!render5}">
+		<apex:pageMessages ></apex:pageMessages>
+    <!--<apex:pageBlockTable value="{!contacts}" var="record"> // IBA-2961 
+<apex:column headerValue="Name">
+<apex:outputLink value="#" onclick="fillIn('{!JSENCODE(record.Name)}','{!record.id}')">{!record.Name}</apex:outputLink> </apex:column>
+
+</apex:pageBlockTable>-->
+        <apex:repeat value="{!contacts}" var="con"><!-- IBA-2961 Start-->
+            <apex:pageBlockTable value="{!con}" var="record">
+                <apex:column headerValue="Name">
+                    <apex:outputLink value="#" onclick="fillIn('{!JSENCODE(record.Name)}','{!record.id}')">{!record.Name}</apex:outputLink> </apex:column>
+                
+            </apex:pageBlockTable>
+        </apex:repeat>					<!-- IBA-2961 End-->
+</apex:pageBlock>
+    <!----START-IBA-1678---->
+    <apex:pageBlock title="Details" rendered="{!render6}">
+        <apex:pageMessages ></apex:pageMessages>
+        <apex:pageBlockTable value="{!listUsers}" var="record">
+            <apex:column headerValue="Name">
+                <apex:outputLink value="#" onclick="fillIn('{!JSENCODE(record.Name)}','{!record.id}')">{!record.Name}</apex:outputLink> </apex:column>
+            
+        </apex:pageBlockTable>
+    </apex:pageBlock>
+    <!----END-IBA-1678---->
+
+</apex:form>
+ 
+<script>    
+function fillIn(name, id)
+{
+
+var winMain=window.opener;
+if (null==winMain)
+{
+winMain=window.parent.opener;
+}
+var ele=winMain.document.getElementById('{!$CurrentPage.parameters.namefield}');
+ele.value=name;
+ele=winMain.document.getElementById('{!$CurrentPage.parameters.idfield}');
+ele.value=id;
+winMain.closeLookupPopup();
+}
+ 
+function CloseWindow()
+{
+var winMain=window.opener;
+if (null==winMain)
+{
+winMain=window.parent.opener;
+}
+winMain.closeLookupPopup();
+}
+</script>
+</apex:page>

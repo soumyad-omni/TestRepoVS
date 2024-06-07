@@ -1,0 +1,4 @@
+<apex:page sidebar="false" showHeader="false">
+ <apex:iframe src="https://tableauprod01.omnicell.com/#/site/SalesandMarketing/projects/134?contentType=view&order=workbookName:asc,name:asc&:embed=y&:display_count=no&:showVizHome=no" frameborder="0" height="2400px" width="100%" scrolling="true">
+  </apex:iframe>    
+</apex:page>

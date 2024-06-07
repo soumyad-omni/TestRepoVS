@@ -1,0 +1,61 @@
+<aura:component controller = "CreateTaskHistory" implements="flexipage:availableForRecordHome,force:hasRecordId" access="global" >
+    <aura:attribute name="recordId" type="Id" />
+    <aura:attribute name="TaskHistoryList" type="TaskHistory__c[]" />
+    
+    <aura:handler name="init" value="{!this}" action="{!c.myAction}" />
+    
+    <lightning:card iconName="standard:work_capacity_usage" title="Task History">
+        <aura:set attribute="actions">
+            <lightning:button label="Refresh" onclick="{!c.refreshDetailsJS}"/>
+        </aura:set>
+        <aura:if isTrue="{!not(empty(v.TaskHistoryList))}">
+            <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+                <thead>
+                    <tr class="slds-line-height_reset">
+                        <th class="slds-text-title_caps" scope="col">
+                            <div class="slds-truncate" title="Date">Date</div>
+                        </th>
+                        <th class="slds-text-title_caps" scope="col">
+                            <div class="slds-truncate" title="User">User</div>
+                        </th>
+                        <th class="slds-text-title_caps" scope="col">
+                            <div class="slds-truncate" title="User">Field Name</div>
+                        </th>
+                        <th class="slds-text-title_caps" scope="col">
+                            <div class="slds-truncate" title="User">old Value</div>
+                        </th>
+                        <th class="slds-text-title_caps" scope="col">
+                            <div class="slds-truncate" title="User">New Value</div>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <aura:iteration  items="{!v.TaskHistoryList}" var="th">
+                        <tr class="slds-hint-parent">
+                            <td data-label="File Name">
+                                <div class="slds-truncate">
+                                    <ui:outputDateTime value="{!th.Edit_Date_Time__c}" format="MM/dd/yyyy hh:mm a"/>
+                                </div>  
+                            </td>
+                            <td data-label="File Name">
+                                <div class="slds-truncate"><a href="{!'/'+th.User__c}" target="_blank">{!th.User__r.Name}</a></div>  
+                            </td>
+                            <td data-label="File Name">
+                                <div class="slds-truncate">{!th.Field_Name__c}</div>  
+                            </td>
+                            <td data-label="File Name">
+                                <div class="slds-truncate">{!th.Old_Value__c}</div>  
+                            </td>
+                            <td data-label="File Name">
+                                <div class="slds-truncate">{!th.New_Value__c}</div>  
+                            </td>
+                        </tr>
+                    </aura:iteration>
+                </tbody>
+            </table>
+            <aura:set attribute="else">
+                <div Style="text-align : center"> There are no Task History</div>
+            </aura:set>
+        </aura:if>
+    </lightning:card>
+</aura:component>

@@ -1,0 +1,14 @@
+<aura:component implements="flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickAction" access="global" controller = "SyncQuoteController">
+	<aura:attribute name="message" type="String"/>
+    <aura:attribute name = "disabled" type = "boolean" default = "false"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:if isTrue="{!v.disabled}">
+        <aura:set attribute="else">
+    <span>
+    	<lightning:button variant="brand" label="Sync Quote" onclick="{!c.sendQuote}" disabled = "{!v.disabled}"/>
+    	<p align="left">{!v.message}</p>
+	</span>
+        </aura:set>
+    </aura:if>
+</aura:component>

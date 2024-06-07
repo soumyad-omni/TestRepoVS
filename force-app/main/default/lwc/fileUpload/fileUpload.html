@@ -1,0 +1,103 @@
+<!-- sldsValidatorIgnore -->
+<template>
+    
+    <article class="slds-card">
+        <div class="slds-card__header card_header">
+            <span lwc-7823ssqlgtm=""
+                class="record-avatar-container slds-avatar slds-avatar_small icon slds-m-right_small"
+                style="background-color: rgb(141, 138, 137)">
+                <lightning-icon size="small" icon-name="standard:file" alternative-text="Files" title="Files"></lightning-icon>
+            </span>
+            <a href={viewAll} style="color:#181818;font-weight:bold;font-size:14px;">{card_title}</a>
+            <div style="float: right;">
+                <lightning-button-menu icon-size="x-small" alternative-text="Show menu" menu-alignment="auto">
+                    <lightning-menu-item value="addFiles" label="Add Files"
+                        onclick={showModalBox}></lightning-menu-item>
+                </lightning-button-menu>
+            </div>
+        </div>
+        <div class="slds-card__body slds-card__body_inner" if:true={viewAllRender}>
+            <template if:true={files}>
+                <template for:each={filesFieldList} for:item="fl" for:index="index">
+                    <article key={fl.Id} style="padding-bottom: 10px;">
+                        <div>
+                            <template if:false={fl.hasUrl}>
+                            <a lwc-oj46kgc6r3="" class="flex-wrap-ie11 slds-truncate" 
+                                data-id={fl.Id} onclick={previewHandler} tabindex="0">{fl.Name}</a> 
+                            </template>
+                            <template if:true={fl.hasUrl}>
+                                <a lwc-oj46kgc6r3="" class="flex-wrap-ie11 slds-truncate" 
+                                href={fl.url} tabindex="0">{fl.Name}</a> 
+                            </template>                           
+                        </div>
+                        <div class="slds-tile__detail">
+                            <dl class="slds-list_horizontal slds-wrap">
+                                <dt class="slds-item_label slds-text-color_weak slds-truncate">Tag:</dt>
+                                <dd class="slds-item_detail slds-truncate">{fl.Tag}</dd>
+                                {fl.cdate} &#x2022; {fl.size} &#x2022; {fl.ctype}
+                            </dl>
+                        </div>
+                    </article>
+                </template>
+            </template>
+            <template if:false={files}>
+                <p>No Files found.</p>
+            </template>
+        </div>
+        <div class="slds-card__footer" if:true={viewAllRender}>
+            <a href={viewAll}>
+                <span lwc-38b9tp4cnq4="" class="view-all-label">View All<span lwc-38b9tp4cnq4=""
+                        class="assistiveText">Files</span></span>
+            </a>
+        </div>
+    </article>
+
+    <!-- <lightning-button variant="brand" label="File Upload" title="File Upload" onclick={showModalBox}>
+    </lightning-button> -->
+
+    <!-- modal start -->
+    <template if:true={isShowModal}>
+
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+            aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"
+                        title="Close" onclick={hideModalBox}>
+                        <lightning-icon icon-name="utility:close" alternative-text="close" variant="inverse"
+                            size="small"></lightning-icon>
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <lightning-card title="Upload file" icon-name="action:add_file"></lightning-card>
+                </header>
+
+                <lightning-card>
+                    <div class="slds-m-around_medium">
+                        <lightning-input type="file" accept=".xlsx, .xls, .csv, .png, .doc, .docx, .pdf"
+                            label="Attachment" onchange={openfileUpload}></lightning-input>
+                            <template if:true={fileData}>
+                                <br/><br/>
+                                <p style="font-size: 16px;">{fileData.filename}</p>
+                                <lightning-record-edit-form object-api-name="ContentVersion">
+                                    <lightning-layout-item padding="around-small">
+                                        <lightning-input-field field-name="Tag__c" required
+                                            onchange={handleTagChange} data-index={index}>
+                                        </lightning-input-field>
+                                    </lightning-layout-item>
+                                </lightning-record-edit-form>
+                            </template>
+                    </div>
+                    
+                    <footer class="slds-modal__footer">
+                        <lightning-button variant="brand" label="Submit" title="Submit" onclick={handleClick}
+                            class="slds-m-left_x-small"></lightning-button>
+                            <lightning-button variant="brand" label="Cancel" title="Cancel" onclick={hideModalBox}
+                            class="slds-m-left_x-small"></lightning-button>
+                    </footer>
+                </lightning-card>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+
+</template>

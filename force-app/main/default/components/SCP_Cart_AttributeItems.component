@@ -1,0 +1,343 @@
+<apex:component >
+    <script id="Cart-AttributeItems" type="text/template">
+      <div class="table-responsive">
+          <table class="cart_figures table table-striped table-condensed cc_table cc_included_items">
+              <thead class="cc_table_header">
+              <th class="cc_name">Operation</th><!-- {{pageLabelMap 'CartInc_SKU'}}-->
+              <th>Material</th>
+              {{#each this.topAttributes}}
+              <th class="cc_attribute_name">{{{this.displayName}}}</th>
+              {{/each}}
+              <th>Brand</th>
+              <th>Generic Name</th>
+              <th>Manufacturer</th>
+              <th>Strength</th>
+              <th class="cc_attribute_qty">{{pageLabelMap 'CartInc_AttributeQuantity'}}</th>
+              <th class="cc_total">{{pageLabelMap 'CartInc_Price'}}</th>
+              <th class="cc_total">{{pageLabelMap 'CartInc_Total'}}</th>
+              <th class="cc_remove"></th>
+              </thead>
+              <tbody>
+              {{#each this.minorLines}}
+              <tr>
+                  <td class="text-nowrap">
+                      {{#if extSKU}}
+                      {{extSKU}}
+                      {{else}}
+                      {{mockProduct.sku}}
+                      {{/if}}
+                  </td>
+                  <td><span class="cc_attr_display">{{this.material}}</span></td>
+                  {{#if primaryAttr}}
+                  <td><span class="cc_attr_display">{{this.machinesR.machineName}}</span></td><!--{{{primaryAttr.displayName}}} -->
+                  {{/if}}
+                  {{#if secondaryAttr}}
+                  <td><span class="cc_attr_display">{{this.machineType}}</span></td><!--{{{secondaryAttr.displayName}}}-->
+                  {{/if}}
+                  {{#if tertiaryAttr}}
+                  <td><span class="cc_attr_display">{{this.drugCodesR.drugCodes}}</span></td><!--{{{tertiaryAttr.displayName}}} -->
+                  {{/if}}
+                  <!--{{#if drugCodesR.brandName}}{{/if}}{{#if drugCodesR.genericDrugName}}{{/if}}{{#if drugCodesR.manufacturerName}}{{/if}}-->
+                  <td><span class="cc_attr_display">{{this.drugCodesR.brandName}}</span></td>
+                  <td><span class="cc_attr_display">{{this.drugCodesR.genericDrugName}}</span></td>
+                  <td><span class="cc_attr_display">{{this.drugCodesR.manufacturerName}}</span></td>
+                  <td><span class="cc_attr_display">{{this.drugCodesR.drugStrength}}</span></td>
+                  <td>
+                      <div class="plus_minus cc_plus-minus gp_quantity_block" data-id="{{sfid}}">
+                          {{#ifEquals pricingType 'external'}}
+                          <div class="row cc_qty_control_row">
+                              {{#if primaryAttr}}
+                              <div class="col-md-12">
+                              {{else}}
+                              <div class="col-md-3 col-md-offset-9">
+                              {{/if}}
+                                  <div class="form-group">
+                                      <p class="cc_order_quantity">
+                                          <span class="cc_quantity_label">{{pageLabelMap 'CartInc_Qty'}}&#58;&#160;</span>
+                                          <span class="cc_quantity">{{quantity}}</span>
+                                      </p>
+                                  </div>
+                              </div>
+                          </div>
+                          {{else}}
+                          {{#ifNotEquals pricingType "attrGroup" }}
+                              {{#if qtySkipIncrement}}
+                              <div class="row cc_qty_control_row">
+                                  <div class="col-md-12">
+                                      <div class="form-group">
+                                          <span class="{{this.className}}" style="color:red;" id="{{this.product.sfid}}-span">{{{this.title}}}</span>
+                                          <div class="input-group cc_input_group">
+                                              <span class="input-group-btn cc_input_group_btn">
+                                                  <input type="button" value="{{pageLabelMap 'Prod_QtyDecrFF'}}" class="btn btn-default btn-sm minusFF cc_minusff">
+                                                  <input type="button" onClick="setTimeOutCustom('{{this.product.sfid}}')"   value="{{pageLabelMap 'Prod_QtyDecrSingle'}}" class="btn btn-default btn-sm minus cc_minus">
+                                              </span>
+                                              <input id="entry_{{sfid}}" type="text" readonly="true" onKeyUp="checkProductQuantity('{{this.product.sfid}}')"   name="qty" value="{{quantity}}" class="input-text entry plus_minus form-control input-sm cc_entry" maxlength="7" />
+                                              <span class="input-group-btn cc_input_group_btn">
+                                                  <input type="button" onClick="setTimeOutCustom('{{this.product.sfid}}')"   value="{{pageLabelMap 'Prod_QtyIncrSingle'}}" class="btn btn-default btn-sm plus cc_plus">
+                                                  <input type="button" onClick="setTimeOutCustom('{{this.product.sfid}}')"   value="{{pageLabelMap 'Prod_QtyIncrFF'}}" class="btn btn-default btn-sm plusFF cc_plusff">
+                                              </span>
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
+                              {{/if}}
+                              {{#ifEquals qtyIncrement 1}}
+                              <div class="row cc_qty_control_row">
+                                  {{#if primaryAttr}}
+                                  	<div class="col-md-12">
+                                  {{else}}
+                                  	<div class="col-md-8 col-md-offset-4">
+                                  {{/if}}
+                                  	{{#ifEqualsChained this.product.SKU "REPAIR" "RECALIB"}}
+                                      	<div class="form-group">
+                                          	<span style="color:red;" class="{{this.className}}" id="{{this.product.sfid}}-span">{{{this.title}}}</span>
+                                          	<div class="input-group cc_input_group">
+                                                  <span class="input-group-btn cc_input_group_btn">
+                                                      <input type="button" disabled="disabled" onClick="flagSetToUpdateOrRemove('{{sfid}}')" value="{{pageLabelMap 'Prod_QtyDecrSingle'}}" class="btn btn-default btn-sm minus cc_minus">
+                                                  </span>
+                                                  <input id="entry_{{sfid}}" disabled="disabled" type="text" name="qty" onChange="flagSetToUpdateOrRemove('{{sfid}}')"  value="{{quantity}}" class="input-text entry plus_minus form-control input-sm cc_entry" maxlength="7" />
+                                                  <span class="input-group-btn cc_input_group_btn">
+                                                      <input type="button" disabled="disabled" onClick="flagSetToUpdateOrRemove('{{sfid}}')" value="{{pageLabelMap 'Prod_QtyIncrSingle'}}" class="btn btn-default btn-sm plus cc_plus">
+                                                  </span>
+                                          	</div>
+                                      	</div>
+                                    {{else}}
+                                     	<div class="form-group">
+                                          	<span style="color:red;" class="{{this.className}}" id="{{this.product.sfid}}-span">{{{this.title}}}</span>
+                                          	<div class="input-group cc_input_group">
+                                                  <span class="input-group-btn cc_input_group_btn">
+                                                      <input type="button" onClick="flagSetToUpdateOrRemove('{{sfid}}')" value="{{pageLabelMap 'Prod_QtyDecrSingle'}}" class="btn btn-default btn-sm minus cc_minus">
+                                                  </span>
+                                                  <input id="entry_{{sfid}}" type="text" name="qty" onChange="flagSetToUpdateOrRemove('{{sfid}}')"  value="{{quantity}}" class="input-text entry plus_minus form-control input-sm cc_entry" maxlength="7" />
+                                                  <span class="input-group-btn cc_input_group_btn">
+                                                      <input type="button" onClick="flagSetToUpdateOrRemove('{{sfid}}')" value="{{pageLabelMap 'Prod_QtyIncrSingle'}}" class="btn btn-default btn-sm plus cc_plus">
+                                                  </span>
+                                          	</div>
+                                      	</div>
+                                  	{{/ifEqualsChained}}
+                                  </div>
+                              </div>
+                              {{/ifEquals}}
+                              <input type="hidden" name="qtyIncrement" value="{{qtyIncrement}}" class="item_qtyIncrement" />
+                              <input type="hidden" name="qtySkipIncrement" value="{{qtySkipIncrement}}" class="item_qtySkipIncrement" />
+      
+                          {{/ifNotEquals}}
+                      {{/ifEquals}}
+                      </div>
+                  </td>
+                  <td><span class="cc_attr_price">{{price this.price this.currencyCode}}</span></td>
+                  <td><span class="cc_attr_line_total">{{price this.subAmount this.currencyCode}}</span></td>
+                  <td>
+                      <button class=" close cc_close cc_remove_attribute_item_button" onClick="setQtyZero('{{sfid}}')" type="button"  aria-hidden="true" data-id="{{sfid}}" data-group="{{parentCartItem}}"><span aria-hidden="true">&#215;</span></button><!-- removeAttributeItemButton-->
+                  </td>
+              </tr>
+              {{/each}}
+              </tbody>
+          </table>
+      </div>
+      <hr>
+      <div class="row">
+          <div class="col-md-12">
+                          <span class="pull-right">
+                        <!--  <button class="btn btn-default btn-sm cc_update_cart_button updateCartButton" type="button">{{pageLabelMap 'CartInc_Update'}}</button>-->
+                          <button class="btn btn-default btn-sm" onclick="upsertItemX()" type="button">Update</button>
+                      </span>
+          </div>
+      </div>
+      <div class="row">
+          <div class="col-md-12">
+              <span class="pull-right">{{pageLabelMap 'CartInc_Total'}}&#58;&#160;{{price this.attributes.subAmount}}</span>
+          </div>
+      </div>
+      <div class="row">
+          <div class="col-md-12">
+              <a href="javascript:void(0);" class="pull-right removeItemButton cc_clear_all" data-dismiss="modal" aria-hidden="true" data-id="{{this.attributes.sfid}}">{{pageLabelMap 'ProductAttributesCart_RemoveAll'}}</a>
+          </div>
+      </div>
+   </script>
+   <script>
+    	const a = new Map();
+    	const minorItemMap = new Map();
+    	const itemToUpdate = new Set()
+    	jQuery(function($){
+            CCRZ.pubSub.on('view:CartDetailView:refresh',function(){
+                if(a.size)
+                	a.clear();
+                for(i=0; i< CCRZ.cartDetailModel.attributes.ECartItemsS.models.length;i++){
+                    var minorItems = CCRZ.cartDetailModel.attributes.ECartItemsS.models[i].attributes.minorData;
+                    if(minorItems != null){
+                    	for(var j = 0;j < minorItems.length; j++){
+                             minorItemMap.set(minorItems[j].sfid,minorItems[j]);
+                             var id = minorItems[j].sfid;
+                             a.set(id,minorItems[j].quantity);
+                    	}
+                        console.log(minorItemMap);
+                    }
+                }
+                //console.log(a);
+                /*var cartItems2 = CCRZ.cartDetailView.model.get('ECartItemsS');
+                console.log(cartItems2);
+                var cartItems3 = cartItems2.models.get('minorData');
+                console.log(cartItems3);
+                var EcartItem = CCRZ.cartDetailModel.attributes.ECartItemsS;
+                // console.log(EcartItem['models']);
+                var models = EcartItem['models'];
+                // console.log(models);
+                var attr = models.get('attributes');
+                var cartItems = attr.get('minorData');
+                // console.log(cartItems);
+                 for (var i = 0; i < cartItems.length; i++){
+                     var minorList = cartItems[i].minorLines;
+                     for(var j = 0;j < minorList.length; j++){
+                         minorItemMap.set(minorList[j].itemID,minorList[j]);
+                         var id = minorList[j].itemID;
+                         a.set(id,minorList[j].quantity);
+                     }
+                 }*/
+            });
+            
+        });
+    	function setQtyZero(id){
+            console.log(id);
+            var qtyId = '#entry_'+id;
+            $(qtyId).val(0);
+            flagSetToUpdateOrRemove(id);
+            //alert(this);
+            //  alert($(qtyId).val());
+            //upsertItemX();
+        }    
+    	function flagSetToUpdateOrRemove(id){
+            //console.log(id);
+            var qtyId = '#qtyInput_'+id;
+            var checkId = '#checkFlag_'+id;
+            if($(qtyId).val() != a.get(id)){
+                itemToUpdate.add(id);
+            }
+            else{   
+                if(itemToUpdate.has(id))
+					itemToUpdate.delete(id);
+            }
+            console.log(itemToUpdate);
+        }
+    	
+    	function upsertItemX(){
+            console.log(itemToUpdate+'**');
+            //console.log(minorItemMap);
+            var flag = false;
+            var count = 0;
+            var setCount = itemToUpdate.size;
+            for (const k of itemToUpdate){
+                var prodAttribute = {};
+                //console.log(minorItemMap.get(k));
+                var minorItem = minorItemMap.get(k);
+                //console.log(minorItem);
+                //console.log(minorItem.product.ccrz__SKU__c);
+                //console.log(minorItem.machine);
+                prodAttribute.machine = minorItem.machinesR.machineName; //reference change to lookup
+                prodAttribute.type = minorItem.machineType;
+                prodAttribute.drugCode = minorItem.drugCodesR.drugCodes;
+                //alert(minorItem.drugCodesR.drugCode);
+                prodAttribute.SKU = minorItem.product.SKU;
+                //console.log(prodAttribute);
+                prodAttribute.quantity = minorItem.quantity - a.get(k);
+                console.log(minorItem.quantity+'**'+a.get(k));
+                if(minorItem.quantity - a.get(k)>0){
+                    OmnicellProductDetailController.upsertCartItem(
+                        CCRZ.pagevars.remoteContext,JSON.stringify(prodAttribute),
+                        function(response) {
+                            //console.log('outside response');
+                           count = count + 1;
+                           if (response) {
+                               //console.log('Inside response');
+                                if(response.success) {
+                                    //console.log('Inside success');
+                                   if(typeof response.data.status !== 'undefined'){
+                                       //console.log('Inside status');
+                                       flag = true; 
+                                   }
+                                   else{
+                                        flag = false;
+                                       //console.log('Inside status else');
+                                   }
+                                }
+                                else{
+                                    flag = false;
+                                    //console.log('Inside success else');
+                                }
+                            }
+                            //console.log(count);
+                            //console.log(setCount);
+                           if(count === setCount){
+                               //console.log(count);
+                                var cartId = CCRZ.pagevars.currentCartID;
+                                CCRZ.pubSub.trigger('cartChange', cartId);
+                                $('.buttondisabled').prop("disabled", false);
+                                $(".gp_cart_attribute_items_modal").modal('hide');
+                                location.reload();
+                           }
+                        });
+                }
+                else if(minorItem.quantity - a.get(k) <= 0){
+                    if(minorItem.quantity - a.get(k) == 0){
+                        prodAttribute.quantity = -a.get(k);
+                    }
+                    console.log(minorItem.quantity - a.get(k));
+                    OmnicellProductDetailController.deleteCartItem(
+                    	CCRZ.pagevars.remoteContext,JSON.stringify(prodAttribute),
+                    	function(response) {
+                            //console.log('outside response');
+                       count = count + 1;
+                       if (response) {
+                           console.log('Inside response');
+                            if(response.success) {
+                               console.log('Inside success');
+                               console.log(typeof response.data.status);
+                               if(typeof response.data.status !== 'undefined'){
+                                   console.log('Inside status');
+                                   flag = true;
+                               }
+                               else{
+                                	flag = false;
+                                    console.log('Inside status else');
+                               }
+                            }
+                           	else{
+                            	flag = false;
+                                console.log('Inside success else');
+                            }
+                        }
+                            //console.log(count);
+                            //console.log(setCount);
+                       if(count === setCount){
+                           //console.log(count);
+                            var cartId = CCRZ.pagevars.currentCartID;
+             				CCRZ.pubSub.trigger('cartChange', cartId);
+                            $('.buttondisabled').prop("disabled", false);
+                            $(".gp_cart_attribute_items_modal").modal('hide');
+                            location.reload();
+                       }
+                    });
+                }
+            }
+            itemToUpdate.clear();
+        }
+    </script>
+    <script>
+    		$(document).ready(function () {
+              Handlebars.registerHelper('ifEqualsChained', function() {
+                  var options = arguments[arguments.length-1];
+                  // Assuming that all wanted operator are '||'
+                  valueToChained=arguments[0];
+                  for (var i = 1; i < (arguments.length - 1); i++) {
+                    if (valueToChained === arguments[i]) {
+                      return options.fn(this);
+                    }
+                  }
+                  return options.inverse(this);
+              });
+              var source = $("#Cart-AttributeItems").html();
+              var template = Handlebars.compile(source);
+            
+            });
+    </script>
+</apex:component>

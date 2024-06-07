@@ -1,0 +1,974 @@
+<!--
+  @File Name          : NewQuoteCreateLayout.page
+  @Description        : 
+  @Author             : ChangeMeIn@UserSettingsUnder.SFDoc
+  @Group              : 
+  @Last Modified By   : ChangeMeIn@UserSettingsUnder.SFDoc
+  @Last Modified On   : 29/5/2020, 9:18:47 pm
+  @Modification Log   : 
+  Ver       Date            Author                  Modification
+  1.0    29/5/2020   ChangeMeIn@UserSettingsUnder.SFDoc     Initial Version
+-->
+<apex:page Standardcontroller="Quote" tabStyle="Quote" id="page1" extensions="NewQuoteCreateLayoutController" lightningStylesheets="true">  <!-- lightningStylesheets="true">  -->
+    
+    
+    <apex:form id="formid">
+        <!--Remove for IBA-4189-->
+        <apex:pageBlock title="New Quote" id="block1">
+            
+            <apex:messages layout="block" id="messages"/>   
+            <style>
+                body .bPageBlock .pbBody .red .pbSubheader{
+                background-color:#c00000;
+                }
+                body .bPageBlock .pbBody .grey .pbSubheader{
+                background-color:#c0c0c0;
+                }
+                body .bPageBlock .pbBody .grey .pbSubheader h3{
+                color:#000;
+                }
+            </style>
+            <apex:pageBlockButtons location="top" rendered="true">
+                <apex:commandButton id="saveBtn" value="Save" action="{!save}" disabled="{!acountDisabled}" />
+                <apex:commandButton id="cancelBtn" value="Cancel" action="{!cancel}" />
+            </apex:pageBlockButtons>
+            
+            <apex:actionRegion >
+                
+                <apex:outputPanel styleClass="grey" layout="block">
+                    <apex:pageBlockSection title="Quote Information" id="sec2">
+                        
+                         
+                        <apex:pageBlockSectionItem >
+                            <apex:outputLabel value="{!$Label.Quote_Name}"/> 
+                            
+                            <apex:outputPanel >                            
+                             <apex:inputText size="30" maxLength="40"  label="Quote Name"  styleClass="form" id="name" value="{!Quote.Name}"/>                                
+                            </apex:outputPanel>
+                        </apex:pageBlockSectionItem>
+                        
+                        
+                        <apex:pageBlockSectionItem >
+                            
+                            <!--<apex:outputLabel value="Primary Quote"/>-->
+                            <apex:outputLabel value="{!$Label.Primary_Quote}"/>
+                            <apex:outputPanel >
+                                <apex:inputField id="PrimaryQuote" value="{!Quote.Primary_Quote__c}"/>
+                            </apex:outputPanel>
+                        </apex:pageBlockSectionItem>   
+                        <!--<apex:pageBlockSectionItem >
+
+<apex:outputLabel value="Related Account"/>
+<apex:outputPanel >
+<apex:outputField id="ra" value="{!Quote.Related_Account__c}"/>
+</apex:outputPanel>
+</apex:pageBlockSectionItem>
+
+<apex:pageBlockSectionItem >
+<apex:outputLabel value="Account ID"/>
+<apex:outputPanel >
+<apex:outputField id="ra" value="{!Quote.Account_ID__c}"/>
+</apex:outputPanel>
+</apex:pageBlockSectionItem>                     
+-->          
+                        <!--START IBA-2374-->
+                        <apex:pageBlockSectionItem rendered="{!IF(acountDisabled,true,false)}">
+                            <!--<apex:outputLabel value="Order Type"/>-->
+                            <apex:outputLabel value="{!$Label.Order_Type}"/>
+                            <apex:outputPanel >
+                                <apex:inputField id="OrderType2" value="{!Quote.Order_Type__c}" required="true" />
+                           <!--     <apex:actionSupport event="onchange" action="{!showleaseduration}" rerender="block1" /> -->
+                            </apex:outputPanel>
+                        </apex:pageBlockSectionItem>
+                        <apex:pageBlockSectionItem rendered="{!IF(acountDisabled,false,true)}">
+                            <!--<apex:outputLabel value="Order Type"/>-->
+                            <apex:outputLabel value="{!$Label.Order_Type}"/>
+                            <apex:outputPanel >
+                                <apex:inputField id="OrderType" value="{!Quote.Order_Type__c}" required="true" />
+                                <apex:actionSupport event="onchange" action="{!showleaseduration}" rerender="block1" />
+                            </apex:outputPanel>
+                        </apex:pageBlockSectionItem>
+                         <!-- END IBA-2374-->
+                        <apex:pageBlockSectionItem id="item6">
+                           
+                            <apex:outputLabel value="{!$Label.Contact_Name_Quote}" >
+                                
+                            </apex:outputLabel>
+                            <apex:outputPanel >
+                                <div class="requiredInput">  
+                                    <div class="requiredBlock">
+                                    </div>
+                                <apex:inputHidden value="{!conId}" id="conId" />
+                                
+                                    <apex:inputText value="{!conName}" id="conname" html-autocomplete="off"/><!-- off auto-complete IBA-1089 -->
+                                
+                                <!--<img src="/Search_Icon.png" onclick="openLookupPopup('{!$Component.conname}', '{!$Component.conId}','{!$CurrentPage.parameters.accid}','contact');return false " class="lookupIcon" onmouseout="this.className='lookupIcon';" alt="Shipping Contact (New Window)" onmouseover="this.className='lookupIconOn';"/>--> 
+                                <a href="#" onclick="openLookupPopup('{!$Component.conname}', '{!$Component.conId}','{!$CurrentPage.parameters.accid}','contact');return false ">
+                                    <apex:image height="20px" value="{!$Label.search_icon_url}" />
+                                   <!-- <apex:image height="20px" value="{!$Label.search_icon_url}" />-->
+                                </a> 
+                                     
+                                    </div>
+                            </apex:outputPanel>
+                        </apex:pageBlockSectionItem>
+                        <apex:selectList id="conts" value="{!Quote.Sales_Org__c}" size="1">
+                            <apex:selectOptions value="{!SOS}">
+                            </apex:selectOptions>
+                            <apex:actionSupport event="onchange" action="{!updateSalesOrg}" rerender="block1"/>
+                        </apex:selectList>
+                        <!--IBA-1678--->
+                        <apex:pageBlockSectionItem id="item2" >
+                            <apex:outputLabel value="{!$Label.Clinical_Consultants}">
+                                <!-- <apex:outputLabel value="Select Ship-to Address" >-->
+                                ({!ClinicalConsultantcount})
+                             </apex:outputLabel>
+                            <apex:outputPanel >
+                                <div class="{!cls1}">  
+                                    <div class="{!cls2}">
+                                    </div>
+                                    <apex:inputHidden value="{!clinicalconsultantid}" id="clinicalconsultantid"/>
+                                    <apex:inputText value="{!clinicalconsultantName}" id="clinicalconsultantname" />
+                                    <a href="#" onclick="openLookupPopup('{!$Component.clinicalconsultantname}', '{!$Component.clinicalconsultantid}','{!$CurrentPage.parameters.accid}','clinicalconsultant');return false ">
+                                        <apex:image height="20px" value="{!$Label.search_icon_url}" />
+                                        <!-- <apex:image height="20px" value="{!$Label.search_icon_url}" />-->
+                                    </a>  <!--?isdtp=p1-->
+                                </div>
+                            </apex:outputPanel>
+                        </apex:pageBlockSectionItem>  
+                        <!--IBA-1678--->
+                        <!-- End - Added by Sam on 22/DEC/2018 -->
+
+                        <!--  <apex:pageBlockSectionItem >
+<apex:outputLabel value="Supplement"/>
+
+<apex:outputPanel >
+<apex:inputField id="supplement" value="{!Quote.Supplement__c}"/>
+</apex:outputPanel>
+
+
+</apex:pageBlockSectionItem>
+
+<apex:pageBlockSectionItem id="item1">
+<apex:outputLabel value="Sap Sales Org"/>
+<apex:outputPanel >
+<apex:inputHidden value="{!ssoId}" id="sapsalesorgid" />
+<apex:inputText value="{!ssoName}" id="sapsalesorgname"  />
+<a href="#" onclick="openLookupPopup('{!$Component.sapsalesorgname}', '{!$Component.sapsalesorgid}','{!$CurrentPage.parameters.accid}','sapsalesorg');return false ">
+<apex:image height="20px" value="{!$Label.search_icon_url}"/>
+</a>
+
+</apex:outputPanel>
+</apex:pageBlockSectionItem>
+-->
+                       <apex:pageBlockSectionItem rendered="{!Quote.Order_Type__c == 'ZQRS'}" > <!--Added by tribhuvan on 30th sep'19 for xr2 project line 122 to 127 -->
+                            <apex:outputLabel value="{!$ObjectType.Quote.fields.subscription_Months__c.Label}"/>
+                            <apex:outputPanel >
+                                <apex:inputField id="SubscriptionMonths" value="{!Quote.subscription_Months__c}"/>
+                                <apex:actionSupport event="onchange" action="{!syncServiceDuration}"  /> 
+                            </apex:outputPanel>
+                        </apex:pageBlockSectionItem>  
+                        
+                    </apex:pageBlockSection>
+                </apex:outputPanel>
+            </apex:actionRegion>
+            <apex:actionRegion >
+                
+                <apex:outputPanel styleClass="grey" layout="block">
+                    <apex:pageBlockSection title="Additional Quote Information" id="secaddinfo">
+                        <apex:pageBlockSectionItem >
+                            <apex:outputLabel value="{!$Label.Status_Quote}"/>
+                            <!--<apex:outputLabel value="Status"/>
+-->
+                            <apex:outputPanel rendered="{!statusrender}" >
+                                <apex:inputField id="status" value="{!Quote.Status}"/>
+                            </apex:outputPanel>
+                        </apex:pageBlockSectionItem>
+                        <apex:pageBlockSectionItem >
+                            <apex:outputLabel value="{!$Label.Master_Agreement_Quote}"/>
+                            <!--<apex:outputLabel value="Master Agreement"/>
+-->
+                            <apex:outputPanel >
+                                <apex:inputField id="MasterAgreement" value="{!Quote.Master_Agreement__c }"/>
+                            </apex:outputPanel>
+                            
+                            
+                        </apex:pageBlockSectionItem> 
+                        
+                        <apex:pageBlockSectionItem >
+                            <apex:outputLabel value="{!$Label.Account_Quote}"/>
+                            <!--<apex:outputLabel value="Account"/>
+-->
+                            <apex:outputPanel >
+                                <apex:outputText value="{!accountName}"/> 
+                            </apex:outputPanel>
+                        </apex:pageBlockSectionItem>
+                        <apex:pageBlockSectionItem >
+                            <apex:outputLabel value="{!$Label.Opportunity_Quote}"/>
+                            <!--<apex:outputLabel value="Opportunity"/>-->                                                              
+                            <apex:outputPanel >
+                                <apex:outputText value="{!oppName}"/> 
+                            </apex:outputPanel>
+                        </apex:pageBlockSectionItem>
+                        <apex:pageBlockSectionItem >
+                            <apex:outputLabel value="{!$Label.Valid_From_Quote}"/>
+                            <!--<apex:outputLabel value="Valid From"/>
+-->
+                            <apex:outputPanel >
+                                <apex:inputField id="From" value="{!Quote.From__c}"/>
+                            </apex:outputPanel>
+                            
+                            
+                        </apex:pageBlockSectionItem>
+                        
+                        <apex:pageBlockSectionItem >
+                            <!--                <apex:outputLabel value="Valid To"/>    -->
+                            <apex:outputLabel value="{!$Label.Valid_To}"/>
+                            
+                            <apex:outputPanel >
+                                <apex:inputField id="ExpirationDate" value="{!Quote.ExpirationDate}"/>
+                            </apex:outputPanel>
+                            
+                            
+                        </apex:pageBlockSectionItem>
+                        
+                        <apex:pageBlockSectionItem >
+                            <apex:outputLabel value="{!$Label.Service_Level_Quote}"/>
+                            <!--<apex:outputLabel value="Service Level"/>-->
+                            <apex:outputPanel >
+                                <apex:inputField id="ServiceLevel" value="{!Quote.Service_Level__c}"/>
+                            </apex:outputPanel>
+                        </apex:pageBlockSectionItem>                           
+                        
+                        <apex:pageBlockSectionItem rendered="{!showlease}" id="lease">
+                            <apex:outputLabel value="{!$Label.Lease_Duration_Quote}"/>
+                            <!--<apex:outputLabel value="Lease Duration"/>
+-->
+                            <apex:outputPanel >
+                                <apex:inputField id="LeaseDuration" value="{!Quote.Lease_Duration__c}"/>
+                            </apex:outputPanel>
+                        </apex:pageBlockSectionItem>
+                        <!-- soumyad start 965-->
+                       <apex:pageBlockSectionItem >
+                            <apex:outputLabel value="{!$Label.Professional_services_duration}"/>
+                            
+                            <apex:outputPanel >
+                                <apex:inputField id="prfserv" value="{!Quote.Professional_services_duration__c}"/>
+                            </apex:outputPanel>
+                        </apex:pageBlockSectionItem>
+                        
+                  
+                        <!-- soumyad end 965-->
+                        <apex:pageBlockSectionItem rendered="{!Quote.Order_Type__c != 'ZQRS'}" ><!-- added by tribhuvan singh 4th oct 2019-->
+                            <apex:outputLabel value="{!$Label.Service_Duration_Quote}"/>
+                            <!-- <apex:outputLabel value="Service Duration"/>-->
+                            <apex:outputPanel >
+                                <apex:inputField id="ServiceDuration" value="{!Quote.Service_Duration__c}"/>
+                            </apex:outputPanel>
+                        </apex:pageBlockSectionItem>
+                        
+                        <apex:pageBlockSectionItem >
+                            <apex:outputLabel value="{!$Label.Free_Month_Service_Quote}"/>
+                            <!--<apex:outputLabel value="Free Month Service"/>-->
+                            <apex:outputPanel >
+                                <apex:inputField id="FreeMonthService" value="{!Quote.Free_Month_Service__c}"/>
+                            </apex:outputPanel>
+                        </apex:pageBlockSectionItem>     
+                        
+                           <!-- changes by pavan Palla IBA-1135 Nov-Release start -->
+                        <apex:pageBlockSectionItem rendered="{!Quote.Order_Type__c == 'ZQRS'}" id="resOper">
+                            <apex:outputLabel value="{!$Label.Resident_Operator_Duration}"/>                        
+                            <apex:outputPanel >
+                                <apex:inputField id="resOper" value="{!Quote.Resident_Operator_Duration__c}"/>
+                            </apex:outputPanel>
+                        </apex:pageBlockSectionItem>
+                        <!-- changes by pavan Palla IBA-1135 Nov-Release finish -->
+                        
+                        <apex:pageBlockSectionItem >
+                            <apex:outputLabel value="{!$Label.Free_Month_for_Lease_Quote}"/>
+                            <!--<apex:outputLabel value="Free Month for Lease"/>-->
+                            <apex:outputPanel >
+                                <apex:inputField id="FreeMonthforLease" value="{!Quote.Free_Month_for_Lease__c}"/>
+                            </apex:outputPanel>
+                        </apex:pageBlockSectionItem>     
+                        
+                        <apex:pageBlockSectionItem >
+                            <apex:outputLabel value="{!$Label.Direct_Manager1}"/>
+                            <!--<apex:outputLabel value="SSM/RD"/>
+-->
+                            <apex:outputPanel >
+                                <apex:outputText >{!oppOwner}</apex:outputText>
+                            </apex:outputPanel>
+                            
+                            
+                        </apex:pageBlockSectionItem>
+                         <apex:pageBlockSectionItem id="item1" >
+                             <apex:outputLabel value="{!$Label.Deal_Desk}">
+                               <!-- <apex:outputLabel value="Select Ship-to Address" >-->
+                                ({!DealDeskcount})
+                                </apex:outputLabel>
+                            <apex:outputPanel >
+                                <apex:inputHidden value="{!dealDeskuserid}" id="dealdeskid"/>
+                                <apex:inputText value="{!dealDeskuserName}" id="dealdeskname" />
+                                <a href="#" onclick="openLookupPopup('{!$Component.dealdeskname}', '{!$Component.dealdeskid}','{!$CurrentPage.parameters.accid}','dealdesk');return false ">
+                                    <apex:image height="20px" value="{!$Label.search_icon_url}" />
+                                   <!-- <apex:image height="20px" value="https://{!$Label.search_icon_url}" />-->
+                                </a>  
+                            </apex:outputPanel>
+                        </apex:pageBlockSectionItem>  
+                        
+                        <apex:pageBlockSectionItem id="item3" >
+                             <apex:outputLabel value="{!$Label.Sales_Consultant}">
+                               <!-- <apex:outputLabel value="Select Ship-to Address" >-->
+                                ({!SalesConsultantcount})
+                            </apex:outputLabel>
+                            <apex:outputPanel >
+                                <apex:inputHidden value="{!salesconsultantid}" id="salesconsultantrid"/>
+                                <apex:inputText value="{!salesconsultantName}" id="salesconsultantName" />
+                                <a href="#" onclick="openLookupPopup('{!$Component.salesconsultantName}', '{!$Component.salesconsultantrid}','{!$CurrentPage.parameters.accid}','salesconsultant');return false ">
+                                    <apex:image height="20px" value="{!$Label.search_icon_url}" />
+                                   <!-- <apex:image height="20px" value="{!$Label.search_icon_url}" />-->
+                                </a>  
+                            </apex:outputPanel>
+                        </apex:pageBlockSectionItem>
+                        <!-- Start - Added by Sam on 22/DEC/2018 -->
+                        
+                        <!--<apex:pageBlockSectionItem >
+                            <apex:outputLabel value="{!$Label.Deal_Desk}"/>
+                             <apex:outputLabel value="Sales Operation Counterpart"/>
+
+                            <apex:outputPanel >
+                                <apex:inputField id="SalesOperationCounterpart" value="{!Quote.Sales_Operation_Counterpart__c}"/>
+                            </apex:outputPanel>
+                            </apex:pageBlockSectionItem>-->
+                            
+                    
+                        <apex:pageBlockSectionItem >
+                            <apex:outputLabel value="{!$Label.Corporate_Agreement_Pricing_Expiration_Quote}"/>
+                            <!--<apex:outputLabel value="Corporate Agreement Pricing Expiration"/>-->
+                            <apex:outputPanel >
+                                <apex:inputField id="ExpirationDate" value="{!Quote.Corporate_Agreement_Pricing_Expiration__c}"/>
+                            </apex:outputPanel>
+                        </apex:pageBlockSectionItem>  
+                        
+                        <apex:pageBlockSectionItem >
+                            <apex:outputLabel value="Supplement Generated"/>
+                            <apex:outputPanel >
+                                <apex:inputField id="status" value="{!Quote.Supplement_Generated__c}"/>
+                            </apex:outputPanel>
+                        </apex:pageBlockSectionItem>
+                        
+                        <apex:pageBlockSectionItem >
+                            <apex:outputLabel value="EOL Date"/>
+                            <!--<apex:outputLabel value="Valid From"/>
+-->
+                            <apex:outputPanel >
+                                <apex:inputField id="eol" value="{!Quote.EOL_Date__c}"/>
+                            </apex:outputPanel>
+                            
+                            
+                        </apex:pageBlockSectionItem>
+                        
+                       <apex:pageBlockSectionItem >
+                            <!--                <apex:outputLabel value="Valid To"/>    -->
+                            <apex:outputLabel value="{!$Label.Quote_Posting_Date}"/>
+                            
+                            <apex:outputPanel >
+                                <apex:inputField id="PostingDate" value="{!Quote.Posting_Date__c}"/>
+                            </apex:outputPanel>
+                            
+                            
+                        </apex:pageBlockSectionItem>
+                        <apex:pageBlockSectionItem >
+                            <apex:outputLabel value="Fee Increase(%)"/>
+                            <!--<apex:outputLabel value="Valid From"/>
+-->
+                            <apex:outputPanel >
+                                <apex:inputField id="eol" value="{!Quote.Fee_Increase__c}"/>
+                            </apex:outputPanel>
+                            
+                            
+                        </apex:pageBlockSectionItem>
+                        
+                        <apex:pageBlockSectionItem rendered="{!Quote.Order_Type__c == 'ZQRS'}" > <!--Added by Jay on 30th sep'19 for xr2 project  -->
+                            <apex:outputLabel value="Statement Of Work"/>
+                            <apex:outputPanel >
+                                <apex:inputField id="SOW" value="{!Quote.Statement_Of_Work__c}" /> 
+                            </apex:outputPanel>
+                        </apex:pageBlockSectionItem>  
+                        
+                        <apex:pageBlockSectionItem rendered="{!Quote.Order_Type__c == 'ZQRS'}" > <!--Added by Jay on 30th sep'19 for xr2 project -->
+                            <apex:outputLabel value="Autonomous Pharmacy Solutions Agreement"/>
+                            <apex:outputPanel >
+                                <apex:inputField id="APSA" value="{!Quote.Auton__c}" />
+                            </apex:outputPanel>
+                        </apex:pageBlockSectionItem>  
+                        
+                        
+                        <!--<apex:pageBlockSectionItem >
+                            <apex:outputLabel value="{!$Label.Clinical_Consultants}"/>
+                            <apex:outputLabel value="Consultant"/>
+                            
+                            <apex:outputPanel >
+                                <apex:inputField id="Consultant" value="{!Quote.Consultant__c }"/>
+                            </apex:outputPanel>
+                            
+                            
+                        </apex:pageBlockSectionItem>-->
+                       <!-- added by jay sf bug 257 renewal revenue field added for edit  -->
+                        <apex:pageBlockSectionItem >
+                            <apex:outputLabel value="Renewal Revenue"/>                            
+                            <apex:outputPanel >
+                                <apex:inputField id="rr" value="{!Quote.Ren_Revenue__c}"/>
+                            </apex:outputPanel>              
+                         </apex:pageBlockSectionItem> 
+                        
+                        <!-- added by Pavan K. JIRA - IBA-1396 Target IV Doses field added for edit  -->
+                        <apex:pageBlockSectionItem >
+                            <apex:outputLabel value="Target IV Doses"/>                            
+                            <apex:outputPanel >
+                                <apex:inputField id="tivd" value="{!Quote.TargetIVDoses__c}"/>
+                            </apex:outputPanel>              
+                         </apex:pageBlockSectionItem>                         
+                    </apex:pageBlockSection>
+                </apex:outputPanel>
+            </apex:actionRegion>
+             
+            <apex:actionRegion >
+                
+                <apex:outputPanel styleClass="grey" layout="block" id="soBlock">
+                    <apex:pageBlockSection title="Sales Organization" id="secSO">            
+                        
+         
+                        
+
+                     
+                        <!--    
+<apex:pageBlockSectionItem >
+<apex:outputLabel value="SAP Sales Org"/>
+<apex:outputPanel id="soid">
+<apex:inputField id="SAPSalesOrg" value="{!Quote.SAP_Sales_Org__c}"/>
+</apex:outputPanel>
+</apex:pageBlockSectionItem>                     
+-->           
+                        <apex:pageBlockSectionItem >
+                            <apex:outputLabel value="{!$Label.Incoterms_1_Quote}"/>
+                            <!--<apex:outputLabel value="Incoterms 1"/>-->
+                            
+                            <apex:outputPanel id="it1">
+                                <apex:inputField id="Incoterms1" value="{!Quote.Incoterms_1__c}" />
+                            </apex:outputPanel>
+                            
+                            
+                        </apex:pageBlockSectionItem> 
+                        <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="{!$Label.Incoterms_2_Quote}"/>
+                        <!--<apex:outputLabel value="Incoterms 2"/>-->
+                        <apex:outputPanel >
+                            <apex:inputField id="Incoterms2" value="{!Quote.Incoterms_2__c}"/>
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                        <apex:pageBlockSectionItem >
+                            <apex:outputLabel value="{!$Label.Terms_of_Payment_Quote}"/>
+                            <!--<apex:outputLabel value="Terms of Payment"/>-->
+                            <apex:outputPanel >
+                                <apex:inputField id="TermsOfPayment" value="{!Quote.Terms_of_Payment__c}"/>
+                            </apex:outputPanel>
+                        </apex:pageBlockSectionItem>                     
+                        <apex:pageBlockSectionItem >
+                            <apex:outputLabel value="{!$Label.Shipping_Conditions_Quote}"/>
+                            <!--<apex:outputLabel value="Shipping Conditions"/>-->
+                            <apex:outputPanel >
+                                <apex:inputField id="shippingconditions" value="{!Quote.Shipping_Conditions__c}"/>
+                            </apex:outputPanel>
+                        </apex:pageBlockSectionItem>                     
+                        <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="{!$Label.Pricing_Reference_Date_Quote}"/>
+                        <!-- <apex:outputLabel value="Pricing Reference Date"/>-->
+                        <apex:outputPanel >
+                            <apex:inputField id="PricingReferenceDate" value="{!Quote.Pricing_Reference_Date__c}"/>
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem> 
+                    
+                        <apex:pageBlockSectionItem rendered="{!Quote.Order_Type__c != 'ZQRS'}" > <!--Rendered condition Added by Jay on 10 OCT for xr2 project CR-18666 -->
+                            <apex:outputLabel value="{!$Label.GPO_Pricelist_Quote}"/>
+                            <!--<apex:outputLabel value="GPO Pricelist"/>-->
+                            <apex:selectList id="pricelists" value="{!Quote.GPO_Price_Lists__c}" size="1">
+                                <apex:selectOptions value="{!pricelists}">
+                                </apex:selectOptions>
+                                
+                            </apex:selectList>
+                            
+                        </apex:pageBlockSectionItem> 
+                        
+                        <apex:pageBlockSectionItem >
+                            <apex:outputLabel value="{!$Label.Currency_Quote}"/>
+                            
+                            <apex:outputPanel >
+                                <apex:outputField id="Currency" value="{!Quote.Currency__c}"/>
+                            </apex:outputPanel>
+                        </apex:pageBlockSectionItem>                       
+                        
+                        <apex:pageBlockSectionItem rendered="{!Quote.Order_Type__c != 'ZQRS'}" > <!--Rendered condition Added by Jay on 10 OCT for xr2 project CR-18666 -->
+                            <apex:outputLabel value="{!$Label.IDN_Pricelist_Quote}"/>
+                            <!--<apex:outputLabel value="IDN Pricelist"/>-->
+                            <apex:outputPanel >
+                            <!-- <apex:inputField id="IDNPricelist" value="{!Quote.IDN_Price_List__c}"/> -->
+                            <!-- IBA-2432 Pabitra -->
+                             <!-- <apex:selectList id="IDNPricelist" value="{!Quote.IDN_Price_List__c}"  size="1" required="true"> -->
+                             <apex:selectList id="IDNPricelist" value="{!Quote.IDN_Price_List__c}"  size="1">
+                                    <apex:selectOptions value="{!IDNPriceList}">
+                                    </apex:selectOptions>  
+                              </apex:selectList>
+                             <!-- IBA-2432 Pabitra -->    
+                            </apex:outputPanel>
+                        </apex:pageBlockSectionItem>   
+                        
+                        
+                    </apex:pageBlockSection>
+                </apex:outputPanel>
+            </apex:actionRegion>
+           <!-- <apex:actionRegion >
+             <apex:outputPanel styleClass="grey" layout="block">   
+                <apex:pageBlockSection title="Prepared For" id="sec1">
+                    
+                    
+                  
+                    <!--<apex:pageBlockSectionItem >
+                        <apex:outputLabel value="{!$Label.Contact_Name_Quote}"/>
+                        <apex:outputLabel value="Contact Name"/>
+                        <apex:outputPanel >
+                            <apex:inputField id="Contact" value="{!Quote.Shipping_Contact__c}"/>
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                    
+
+                                    </apex:pageBlockSection>
+            </apex:outputPanel>
+            </apex:actionRegion>-->
+            
+            <apex:actionRegion >
+                <apex:outputPanel styleClass="grey" layout="block"> 
+                    <apex:pageBlockSection title="Sold-to, Bill-to, Ship-to, GPO, IDN" id="b2s2" columns="2">
+                        
+                        <apex:pageBlockSectionItem >
+                            <apex:outputLabel value="{!$Label.Sold_to_Quote}"/>
+                            <!--<apex:outputLabel value="Sold-to"/>-->                                                              
+                            <apex:outputPanel >
+                                <apex:outputText value="{!accountName}"/> 
+                            </apex:outputPanel>
+                        </apex:pageBlockSectionItem>
+                        
+                        <apex:pageBlockSectionItem >
+                            <apex:outputLabel value="{!$Label.Sold_to_Address_Quote}"/>
+                            <!--<apex:outputLabel value="Sold-to Address"/>-->                                                              
+                            <apex:outputPanel >
+                                <apex:outputText value="{!accountAddress}"/> 
+                            </apex:outputPanel>
+                        </apex:pageBlockSectionItem>
+                        
+                        <!--<apex:pageBlockSectionItem >
+<apex:outputLabel value="Ship-to:  Use Sold-to Address"/>
+<apex:outputPanel >
+<apex:inputCheckbox id="overS2" value="{!overrideshipto}"/>
+<apex:actionSupport event="onchange" rerender="b2s2"/>
+</apex:outputPanel>
+</apex:pageBlockSectionItem>                 
+-->
+                        <apex:pageBlockSectionItem id="item1" >
+                            <apex:outputLabel value="{!$Label.Select_Ship_to_Address_Quote}">
+                                <!--<apex:outputLabel value="Select Ship-to Address" >-->
+                                ({!shiptocount})
+                            </apex:outputLabel>
+                            <apex:outputPanel >
+                                <apex:inputHidden value="{!shiptoId}" id="inputid">
+                                    <apex:actionSupport event="onchange" action="{!updateshipto}" reRender="b2s2"/>
+                                </apex:inputHidden>
+                                <apex:inputText value="{!shiptoName}" id="inputname" />
+                                
+                                <a href="#" onclick="openLookupPopup('{!$Component.inputname}', '{!$Component.inputid}','{!$CurrentPage.parameters.accid}','shipto');return false ">
+                                    <apex:image height="20px" value="{!$Label.search_icon_url}" />
+                                   <!-- <apex:image height="20px" value="{!$Label.search_icon_url}" />-->
+                                </a>
+                                
+                            </apex:outputPanel>
+                        </apex:pageBlockSectionItem>    
+                         
+                        
+                        <!--<apex:pageBlockSectionItem >
+<apex:outputLabel value="Bill-to:  Use Sold-to Address"/>
+<apex:outputPanel >
+<apex:inputCheckbox id="overS2" value="{!overridebillto}"/>
+<apex:actionSupport event="onchange" rerender="b2s2"/>
+</apex:outputPanel>
+</apex:pageBlockSectionItem>                 
+-->
+                        <apex:pageBlockSectionItem id="item2">
+                            <apex:outputLabel value="{!$Label.Select_Bill_to_Address_Quote}">
+                                <!--<apex:outputLabel value="Select Bill-to Address" >-->
+                                ({!billtocount})
+                            </apex:outputLabel>
+                            <apex:outputPanel >
+                                <apex:inputHidden value="{!billtoId}" id="billtoid" />
+                                <apex:inputText value="{!billtoName}" id="billtoname" />
+                                <a href="#" onclick="openLookupPopup('{!$Component.billtoname}', '{!$Component.billtoid}','{!$CurrentPage.parameters.accid}','billto');return false ">
+                                    <apex:image height="20px" value="{!$Label.search_icon_url}" />
+                                   <!-- <apex:image height="20px" value="{!$Label.search_icon_url}" />-->
+                                </a> 
+                            </apex:outputPanel>
+                        </apex:pageBlockSectionItem>
+                        
+                        
+                        <!-- <apex:pageBlockSectionItem >
+<apex:outputLabel value="Payer:  Use Sold-to Address"/>
+<apex:outputPanel >
+<apex:inputCheckbox id="overS2" value="{!overridepayer}"/>
+<apex:actionSupport event="onchange" rerender="b2s2"/>
+</apex:outputPanel>
+</apex:pageBlockSectionItem>                 
+-->
+                        <!--Commented below code for SF-BUG-1023-->
+                        <!--
+                        <apex:pageBlockSectionItem id="item3">
+                            
+                            <apex:outputLabel value="{!$Label.Select_Payer_Address_Quote}">
+                                <apex:outputLabel value="Select Payer Address">
+                                ({!payercount}) 
+                            </apex:outputLabel>
+                        
+                            
+                            <apex:outputPanel >
+                                <apex:inputHidden value="{!payerId}" id="payerid" />
+                                <apex:inputText value="{!payerName}" id="payername" />
+                                <a href="#" onclick="openLookupPopup('{!$Component.payername}', '{!$Component.payerid}','{!$CurrentPage.parameters.accid}','payer');return false ">
+                                    <apex:image height="20px" value="{!$Label.search_icon_url}" />
+                                    <apex:image height="20px" value="{!$Label.search_icon_url}" />
+                                </a> 
+                            </apex:outputPanel>
+                        
+                        </apex:pageBlockSectionItem>
+                        -->
+                        <apex:pageBlockSectionItem id="item4">
+                            <apex:outputLabel value="{!$Label.Select_GPO_Address_Quote}">
+                                <!--<apex:outputLabel value="Select Payer Address">-->
+                                ({!Gpocount}) 
+                            </apex:outputLabel>
+                            <apex:outputPanel >
+                                <apex:inputHidden value="{!gpoId}" id="gpoid" />
+                                <apex:inputText value="{!gpoName}" id="gponame" />
+                                <a href="#" onclick="openLookupPopup('{!$Component.gponame}', '{!$Component.gpoid}','{!$CurrentPage.parameters.accid}','gpo');return false ">
+                                    <apex:image height="20px" value="{!$Label.search_icon_url}" />
+                                   <!-- <apex:image height="20px" value="{!$Label.search_icon_url}" />-->
+                                </a> 
+                            </apex:outputPanel>
+                        </apex:pageBlockSectionItem>
+                        
+                        <apex:pageBlockSectionItem id="item5">
+                            <apex:outputLabel value="{!$Label.Select_IDN_Address_Quote}">
+                                <!--<apex:outputLabel value="Select Payer Address">-->
+                                ({!Idncount}) 
+                            </apex:outputLabel>
+                            <apex:outputPanel >
+                                <apex:inputHidden value="{!idnId}" id="idnid" />
+                                <apex:inputText value="{!idnName}" id="idnname" />
+                                <a href="#" onclick="openLookupPopup('{!$Component.idnname}', '{!$Component.idnid}','{!$CurrentPage.parameters.accid}','idn');return false ">
+                                    <apex:image height="20px" value="{!$Label.search_icon_url}" />
+                                   <!-- <apex:image height="20px" value="{!$Label.search_icon_url}" />-->
+                                </a> 
+                            </apex:outputPanel>
+                        </apex:pageBlockSectionItem>
+                        
+                    </apex:pageBlockSection>
+                </apex:outputPanel> 
+            </apex:actionRegion>
+            <apex:outputPanel styleClass="grey" layout="block">
+                <apex:pageBlockSection title="Additional Information" id="sec3">
+                    
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="{!$Label.Description_Quote}"/>
+                        <!-- <apex:outputLabel value="Description"/>-->
+                        <apex:outputPanel >
+                            <apex:inputField id="Description" value="{!Quote.Description}"/>
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem> 
+                    
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="{!$Label.Product_PO_Number_Quote}"/>
+                        <!--<apex:outputLabel value="Product PO Number"/>-->
+                        <apex:outputPanel >
+                            <apex:inputField id="ProductPONumber" value="{!Quote.Product_PO_Number__c}"/>
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="{!$Label.Purchase_PO_Amount_Quote}"/>
+                        <apex:outputPanel >
+                            <apex:inputField id="PurchasePOAmount" value="{!Quote.Purchase_PO_Amount__c}"/>
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                   <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="{!$Label.Purchase_PO_Date_Quote}"/>
+                        <apex:outputPanel >
+                            <apex:inputField id="PurchasePODate" value="{!Quote.Purchase_PO_Date__c}"/>
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="{!$Label.Service_PO_Number_Quote}"/>
+                        <!--<apex:outputLabel value="Service PO Number"/>-->
+                        <apex:outputPanel >
+                            <apex:inputField id="ServicePONumber" value="{!Quote.Service_PO_Number__c}"/>
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>  
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="{!$Label.Service_PO_Amount_Quote}"/>
+                        <apex:outputPanel >
+                            <apex:inputField id="ServicePOAmount" value="{!Quote.Service_PO_Amount__c}"/>
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="{!$Label.Service_PO_Date_Quote}"/>
+                        <apex:outputPanel >
+                            <apex:inputField id="ServicePODate" value="{!Quote.Service_PO_Date__c}"/>
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                    
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="{!$Label.Service_Escalator_Quote}"/>
+                        <!--<apex:outputLabel value="Service Escalator"/>-->
+                        <apex:outputPanel >
+                            <apex:inputField id="Serviceescalator" value="{!Quote.Service_Escalator__c}"/>
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem> 
+                    
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="{!$Label.Service_Start_Date_Quote}"/>
+                        <!--<apex:outputLabel value="Service Start Date"/>-->
+                        <apex:outputPanel >
+                            <apex:inputField id="ServiceStartDate" value="{!Quote.Service_Start_Date__c}"/>
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem> 
+                    
+                     <!-- added by jay for XR Project -->
+                         <apex:pageBlockSectionItem >
+                            <apex:outputLabel value="Autonomous Pharmacy Solutions Agmnt Date"/>                            
+                            <apex:outputPanel >
+                                <apex:inputField id="rr" value="{!Quote.Autonomous_Pharmacy_Solutions_Agmnt_Date__c}"/>
+                            </apex:outputPanel>              
+                         </apex:pageBlockSectionItem>
+                     
+                </apex:pageBlockSection>
+            </apex:outputPanel>    
+            
+            <apex:outputPanel styleClass="grey" layout="block">
+                <apex:pageBlockSection title="Financial Information">
+                    <!--<apex:pageBlockSectionItem >
+                        <apex:outputLabel value="{!$Label.Currency_Quote}"/>
+                        
+                        <apex:outputPanel >
+                            <apex:outputField id="Currency" value="{!Quote.Currency__c}"/>
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>--> 
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="{!$Label.Exchange_Rate_Quote}"/>
+                        <!--<apex:outputLabel value="Exchange Rate"/>-->
+                        <apex:outputPanel >
+                            <apex:inputField id="ExchangeRate" value="{!Quote.Exchange_Rate__c}"/>
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>     
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="{!$Label.Total_Net_Quote}"/>
+                        <!--<apex:outputLabel value="Total Net"/>-->
+                        <apex:outputPanel >
+                            <apex:inputField id="TotalNet" value="{!Quote.Total_Net__c}"/>
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>     
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="{!$Label.Tax_Quote}"/>
+                        <!-- <apex:outputLabel value="Tax"/>-->
+                        <apex:outputPanel >
+                            <apex:inputField id="Tax" value="{!Quote.Tax}"/>
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>   
+                </apex:pageBlockSection>
+            </apex:outputPanel>
+            <apex:outputPanel styleClass="grey" layout="block">
+                <apex:pageBlockSection title="Date Information">
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="{!$Label.Booking_Date_Quote}"/>
+                        <!--<apex:outputLabel value="Booking Date"/>-->
+                        <apex:outputPanel >
+                            <apex:inputField id="BookingDate" value="{!Quote.Booking_Date__c}"/>
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>  
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="{!$Label.Requested_Delivery_date_Quote}"/>
+                        <!--<apex:outputLabel value="Requested Delivery date"/>-->
+                        <apex:outputPanel >
+                            <apex:inputField id="RequestedDeliveryDate" value="{!Quote.Requested_Delivery_Date__c}"/>
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                </apex:pageBlockSection>
+            </apex:outputPanel>
+           
+            <apex:outputPanel styleClass="grey" layout="block">   
+                <apex:pageBlockSection title="Notes" id="notes">
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="{!$Label.Hospital_Contact_Notes_Quote}"/>
+                        <!--<apex:outputLabel value="Hospital Contact Notes"/>-->
+                        <apex:outputPanel >
+                            <apex:inputField id="Hospital_Contact_Notes" value="{!Quote.Hospital_Contact_Notes__c}"/>
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="{!$Label.Inv_Text_Notes_Quote}"/>
+                        <!--<apex:outputLabel value="Inv Text Notes"/>-->
+                        <apex:outputPanel >
+                            <apex:inputField id="Inv_Text_Notes" value="{!Quote.Inv_Text_Notes__c}"/>
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="{!$Label.Quote_Printout_Standard_Text_Quote}"/>
+                        <!--<apex:outputLabel value="Quote Printout Standard Text"/>-->
+                        <apex:outputPanel >
+                            <apex:inputField id="Quote_Printout_Standard_Text" value="{!Quote.Quote_Printout_Standard_Text__c}"/>
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="{!$Label.Other_Notes_Quote}"/>
+                        <!--<apex:outputLabel value="Other Notes"/>-->
+                        <apex:outputPanel >
+                            <apex:inputField id="Other_Notes" value="{!Quote.Other_Notes__c}"/>
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="{!$Label.Quote_Text_Quote}"/>
+                        <!--<apex:outputLabel value="Quote Text"/>-->
+                        <apex:outputPanel >
+                            <apex:inputField id="Quote_Text" value="{!Quote.Quote_Text__c}"/>
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="{!$Label.Quote_Rework_Comments}"/>
+                        <!--<apex:outputLabel value="Quote Text"/>-->
+                        <apex:outputPanel >
+                            <apex:inputField id="Quote_rework" value="{!Quote.Rework_Comments__c}"/>
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="{!$Label.Special_Instructions_Quote}"/>
+                        <!--<apex:outputLabel value="Special Instructions"/>-->
+                        <apex:outputPanel >
+                            <apex:inputField id="Special_Instructions" value="{!Quote.Special_Instructions__c}"/>
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="{!$Label.Deal_Desk_Notes_Quote}"/>
+                        <!--<apex:outputLabel value="Deal Desk Notes"/>-->
+                        <apex:outputPanel >
+                            <apex:inputField id="Sales_Ops_Notes" value="{!Quote.Sales_Ops_Notes__c}"/>
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                    
+                </apex:pageBlockSection>
+            </apex:outputPanel>
+            
+            <apex:pageBlockButtons id="editButtons" location="bottom" rendered="true">
+                <apex:commandButton id="saveBtn" value="{!$Label.Label_Save}" action="{!save}" status="actStatusId" disabled="{!acountDisabled}"/>
+                <apex:actionStatus id="actStatusId" >
+                    <apex:facet name="start" >
+                        <img src="{!$Label.search_icon_url}"/>                    
+                    </apex:facet>
+                </apex:actionStatus>
+                <apex:commandButton id="cancelBtn" value="{!$Label.Label_Cancel}" action="{!cancel}" />
+            </apex:pageBlockButtons>
+            
+        </apex:pageBlock>
+        
+        
+    </apex:form>
+    <script>
+    var newWin=null;
+    function openLookupPopup(name,id,accid,lookuptype)
+    {
+        console.log("acc id : "+accid);
+        console.log("lookuptype : "+lookuptype);
+        var inid1=document.getElementById("{!$Component.page1.formid.block1.b2s2.item1.inputid}").value;
+        console.log('inid1 : '+inid1);
+        var inname=document.getElementById("{!$Component.page1.formid.block1.b2s2.item1.inputname}").value;
+        console.log('inname : '+inname);
+        var inid2 = document.getElementById("{!$Component.page1.formid.block1.b2s2.item2.billtoid}").value;
+        console.log('inid2 : '+inid2);
+        var inname2=document.getElementById("{!$Component.page1.formid.block1.b2s2.item2.billtoname}").value;
+        console.log('inname2 : '+inname2);
+        // var inid3 = document.getElementById("{!$Component.page1.formid.block1.sec2.item1.sapsalesorgid}").value;
+        //console.log('inid3 : '+inid3);
+        //var inname3=document.getElementById("{!$Component.page1.formid.block1.sec2.item1.sapsalesorgname}").value;
+        //console.log('inname3 : '+inname3);
+        //var inid4 = document.getElementById("{!$Component.page1.formid.block1.b2s2.item3.payerid}").value;
+        //console.log('inid4 : '+inid4);
+        //var inname4=document.getElementById("{!$Component.page1.formid.block1.b2s2.item3.payername}").value;
+        //console.log('inname4 : '+inname4);
+        var inid8 = document.getElementById("{!$Component.page1.formid.block1.b2s2.item4.gpoid}").value;
+        console.log('inid8 : '+inid8);
+        var inname8=document.getElementById("{!$Component.page1.formid.block1.b2s2.item4.gponame}").value;
+        console.log('inname8 : '+inname8);
+        var inid9 = document.getElementById("{!$Component.page1.formid.block1.b2s2.item5.idnid}").value;
+        console.log('inid9 : '+inid9);
+        var inname9=document.getElementById("{!$Component.page1.formid.block1.b2s2.item5.idnname}").value;
+        console.log('inname9 : '+inname9);
+        var inid5 = document.getElementById("{!$Component.page1.formid.block1.secaddinfo.item1.dealdeskid}").value;
+        console.log('inid5 : '+inid5);
+        var inname5=document.getElementById("{!$Component.page1.formid.block1.secaddinfo.item1.dealdeskname}").value;
+        console.log('inname5 : '+inname5);
+        var inid6 = document.getElementById("{!$Component.page1.formid.block1.sec2.item2.clinicalconsultantid}").value;
+        console.log('inid6 : '+inid6);
+        var inname6=document.getElementById("{!$Component.page1.formid.block1.sec2.item2.clinicalconsultantName}").value;
+        console.log('inname6 : '+inname6);
+        var inid7 = document.getElementById("{!$Component.page1.formid.block1.secaddinfo.item3.salesconsultantrid}").value;
+        console.log('inid7 : '+inid7);
+        var inname7=document.getElementById("{!$Component.page1.formid.block1.secaddinfo.item3.salesconsultantName}").value;
+        console.log('inname7 : '+inname7);
+        // var inid8 = document.getElementById("{!$Component.page1.formid.block1.b2s2.item6.conId}").value;
+        //console.log('inid8 : '+inid8);
+        //  var inname8=document.getElementById("{!$Component.page1.formid.block1.b2s2.item6.conname}").value;
+        //console.log('inname8 : '+inname8);
+        var inid8 = document.getElementById("{!$Component.page1.formid.block1.sec2.item6.conId}").value;
+        console.log('inid8 : '+inid8);
+         var inname8=document.getElementById("{!$Component.page1.formid.block1.sec2.item6.conname}").value;
+        console.log('inname8 : '+inname8);
+        if(lookuptype == 'shipto')
+            var url="/apex/LookUpPage?namefield=" + name +"\&idfield\="+id+"\&parentid\="+inid1+"\&parentname\="+inname+"\&accid\="+accid+"\&lookuptype\=shipto";
+        else if(lookuptype == 'billto')
+            var url="/apex/LookUpPage?namefield=" + name +"\&idfield\="+id+"\&parentid\="+inid2+"\&parentname\="+inname2+"\&accid\="+accid+"\&lookuptype\=billto";
+            else if(lookuptype == 'payer')
+                var url="/apex/LookUpPage?namefield=" + name +"\&idfield\="+id+"\&parentid\="+inid4+"\&parentname\="+inname4+"\&accid\="+accid+"\&lookuptype\=payer";
+               else if(lookuptype == 'gpo')
+                var url="/apex/LookUpPage?namefield=" + name +"\&idfield\="+id+"\&parentid\="+inid8+"\&parentname\="+inname8+"\&accid\="+accid+"\&lookuptype\=gpo";
+                else if(lookuptype == 'idn')
+                var url="/apex/LookUpPage?namefield=" + name +"\&idfield\="+id+"\&parentid\="+inid9+"\&parentname\="+inname9+"\&accid\="+accid+"\&lookuptype\=idn";
+                else if(lookuptype == 'dealdesk')
+                    var url="/apex/LookUpPage?namefield=" + name +"\&idfield\="+id+"\&parentid\="+inid5+"\&parentname\="+inname5+"\&accid\="+accid+"\&lookuptype\=dealdesk";
+                else if(lookuptype == 'clinicalconsultant')
+                    var url="/apex/LookUpPage?namefield=" + name +"\&idfield\="+id+"\&parentid\="+inid6+"\&parentname\="+inname6+"\&accid\="+accid+"\&lookuptype\=clinicalconsultant";
+                else if(lookuptype == 'salesconsultant')
+                    var url="/apex/LookUpPage?namefield=" + name +"\&idfield\="+id+"\&parentid\="+inid7+"\&parentname\="+inname7+"\&accid\="+accid+"\&lookuptype\=salesconsultant";
+                else
+                    var url="/apex/LookUpPage?namefield=" + name +"\&idfield\="+id+"\&parentid\="+inid8+"\&parentname\="+inname8+"\&accid\="+accid+"\&lookuptype\="+inid1;
+                
+        console.log("Url :"+url);
+        newWin=window.open(url, 'Popup','height=500,width=600,left=100,top=100,resizable=no,scrollbars=yes,toolbar=no,status=no');
+        if (window.focus)
+        {
+            newWin.focus();
+        }
+        
+        return false;
+    }
+    
+    function closeLookupPopup()
+    {
+        if (null!=newWin)
+        {
+            newWin.close();
+        }
+    }
+    </script>
+</apex:page>

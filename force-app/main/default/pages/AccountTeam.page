@@ -1,0 +1,38 @@
+<apex:page standardController="Account" extensions="AccountTeamMemberController" lightningStylesheets="true">
+
+    <apex:form id="form">
+        <div align="center" draggable="false" ><apex:commandButton onClick="openNewAccountTeamMember('{!accountid}');return false" rendered="{!ownerusertrue}" value="Add Team Members"/>
+        </div>
+        <br/>
+        <apex:pageBlock tabStyle="Account" rendered="{!atmList.size!=0}">
+            <apex:pageBlockTable value="{!atmList}" var="atm">
+                <apex:column headerValue="">                
+                </apex:column>
+                <apex:column rendered="{!ownerusertrue}">
+                    <apex:outputLink value="javascript:if (window.confirm('{!$Label.RemoveAccountTeamMember}')) DeleteTeamMember('{!atm.Id}');" >
+                        Remove
+                    </apex:outputLink>
+                    
+                </apex:column>
+                <apex:column value="{!atm.User.Name}"/>
+                <apex:column value="{!atm.TeamMemberRole}"/>
+                <apex:column value="{!atm.Account.Name}"/>
+                <apex:column value="{!atm.AccountAccessLevel}"/>
+                <apex:column value="{!atm.OpportunityAccessLevel}"/>
+                <apex:column value="{!atm.ContactAccessLevel}"/>
+            </apex:pageBlockTable>            
+        </apex:pageBlock>
+        <apex:actionFunction name="DeleteTeamMember" action="{!deleteMember}"  reRender="form" >
+            <apex:param name="memberId" value="" assignTo="{!SelectedId}" />
+        </apex:actionFunction>
+    </apex:form>
+    <script>
+    function openNewAccountTeamMember(accountId)
+    {
+        var url="/apex/NewAccountTeamMember?accid="+accountId;
+        console.log("Url :"+url);
+        newWin=window.open(url, '_parent','height=500,width=600,left=100,top=100,resizable=no,scrollbars=yes,toolbar=no,status=no');
+        return false;
+   }
+        </script>
+</apex:page>

@@ -1,0 +1,95 @@
+<template>
+    <article class="slds-card">
+        <div class="slds-card__header card_header">
+            <span lwc-7823ssqlgtm=""
+                class="record-avatar-container slds-avatar slds-avatar_small icon slds-m-right_small"
+                style="background-color: #FF5D2D">
+                <img lwc-7823ssqlgtm=""
+                    src="https://wise-shark-wd7ct1-dev-ed.trailblaze.my.salesforce.com/img/icon/t4v35/standard/opportunity_120.png"
+                    title="Opportunities" alt="">
+            </span>
+            <a href={viewAll} style="color: black;font-weight:bold;font-size:1rem;">{card_title}</a>
+            <div style="float: right;">
+                <lightning-button-menu icon-size="x-small" alternative-text="Show menu" menu-alignment="auto" if:true={nonSoldToOrDeleted}>
+                    <lightning-menu-item value="CreateNewCORE" label="Create New CORE"
+                        onclick={newCOREOpps}></lightning-menu-item>
+                    <lightning-menu-item value="CreateNewAdvancedServices" label="Create New Advanced Services"
+                        onclick={newAdvsOpps}></lightning-menu-item>
+                    <lightning-menu-item value="CreateNewSpecialty" label="Create New Specialty"
+                        onclick={newSpecialtyOpps}></lightning-menu-item>
+                </lightning-button-menu>
+            </div>
+        </div>
+        <div class="slds-card__body slds-card__body_inner" if:true={viewAllRender}>
+            <template if:true={opportunities}>
+                <template for:each={updatedopportunities} for:item="opp" for:index="index">
+                    <article key={opp.Id} style="padding-bottom: 10px;">
+                        <div>
+                            <a lwc-oj46kgc6r3="" class="flex-wrap-ie11 slds-truncate" onclick={navigateToOppURL2}
+                                data-id={opp.Id} tabindex="0">{opp.Name}</a>
+                            <div style="float: right;">
+                                <ul class="slds-button-group-list">
+                                    <li
+                                        class="slds-dropdown-trigger slds-dropdown-trigger_click slds-button_last overflow">
+                                        <lightning-button-menu icon-size="x-small" alternative-text="Show menu">
+                                            <lightning-menu-item label="Edit" value={opp.Id}
+                                                onclick={editOpportunity}></lightning-menu-item>
+                                            <lightning-menu-item label="Delete" value={opp.Id}
+                                                onclick={deleteOpportunity}></lightning-menu-item>
+                                        </lightning-button-menu>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="slds-tile__detail">
+                            <dl class="slds-list_horizontal slds-wrap">
+                                <dt class="slds-item_label slds-text-color_weak slds-truncate">Opportunity Number:</dt>
+                                <dd class="slds-item_detail slds-truncate">{opp.Opportunity_Number__c}</dd>
+                                <dt class="slds-item_label slds-text-color_weak slds-truncate">Stage:</dt>
+                                <dd class="slds-item_detail slds-truncate">{opp.StageName}</dd>
+                                <dt class="slds-item_label slds-text-color_weak slds-truncate">Expected Bookings:</dt>
+                                <dd class="slds-item_detail slds-truncate">{opp.CurrencyIsoCode}&nbsp;{opp.Exp_Amount}
+                                </dd>
+                            </dl>
+                        </div>
+                    </article>
+                </template>
+            </template>
+            <template if:false={opportunities}>
+                <p>No opportunities found.</p>
+            </template>
+        </div>
+        <div class="slds-card__footer" if:true={viewAllRender}>
+            <a href={viewAll}>
+                <span lwc-38b9tp4cnq4="" class="view-all-label">View All<span lwc-38b9tp4cnq4=""
+                        class="assistiveText">Opportunities</span></span>
+            </a>
+        </div>
+    </article>
+    <c-specialityopportunity-creation-form get-record-type-name={recordTypeName} get-record-type-id={recordTypeId}
+        get-account-id={recordId} onclosemodalform={handlemodalform} if:true={createSpecialtyOpp}>
+    </c-specialityopportunity-creation-form>
+
+    <c-core-opportunity-creation-form get-record-type-name={recordTypeName} get-record-type-id={recordTypeId}
+        get-account-id={recordId} onclosemodalform={handlemodalform} if:true={createCOREOpp}>
+    </c-core-opportunity-creation-form>
+
+    <c-product-Line-Create-Form get-opp-id={getOppId} get-opp-name={newOpp.Name} onclosemodalform={handlemodalform}
+        if:true={openProductLineFlag}>
+    </c-product-Line-Create-Form>
+
+    <c-contact-Role-Create-Form get-opp-id={getOppId} onclosemodalform={handlemodalform} if:true={openContactRoleFlag}>
+    </c-contact-Role-Create-Form>
+
+    <c-specialty-opportunity-yearly-creation-form record-id={getOppId} onclosemodalform={handlemodalform}
+        if:true={openSpecialtyYearlyFlag}>
+    </c-specialty-opportunity-yearly-creation-form>
+
+    <c-advanced-service-opportunity-creation-form get-record-type-name={recordTypeName}
+        get-record-type-id={recordTypeId} get-account-id={recordId} onclosemodalform={handlemodalform}
+        if:true={createAdvsOpp}>
+    </c-advanced-service-opportunity-creation-form>
+
+    <c-opportunity-Delete-modal opp-id={selectedOpportunityId} onclosemodalform={handlemodalform}
+        if:true={opportunityDeleteFlag}></c-opportunity-Delete-modal>
+</template>

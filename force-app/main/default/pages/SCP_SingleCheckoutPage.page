@@ -1,0 +1,2896 @@
+<!--
+@description       : 
+@author            : ChangeMeIn@UserSettingsUnder.SFDoc
+@group             : 
+@last modified on  : 06-08-2021
+@last modified by  : ChangeMeIn@UserSettingsUnder.SFDoc
+Modifications Log 
+Ver   Date         Author                               Modification
+1.0   05-27-2021   ChangeMeIn@UserSettingsUnder.SFDoc   Initial Version
+-->
+<apex:page controller="OmniCellBillingAddressController" id="OmniCellBillingAddress" applyHtmlTag="false" docType="html-5.0" sidebar="false" showHeader="false" standardStylesheets="false">  
+    <style>
+        .contactText {
+        width: 25%;
+        padding: 10px 10px;
+        margin: 8px 0;
+        display: inline-block;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+        }
+        div.miniCart {
+        border-radius: 25px;
+        width: 250px;
+        height: 265px;
+        padding: 10px;
+        margin: 0;
+        float:right;
+        position:fixed;
+        right: 9%;
+        top:20%;
+        box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+        border: 2px solid #46B555;
+        }
+        .miniPlaceOrder{ 
+        left: 16%;
+        padding: 20px;  
+        position: relative;
+        
+        }
+        .miniPlaceOrderbutton{
+        align:left;
+        position: absolute;
+        top: 30%;
+        }
+        .miniCartPrice{
+        border-radius: 25px;
+        height: 190px;
+        width: 225px;
+        text-align: -webkit-center;
+        padding: 10px;
+        border: 2px solid #d1d1e0;
+        background-color: #f1f1f1;
+        }
+        .normal {
+        font-family:Arial;
+        font-size:15px;
+        font-weight:normal;
+        }
+        .heading {
+        color:#46B555;
+        font-family:Arial;
+        font-size:15px;
+        font-weight: 700;
+        }
+        .inputNormal {
+        width: 100%;
+        padding: 0px 0px;
+        margin: 0px 0;
+        outline: none;
+        border-top-style: hidden;
+        border-right-style: hidden;
+        border-left-style: hidden;
+        border-bottom-style: hidden;
+        }
+        .inputNormal:disabled {
+        background: white;
+        }
+        .inlinespan {
+        display: block;
+        overflow: hidden;
+        padding: 0 4px 0 6px
+        }
+        .leftlabel {    
+        float:left
+        }
+        .trPad {
+        padding: 1px;
+        align : left;
+        }
+        .tdPad {
+        align : left;
+        pading: 1px;
+        }
+        .collapsible {
+        background-color: #46B555;
+        color: white;
+        cursor: pointer;
+        padding: 18px;
+        width: 100%;
+        border: none;
+        text-align: left;
+        outline: none;
+        font-size: 15px;
+        }
+        
+        .collapsible:after {
+        content: '\002B';
+        color: white;
+        font-weight: bold;
+        float: right;
+        margin-left: 5px;
+        }
+        
+        /*.active:after {
+        content: "\2212";
+        }*/
+        
+        .active, .collapsible:hover {
+        background-color: #555;
+        }
+        
+        .content {
+        padding: 0 18px;
+        display: none;
+        overflow: hidden;
+        background-color: #f1f1f1;
+        }
+        
+        /*
+        Paymen style
+        /* Style the tab */
+        .tab {
+        overflow: hidden;
+        Width: 60%;
+        border: 1px solid #ccc;
+        background-color: #f1f1f1;
+        }
+        
+        /* Style the buttons inside the tab */
+        .tab button {
+        background-color: inherit;
+        float: left;
+        border: none;
+        outline: none;
+        cursor: pointer;
+        padding: 14px 16px;
+        transition: 0.3s;
+        font-size: 15px;
+        }
+        
+        /* Change background color of buttons on hover */
+        .tab button:hover {
+        background-color: #ddd;
+        }
+        
+        /* Create an active/current tablink class */
+        .tab button.active {
+        background-color: #ccc;
+        }
+        
+        /* Style the tab content */
+        .tabcontent {
+        display: none;
+        padding: 6px 12px;
+        border: 1px solid #ccc;
+        Width: 60%;
+        border-top: none;
+        }
+        */
+        
+        .secborder {
+        border: 2px solid #ddd;
+        }
+        
+        .cc_creditcardinfo p{
+        color :#FF0000;
+        }
+        
+        .arrow {
+        border: solid black;
+        border-width: 0 3px 3px 0;
+        display: inline-block;
+        padding: 4px;
+        border-color: #46B555;
+        }
+        
+        .up {
+        transform: rotate(-135deg);
+        -webkit-transform: rotate(-135deg);
+        }
+        
+        .down {
+        transform: rotate(45deg);
+        -webkit-transform: rotate(45deg);
+        }
+    </style>
+    <script type="text/javascript">
+     Visualforce.remoting.timeout = 120000; // Set timeout at page level
+    </script>
+    <script id="CheckoutHeader-Desktop" type="text/template"></script>
+    <script id="UserInfo-Desktop" type="text/template">
+        
+        
+        <div style="display: none"><!-- style="display: none" -->
+            <form id="mainform" class="cc_userInfo_form">
+                <div class="main-messagingSection-Error" style="display: none"></div>
+                <div class="form-group">
+                    <label for="firstNameField" class="cc_contact_input_firstname_label">{{pageLabelMap 'CheckOut_FirstName'}}</label>
+                        <input id="firstNameField"  disabled="disabled" type="text" class="form-control contactInput cc_contact_input_firstname" name="buyerFirstName" maxlength=40 value="{{this.buyerFirstName}}" />
+                        </div>
+                        <div class="form-group">
+                        <label for="lastNameField" class="cc_contact_input_lastname_label">{{pageLabelMap 'CheckOut_LastName'}}</label>
+                        <input id="lastNameField" disabled="disabled" type="text" class="form-control contactInput cc_contact_input_lastname" name="buyerLastName" maxlength=40 value="{{this.buyerLastName}}" />
+                        </div>
+                        <div class="form-group">
+                        <label for="homePhoneField" class="cc_contact_input_phone_label">{{pageLabelMap 'CheckOut_PrimaryPhone'}}</label>
+                        <input id="homePhoneField" disabled="disabled" type="text" class="form-control contactInput cc_contact_input_phone" name="buyerPhone" maxlength=40 value="{{this.buyerPhone}}" />
+                        </div>
+                        <div class="form-group">
+                        <label for="emailField" class="cc_contact_input_email_label">{{pageLabelMap 'CheckOut_Email'}}</label>
+                        <input id="emailField" disabled="disabled" type="email" class="form-control contactInput cc_contact_input_email" name="buyerEmail" maxlength=80 value="{{this.buyerEmail}}" />
+                        </div>
+                        </form>
+                        </div>
+                        
+                        <div class="cc_address_entry_billing" >
+                    {{> addressEntry this.billingAddress}}
+                        </div>
+                        <div class="cc_address_entry_shipping" >
+                    {{> addressEntry this.shippingAddress}}
+                        </div>
+                        
+                        <div class="miniCart">
+                        <div class="miniCartPrice normal">
+                        <table style="border-collapse: separate;border-spacing: 0 1em;">
+                        <tr><td class="trPad">Items Subtotal: &nbsp<span id="mincart_subtotall">{{price this.subTotal}}</span></td></tr>
+                        <tr><td class="trPad">Estimated Tax: &nbsp<span id="mincartesttax" /></td></tr>
+                        <tr><td class="trPad">Est. Shipping: &nbsp<span id="mincartestship" /></td></tr>
+                        <tr><td class="trPad" style="font-weight: bold;">Grand Total: &nbsp<span id="mincart_grandtotal" /></td></tr>                             
+                        </table>
+                        </br></br></br></br></br>
+                        </div>
+                        <div class="miniPlaceOrder">
+                        <div class="miniPlaceOrderbutton" >
+                        <input id="contB" disabled ="true" class="btn btn-default btn-sm  updateCartCustomFields  cc_process_user_info" type="button" value="Place Order" title="Omnicell Terms and Conditions have to be accepted before proceed to payment"/> </div><!-- IBA-4135 -->
+                        </div>
+                        </div>
+                        
+                        </form>
+                        </div>
+                        
+                        
+                    {{#ifDisplay 'Dspl.CCEmail'}}
+                        <form id="ccEmailForm" class="cc_ccemail_new">
+                        <div class="ccemail-messagingSection-Error" style="display: none"></div>
+                        <h3 class="cc_ccemail_title">{{pageLabelMap 'CheckOut_ccEmailAddress'}}</h3>
+                        <p class="cc_ccemail_helptext">{{{pageLabelMap 'CheckOut_ccEmailAddressHelpText'}}}</p>
+                        <div class="form-group">
+                        <label for="ccEmailAddress" class="cc_contact_input_cc_email_label">{{pageLabelMap 'CheckOut_ccEmailAddress'}}</label>
+                        <input id="ccEmailAddress" type="text" class="form-control contactInput ccemail cc_contact_input_cc_email" name="ccEmailAddresses" maxlength=80 value="{{this.ccEmailAddresses}}" />
+                        </div>
+                        </form>
+                    {{/ifDisplay}}
+                        
+                        
+                        </div>
+                        <div style="display:none">   <!-- space between shipping address and shipping optionn -->  
+                        <form class="userInformation cc_user_information">
+                        <p class="cc_user_information_helptext">{{{pageLabelMap 'Required_Fields'}}}</p>
+                        <p class="link_button cc_link_button">
+                        
+                        </p>
+                        </form>
+                        </div>
+                        </div>
+                        </div>
+                        <!-- Shipping section start -->
+                        <!-- <a data-toggle="collapse" data-parent="#accordion" href="#collapse3">{{pageLabelMap 'CheckOut_ShipmentInformation'}}</a> -->
+                        <button type="button" id = "shipbtn" class="btn-link" data-toggle="collapse" onclick="iconchg('#a5')" data-target="#collapse3" style="background-color: #f1f1f1;height:50px;border: 1px solid #b3b3b3;width: 80%;text-align: left;"><h3 class="heading"><i id = "a5" class="arrow down"></i> &nbsp{{pageLabelMap 'CheckOut_ShipmentInformation'}}</h3></button>
+                        <div id="collapse3" class="panel-collapse collapse " style="left: 5%;width: 75%;">
+                        <br/>
+                        
+                        <div class="shiperror-msg" ></div>
+                        <p class="coso_ship_guide_text cc_ship_guide_text normal">
+                        If the Cart weight is larger than 300 lbs. then it will be shipped only through Standard Ground shipping method.
+                        </p>
+                        
+                        <p style="color:red;display: none;" class="cc_shipCharge_error normal">{{pageLabelMap 'Checkout_ShippingError'}}</p>
+                        <p style="color:red;display: none;" class="cc_SAPDown_error normal">{{pageLabelMap 'Checkout_ShippingSAPDown'}}</p>
+                        <p style="color:red;display: none;" class="cc_shipblockError normal">{{pageLabelMap 'Checkout_ShippingBlock'}}</p>
+                        <p style="color:red;display: none;" class="cc_tax_defaultError normal">*Tax will be Calculated and Charged Later</p>
+                        
+                        
+                        <table>
+                        <tr>
+                        <td>
+                        <div class="shippingmethodList">
+                        <span class="shippingmeth">
+                        <select id="shippingmethodList" class="form-control" onchange="shipChange();" style = "width:100%;height:40px;"></select>
+                        </span>
+                        </div>
+                        </td>
+                        <td>
+                        <label class="cc_shipnotes_label normal" >Estimated Shipping Cost: </label><span id="estShipping" class="shippingCost cc_est_shipping normal">{{{this.selectedshipmethod}}}</span>
+                        </br>
+                    {{#ifDisplay 'SO.ShowReqDate'}}
+                        <p class="deliveryDateMessages cc_delivery_date_messages" id="deliveryDateMessages" hidden=true><span class="normal">{{pageLabelMap 'Checkout_RequestedDeliveryDt'}}</span>&nbsp;&nbsp;<span id="reqDeliveryDate" class="normal">{{this.requestedDateStr}}</span></p><!-- IBA-3736 -->
+                    {{/ifDisplay}}
+                        </td>
+                        </tr>
+                        <tr>
+                        <td>
+                        <div class="form-group">
+                        <!--<label for="referenceNumberField" class="cc_contact_input_firstname_label">Reference Number</label>-->
+                        <input id="referenceNumberField" placeholder="Reference Number" style = "width:100%;height:40px;" type="text" class="form-control"  maxlength="18" value="{{this.referenceNumber}}"  aria-invalid="false">
+                        </div>
+                        </td>
+                        
+                        </tr>
+                        <tr>
+                        <td colspan="2">
+                    {{#ifDisplay 'SO.DsplShipNotes'}}
+                        <!-- <div class="coso_ship_notes form-group cc_coso_ship_notes">
+                        <label for="shippingNotes" class="cc_shipnotes_label">{{pageLabelMap 'CheckOut_ShippingNotes'}}</label>-->
+                    {{#ifEquals this.shippingInst 'Shipping Notes'}}
+                        <textarea id="shippingNotes" placeholder="Shipping Notes" style = "width:100%;height:50px;" name="shippingInst" rows="6" maxlength="1000" class="shipnotes form-control cc_shipnotes"></textarea>
+                    {{else}}
+                        <textarea id="shippingNotes" placeholder="Shipping Notes" style = "width:100%;height:50px;" name="shippingInst" rows="6" maxlength="1000" class="shipnotes form-control cc_shipnotes">{{this.shippingInst}}</textarea>
+                    {{/ifEquals}}
+                        </div>
+                    {{/ifDisplay}}
+                        </td>
+                        </tr>
+                        </table>
+                        <!--<div class="shippingmethodList">
+                        <span class="shippingmeth">
+                        <select id="shippingmethodList" class="form-control" onchange="shipChange();" style = "width:25%;"></select>
+                        </span>
+                        </div>-->
+                        <div class="panel-body">
+                        <!-- <label class="cc_shipnotes_label">Estimated Shipping Cost: </label><span id="estShipping" class="shippingCost cc_est_shipping">{{{this.selectedshipmethod}}}</span>-->
+                        <div class="panel-body cc_body">
+                        <form id="shipForm" class="shipForm cc_ship_form"> 
+                        <div class="messagingSection-Error" style="display: none"></div>
+                        <div class="messagingSection-Info" style="display: none"></div>
+                        <div class="messagingSection-Warning" style="display: none"></div>
+                        <div class="shipping_payment cc_shipping_payment">
+                        <!--<p class="coso_ship_guide_text cc_ship_guide_text">
+                    {{pageLabelMap 'CheckOut_ShippingGuidingText'}}
+                        </p>-->
+                    {{#ifDisplay 'SO.DsplShipOptions'}}
+                    {{#if this.shippingMethods}}
+                        <div class="coso_ship_method cc_coso_ship_method">
+                        <div class="form-group">
+                        <label for="shippingMethod" class="cc_shipping_method_label">{{pageLabelMap 'CheckOut_ShippingMethod'}}</label>
+                        <select id="shippingMethod" class="form-control shippingOptions cc_shipping_method" name="shippingMethod" onchange="updateRequestedDateCustom(this)">
+                    {{#each this.shippingMethods}}
+                        <option value="{{this.uniqueId}}" {{#ifEquals ../shippingMethod this.uniqueId}} selected {{/ifEquals}}>
+                    {{this.provider}} - {{pageLabelMap this.serviceName}}
+                        </option>
+                    {{/each}}
+                        </select>
+                        </div>
+                        </div>
+                    {{#each this.shippingMethods}}
+                        
+                    {{/each}}
+                        <div class="coso_est_shipping form-group cc_coso_est_shipping">
+                        <label for="estShipping" class="cc_est_shipping_label">{{pageLabelMap 'CheckOut_EstimatedShipping'}}</label>
+                        <span id="estShipping" class="shippingCost cc_est_shipping normal"></span>
+                        </div>
+                    {{/if}}
+                    {{/ifDisplay}}       
+                        <!--{{#ifDisplay 'SO.ShowReqDate'}}
+                        <p class="deliveryDateMessages cc_delivery_date_messages" id="deliveryDateMessages"><span style="font-size:16px;font-weight:normal">{{pageLabelMap 'Checkout_RequestedDeliveryDt'}}</span>&nbsp;&nbsp;<span id="reqDeliveryDate">{{this.requestedDateStr}}</span></p>
+                    {{/ifDisplay}}-->
+                    {{#ifDisplay 'SO.DsplShipComplete'}}
+                        <div class="coso_ship_complete cc_coso_ship_complete form-group">
+                        <div class="checkbox">
+                        <label for="estShipping" class="cc_est_shipping_label">
+                        <input id="estShipping" type="checkbox" name="shipComplete" class="boxes cc_ship_complete" value="true" {{#if this.shipComplete}} checked {{/if}} />
+                    {{pageLabelMap 'CheckOut_ShipComplete'}}
+                        </label>
+                        </div>
+                        </div>
+                    {{/ifDisplay}}
+                        <!--{{#ifDisplay 'SO.DsplShipNotes'}}
+                        <div class="coso_ship_notes form-group cc_coso_ship_notes">
+                        <label for="shippingNotes" class="cc_shipnotes_label">{{pageLabelMap 'CheckOut_ShippingNotes'}}</label>
+                    {{#ifEquals this.shippingInst 'Shipping Notes'}}
+                        <textarea id="shippingNotes" style = "width:75%;" name="shippingInst" rows="6" maxlength="1000" class="shipnotes form-control cc_shipnotes"></textarea>
+                    {{else}}
+                        <textarea id="shippingNotes" style = "width:75%;" name="shippingInst" rows="6" maxlength="1000" class="shipnotes form-control cc_shipnotes">{{this.shippingInst}}</textarea>
+                    {{/ifEquals}}
+                        </div>
+                    {{/ifDisplay}}-->
+                        <div class="form-group">
+                        <!--<label for="referenceNumberField" class="cc_contact_input_firstname_label">Reference Number</label>
+                        <input id="referenceNumberField" style = "width:75%;" type="text" class="form-control"  maxlength="18" value="{{this.referenceNumber}}"  aria-invalid="false">-->
+                        </div>
+                    {{#ifDisplay 'SO.ShowReqDate'}}
+                        <div style="display:none;">
+                        <p class="deliveryDateMessages cc_delivery_date_messages" id="deliveryDateMessages"></p>
+                    {{#unless this.requestedDateData.ApiError}}
+                        <div class="coso_ship_delivery_date cc_coso_ship_delivery_date from-group">
+                        <label for="requestedDateStr" class="cc_requested_date_label">{{pageLabelMap 'Checkout_RequestedDeliveryDt'}}</label>
+                        <div class="input-group date">
+                        <input id="requestedDateStr" name="requestedDateStr" value="{{this.requestedDateStr}}" class="requestedDate cc_requested_date form-control" readonly="true">
+                        <div class="input-group-addon">
+                        <span class="glyphicon glyphicon-th"></span>
+                        </div>
+                        </div>
+                        </div>
+                    {{/unless}}
+                        </div>
+                    {{/ifDisplay}}
+                        
+                        
+                        </div>
+                        
+                        
+                        </form>
+                        </div>
+                        </div>
+                        </div>       
+                        <!-- Shipping section end -->
+                        
+                        
+                        <!-- Payment section start -->
+                        
+                        <!--<button type="button" class="btn-link" data-toggle="collapse" onclick="iconchg('#a2')" data-target="#collaps4" style="background-color: #f1f1f1;height:50px;border: 1px solid #b3b3b3;width: 80%;text-align: left;"><h3 class="heading"><i id = "a2" class="fa fa-plus"></i> Payment</h3></button>
+                        <a data-toggle="collapse" data-parent="#accordion" href="#collapse4"><h3 class="heading">Payment</h3></a>-->
+                        <button type="button" id = "paybtn" class="btn-link" data-toggle="collapse" onclick="iconchg('#a2')" data-target="#collapse4" style="background-color: #f1f1f1;height:50px;border: 1px solid #b3b3b3;width: 80%;text-align: left;"><h3 class="heading"><i id = "a2" class="arrow down"></i> &nbspPayment</h3></button>
+                        <div id="collapse4" class="panel-collapse collapse" style="left: 5%;width: 75%;">
+                        <br/>
+                        <div class="pay-Error" ></div>
+                        <div class="cc_creditcardinfo normal" ><p>{{pageLabelMap 'SCP_CreditCardInfo'}}</p></div> 
+                        <div style="height:190px;font-size: 15px;"><!--iba-4519-->
+                            <div style="float:left;width:50%;">
+                            <p style="color:red;">Payment in US Dollars should be remitted to:</p>
+                                <p style="color:red;">Omnicell, Inc.</p>
+                                <p style="color:red;">PO BOX 204650</p>
+                                <p style="color:red;">Dallas, TX 75320-4650</p><br/>
+                            </div>                             
+                             
+                            <div style="float:right;width:50%;">
+                                <p style="color:red;">Payment in Canadian Dollars should be remitted to:</p>
+                                <p style="color:red;">Omnicell #12197</p>
+                                <p style="color:red;">Toronto Dominion Center</p>
+                                <p style="color:red;">66 Wellington St. West, Ste. 4500</p>
+                                <p style="color:red;">Toronto, Ontario M5K 1E7</p>
+                                <p style="color:red;">Canada</p>
+                            </div>
+                            
+                        </div>
+                        
+                        <div class="cc_creditcardinfo normal" >                         
+                            <p style="color:red;font-weight: bold;">If you need further assistance or need remittance instructions for ACH or wire, please reach out to us at <span style="color:blue;font-weight:bold;">accountsreceivable@omnicell.com</span></p><br/>
+                        </div>
+                        <div class="tab" style="width: 100%;">
+                        <button class="tablinks normal active" id="deftab" onclick="opentab(event, 'po')" style="border:1px solid #ccc;">New PO</button>
+                        <button class="tablinks normal" onclick="opentab(event, 'spo')" style="border:1px solid #ccc;">Stored PO</button>
+                        <button class="tablinks normal" id="creditC" onclick="opentab(event, 'cc')" style="border:1px solid #ccc;">Credit Card</button>
+                        </div>
+                        
+                        <div id="spo" class="tabcontent" style="width: 100%;">
+                        <div class="normal">{{pageLabelMap 'PaymentProcessor_Top'}}</div>
+                        <br/>
+                        <div class="spo-Error" style="display: none"></div>
+                        <div class="normal" id="stpo"></div>
+                        <br/>                        
+                        </div>
+                        
+                        <div id="po" class="tabcontent" style="width: 100%;">
+                        <div class="po-Error" style="display: none"></div>
+                        <p class="normal">Enter PO information below. Check Save Payment and enter a Name to save to your wallet</p>
+                        <input type="text" id="ponum" class="normal" placeholder="Purchase Order" style="width:50%;" onchange="ponumchk(this.value)" maxlength="35"/><br/><!-- IBA-3427 -->
+                        <input type="checkbox" id="chkpo" name="chkpo" value="Checkpo">
+                        <label for="chkpo" class="normal"> Save Payment</label><br/>
+                        <input type="text" id="poname" class="normal" placeholder="Name (Optional)" style="width:50%;"/><br/>
+                        <label for="myfile" class="normal">Upload PO Attachment</label>
+                        <input type="file" class="normal" id="fileupload"/>
+                        </div>
+                        
+                        <div id="cc" class="tabcontent" style="width: 100%;">
+                        <div class="crdit-Error1" style="display: none"></div>
+                        <div class="crdit-Error2" style="display: none"></div>
+                        <div class="crdit-Error3" style="display: none"></div>
+                        <div class="crdit-Error4" style="display: none"></div>
+                        <div class="crdit-Error5" style="display: none"></div>
+                        <div class="crdit-Error6" style="display: none"></div>
+                        <div class="crdit-Error7" style="display: none"></div>
+                        <div class="crdit-Error8" style="display: none"></div>
+                        <table>
+                        <tr>
+                        <td colspan="2">
+                        <input id="creditFname" style = "width:45%;" class="normal" type="text" placeholder="First Name" onchange="credfn1(this.value)"/>
+                        <input id="creditLname" style = "width:45%;" class="normal" type="text" placeholder="Last Name" onchange="credfn2(this.value)"/>
+                        </td>
+                        <td>
+                        
+                        </td>
+                        </tr>
+                        <tr>
+                        <td>
+                        <span class="normal">
+                        <select id="paycard" class="normal" style = "width:90.5%;height:26.36px;" onchange="credfn3(this.value)"></select>
+                        </span>
+                        </td>
+                        </tr>
+                        <tr>
+                        <td colspan="2">
+                        <input id="creditNum" style = "width:45%;" class="normal" type="text" placeholder="Credit Card Number" onchange="credfn4(this.value)"/>
+                        </td>
+                        </tr>
+                        <tr>
+                        <td>
+                        <input class="normal" placeholder="Expiration (MM)" maxlength="2" minlength="2" pattern="\d{2}" onchange="credfn5(this.value)" class="textbox-n" type="text" id="expm" style="width:36%;"/>
+                        <input class="normal" placeholder="Expiration (YYYY)" maxlength="4" minlength="4" pattern="\d{4}" onchange="credfn6(this.value)" class="textbox-n" type="text" style="width:38%;" id="expy"/>
+                        <input id="creditCVN" class="normal" type="text" placeholder="CVN" style="width:15.5%;" onchange="credfn7(this.value)"/>
+                        </td>
+                        
+                        </tr>
+                        <tr>
+                        <td>
+                        <div class="address normal">
+                        Credit Card Billing Address <a href="#" class="addressAdd normal" data-toggle="modal" data-target="#CredBillAddress">Enter a New Credit Card Billing Address</a>
+                        <span class="shippingmeth">
+                        <select id="credaddress" class="normal" style = "width:90.5%;height:26.36px;" onchange="credfn8(this.value)"></select>
+                        </span>
+                        </div>
+                        </td>
+                        
+                        </tr>
+                        </table>
+                        
+                        
+                        <!-- Cred Bill Address start -->
+                        <div class="modal fade" id="CredBillAddress" role="dialog">
+                        <div class="modal-dialog">
+                        <div class="modal-content">
+                        <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+                        <h3 id="myModalLabel">Enter a New Credit Card Billing Address</h3>
+                        </div>
+                        <div class="ccpgcs-Address-messagingSection-Error" style="display:none;"></div>
+                        <form id="sopcc_FormAddressAdd" class="addressForm modal-body">
+                        <div class="form-group">
+                        <label for="Address.firstName" class="control-label">First Name</label>
+                        <input type="text" id="credBillFname" placeholder="First Name" maxlength="100" value="" name="Address.firstName" class="form-control">
+                        <label for="Address.lastName" class="control-label">Last Name</label>
+                        <input type="text" id="credBillLname" placeholder="Last Name" maxlength="100" value="" name="Address.lastName" class="form-control">
+                        </div>
+                        <div class="form-group">
+                        <label for="Address.companyName">Company Name</label>
+                        <input type="text" id="credBillCompname" placeholder="Company Name" maxlength="100" value="" name="Address.companyName" class="form-control">
+                        </div>
+                        <div class="form-group">
+                        <label for="Address.address1" class="control-label">Credit Card Billing Address</label>
+                        <input type="text" id="credBillAddress1" placeholder="Credit Card Billing Address" maxlength="255" value="" name="Address.addressFirstline" class="form-control">
+                        <input type="text" id="credBillAddress2" placeholder="Credit Card Billing Address 2" maxlength="255" value="" name="Address.addressSecondline" class="form-control">
+                        </div>
+                        <div class="form-group">
+                        <label for="Address.country" class="control-label">Country</label>
+                        <select id="credBillCountry" name="Address.countryCode" class="form-control countryListing Address.Field Address.country" disabled="">
+                        <option value="AD">Andorra</option>
+                        <option value="AE">United Arab Emirates</option>
+                        <option value="AF">Afghanistan</option>
+                        <option value="AG">Antigua And Barbuda</option>
+                        <option value="AI">Anguilla</option>
+                        <option value="AL">Albania</option>
+                        <option value="AM">Armenia</option>
+                        <option value="AO">Angola</option>
+                        <option value="AQ">Antarctica</option>
+                        <option value="AR">Argentina</option>
+                        <option value="AS">American Samoa</option>
+                        <option value="AT">Austria</option>
+                        <option value="AU">Australia</option>
+                        <option value="AW">Aruba</option>
+                        <option value="AX">Aland Islands</option>
+                        <option value="AZ">Azerbaijan</option>
+                        <option value="BA">Bosnia And Herzegovina</option>
+                        <option value="BB">Barbados</option>
+                        <option value="BD">Bangladesh</option>
+                        <option value="BE">Belgium</option>
+                        <option value="BF">Burkina Faso</option>
+                        <option value="BG">Bulgaria</option>
+                        <option value="BH">Bahrain</option>
+                        <option value="BI">Burundi</option>
+                        <option value="BJ">Benin</option>
+                        <option value="BL">Saint Barthƒlemy</option>
+                        <option value="BM">Bermuda</option>
+                        <option value="BN">Brunei Darussalam</option>
+                        <option value="BO">Bolivia, Plurinational State Of</option>
+                        <option value="BQ">Bonaire, Sint Eustatius And Saba</option>
+                        <option value="BR">Brazil</option>
+                        <option value="BS">Bahamas</option>
+                        <option value="BT">Bhutan</option>
+                        <option value="BV">Bouvet Island</option>
+                        <option value="BW">Botswana</option>
+                        <option value="BY">Belarus</option>
+                        <option value="BZ">Belize</option>
+                        <option value="CA">Canada</option>
+                        <option value="CC">Cocos (Keeling) Islands</option>
+                                                  <option value="CD">Congo, The Democratic Republic Of The</option>
+                                                  <option value="CF">Central African Republic</option>
+                                                  <option value="CG">Congo</option>
+                                                  <option value="CH">Switzerland</option>
+                                                  <option value="CI">Cïte D'ivoire</option>
+                                                  <option value="CK">Cook Islands</option>
+                                                  <option value="CL">Chile</option>
+                                                  <option value="CM">Cameroon</option>
+                                                  <option value="CN">China</option>
+                                                  <option value="CO">Colombia</option>
+                                                  <option value="CR">Costa Rica</option>
+                                                  <option value="CU">Cuba</option>
+                                                  <option value="CV">Cape Verde</option>
+                                                  <option value="CW">Cura‚ao</option>
+                                                  <option value="CX">Christmas Island</option>
+                                                  <option value="CY">Cyprus</option>
+                                                  <option value="CZ">Czech Republic</option>
+                                                  <option value="DE">Germany</option>
+                                                  <option value="DJ">Djibouti</option>
+                                                  <option value="DK">Denmark</option>
+                                                  <option value="DM">Dominica</option>
+                                                  <option value="DO">Dominican Republic</option>
+                                                  <option value="DZ">Algeria</option>
+                                                  <option value="EC">Ecuador</option>
+                                                  <option value="EE">Estonia</option>
+                                                  <option value="EG">Egypt</option>
+                                                  <option value="EH">Western Sahara</option>
+                                                  <option value="ER">Eritrea</option>
+                                                  <option value="ES">Spain</option>
+                                                  <option value="ET">Ethiopia</option>
+                                                  <option value="FI">Finland</option>
+                                                  <option value="FJ">Fiji</option>
+                                                  <option value="FK">Falkland Islands (Malvinas)</option>
+                        <option value="FM">Micronesia, Federated States Of</option>
+                        <option value="FO">Faroe Islands</option>
+                        <option value="FR">France</option>
+                        <option value="GA">Gabon</option>
+                        <option value="GB">United Kingdom</option>
+                        <option value="GD">Grenada</option>
+                        <option value="GE">Georgia</option>
+                        <option value="GF">French Guiana</option>
+                        <option value="GG">Guernsey</option>
+                        <option value="GH">Ghana</option>
+                        <option value="GI">Gibraltar</option>
+                        <option value="GL">Greenland</option>
+                        <option value="GM">Gambia</option>
+                        <option value="GN">Guinea</option>
+                        <option value="GP">Guadeloupe</option>
+                        <option value="GQ">Equatorial Guinea</option>
+                        <option value="GR">Greece</option>
+                        <option value="GS">South Georgia And The South Sandwich Islands</option>
+                        <option value="GT">Guatemala</option>
+                        <option value="GU">Guam</option>
+                        <option value="GW">Guinea-Bissau</option>
+                        <option value="GY">Guyana</option>
+                        <option value="HK">Hong Kong</option>
+                        <option value="HM">Heard Island And Mcdonald Islands</option>
+                        <option value="HN">Honduras</option>
+                        <option value="HR">Croatia</option>
+                        <option value="HT">Haiti</option>
+                        <option value="HU">Hungary</option>
+                        <option value="ID">Indonesia</option>
+                        <option value="IE">Ireland</option>
+                        <option value="IL">Israel</option>
+                        <option value="IM">Isle Of Man</option>
+                        <option value="IN">India</option>
+                        <option value="IO">British Indian Ocean Territory</option>
+                        <option value="IQ">Iraq</option>
+                        <option value="IR">Iran, Islamic Republic Of</option>
+                        <option value="IS">Iceland</option>
+                        <option value="IT">Italy</option>
+                        <option value="JE">Jersey</option>
+                        <option value="JM">Jamaica</option>
+                        <option value="JO">Jordan</option>
+                        <option value="JP">Japan</option>
+                        <option value="KE">Kenya</option>
+                        <option value="KG">Kyrgyzstan</option>
+                        <option value="KH">Cambodia</option>
+                        <option value="KI">Kiribati</option>
+                        <option value="KM">Comoros</option>
+                        <option value="KN">Saint Kitts And Nevis</option>
+                        <option value="KP">Korea, Democratic People's Republic Of</option>
+                        <option value="KR">Korea, Republic Of</option>
+                        <option value="KW">Kuwait</option>
+                        <option value="KY">Cayman Islands</option>
+                        <option value="KZ">Kazakhstan</option>
+                        <option value="LA">Lao People's Democratic Republic</option>
+                        <option value="LB">Lebanon</option>
+                        <option value="LC">Saint Lucia</option>
+                        <option value="LI">Liechtenstein</option>
+                        <option value="LK">Sri Lanka</option>
+                        <option value="LR">Liberia</option>
+                        <option value="LS">Lesotho</option>
+                        <option value="LT">Lithuania</option>
+                        <option value="LU">Luxembourg</option>
+                        <option value="LV">Latvia</option>
+                        <option value="LY">Libya</option>
+                        <option value="MA">Morocco</option>
+                        <option value="MC">Monaco</option>
+                        <option value="MD">Moldova, Republic Of</option>
+                        <option value="ME">Montenegro</option>
+                        <option value="MF">Saint Martin (French Part)</option>
+                        <option value="MG">Madagascar</option>
+                        <option value="MH">Marshall Islands</option>
+                        <option value="MK">Macedonia, The Former Yugoslav Republic Of</option>
+                        <option value="ML">Mali</option>
+                        <option value="MM">Myanmar</option>
+                        <option value="MN">Mongolia</option>
+                        <option value="MO">Macao</option>
+                        <option value="MP">Northern Mariana Islands</option>
+                        <option value="MQ">Martinique</option>
+                        <option value="MR">Mauritania</option>
+                        <option value="MS">Montserrat</option>
+                        <option value="MT">Malta</option>
+                        <option value="MU">Mauritius</option>
+                        <option value="MV">Maldives</option>
+                        <option value="MW">Malawi</option>
+                        <option value="MX">Mexico</option>
+                        <option value="MY">Malaysia</option>
+                        <option value="MZ">Mozambique</option>
+                        <option value="NA">Namibia</option>
+                        <option value="NC">New Caledonia</option>
+                        <option value="NE">Niger</option>
+                        <option value="NF">Norfolk Island</option>
+                        <option value="NG">Nigeria</option>
+                        <option value="NI">Nicaragua</option>
+                        <option value="NL">Netherlands</option>
+                        <option value="NO">Norway</option>
+                        <option value="NP">Nepal</option>
+                        <option value="NR">Nauru</option>
+                        <option value="NU">Niue</option>
+                        <option value="NZ">New Zealand</option>
+                        <option value="OM">Oman</option>
+                        <option value="PA">Panama</option>
+                        <option value="PE">Peru</option>
+                        <option value="PF">French Polynesia</option>
+                        <option value="PG">Papua New Guinea</option>
+                        <option value="PH">Philippines</option>
+                        <option value="PK">Pakistan</option>
+                        <option value="PL">Poland</option>
+                        <option value="PM">Saint Pierre And Miquelon</option>
+                        <option value="PN">Pitcairn</option>
+                        <option value="PR">Puerto Rico</option>
+                        <option value="PS">Palestinian Territory, Occupied</option>
+                        <option value="PT">Portugal</option>
+                        <option value="PW">Palau</option>
+                        <option value="PY">Paraguay</option>
+                        <option value="QA">Qatar</option>
+                        <option value="RE">Rƒunion</option>
+                        <option value="RO">Romania</option>
+                        <option value="RS">Serbia</option>
+                        <option value="RU">Russian Federation</option>
+                        <option value="RW">Rwanda</option>
+                        <option value="SA">Saudi Arabia</option>
+                        <option value="SB">Solomon Islands</option>
+                        <option value="SC">Seychelles</option>
+                        <option value="SD">Sudan</option>
+                        <option value="SE">Sweden</option>
+                        <option value="SG">Singapore</option>
+                        <option value="SH">Saint Helena, Ascension And Tristan Da Cunha</option>
+                        <option value="SI">Slovenia</option>
+                        <option value="SJ">Svalbard And Jan Mayen</option>
+                        <option value="SK">Slovakia</option>
+                        <option value="SL">Sierra Leone</option>
+                        <option value="SM">San Marino</option>
+                        <option value="SN">Senegal</option>
+                        <option value="SO">Somalia</option>
+                        <option value="SR">Suriname</option>
+                        <option value="SS">South Sudan</option>
+                        <option value="ST">Sao Tome And Principe</option>
+                        <option value="SV">El Salvador</option>
+                        <option value="SX">Sint Maarten (Dutch Part)</option>
+                        <option value="SY">Syrian Arab Republic</option>
+                        <option value="SZ">Swaziland</option>
+                        <option value="TC">Turks And Caicos Islands</option>
+                        <option value="TD">Chad</option>
+                        <option value="TF">French Southern Territories</option>
+                        <option value="TG">Togo</option>
+                        <option value="TH">Thailand</option>
+                        <option value="TJ">Tajikistan</option>
+                        <option value="TK">Tokelau</option>
+                        <option value="TL">Timor-Leste</option>
+                        <option value="TM">Turkmenistan</option>
+                        <option value="TN">Tunisia</option>
+                        <option value="TO">Tonga</option>
+                        <option value="TR">Turkey</option>
+                        <option value="TT">Trinidad And Tobago</option>
+                        <option value="TV">Tuvalu</option>
+                        <option value="TW">Taiwan, Province Of China</option>
+                        <option value="TZ">Tanzania, United Republic Of</option>
+                        <option value="UA">Ukraine</option>
+                        <option value="UG">Uganda</option>
+                        <option value="UM">United States Minor Outlying Islands</option>
+                        <option value="US" selected="">United States</option>
+                        <option value="UY">Uruguay</option>
+                        <option value="UZ">Uzbekistan</option>
+                        <option value="VA">Holy See (Vatican City State)</option>
+                        <option value="VC">Saint Vincent And The Grenadines</option>
+                        <option value="VE">Venezuela, Bolivarian Republic Of</option>
+                        <option value="VG">Virgin Islands, British</option>
+                        <option value="VI">Virgin Islands, U.s.</option>
+                        <option value="VN">Viet Nam</option>
+                        <option value="VU">Vanuatu</option>
+                        <option value="WF">Wallis And Futuna</option>
+                        <option value="WS">Samoa</option>
+                        <option value="YE">Yemen</option>
+                        <option value="YT">Mayotte</option>
+                        <option value="ZA">South Africa</option>
+                        <option value="ZM">Zambia</option>
+                        <option value="ZW">Zimbabwe</option>
+                        </select>
+                        <label for="Address.stateCode" class="control-label">State</label>
+                            <div class="stateSection">
+                            <span class="cc_select_geo">
+                            <select id="credBillState" name="Address.stateCode" class="form-control Field state">
+                            <option value="AK">Alaska</option>
+                            <option value="AL">Alabama</option>
+                            <option value="AR">Arkansas</option>
+                            <option value="AZ">Arizona</option>
+                            <option value="CA">California</option>
+                            <option value="CO">Colorado</option>
+                            <option value="CT">Connecticut</option>
+                            <option value="DC">DistrictofColumbia</option>
+                            <option value="DE">Delaware</option>
+                            <option value="FL">Florida</option>
+                            <option value="GA">Georgia</option>
+                            <option value="HI">Hawaii</option>
+                            <option value="IA">Iowa</option>
+                            <option value="ID">Idaho</option>
+                            <option value="IL">Illinois</option>
+                            <option value="IN">Indiana</option>
+                            <option value="KS">Kansas</option>
+                            <option value="KY">Kentucky</option>
+                            <option value="LA">Louisiana</option>
+                            <option value="MA">Massachusetts</option>
+                            <option value="MD">Maryland</option>
+                            <option value="ME">Maine</option>
+                            <option value="MI">Michigan</option>
+                            <option value="MN">Minnesota</option>
+                            <option value="MO">Missouri</option>
+                            <option value="MS">Mississippi</option>
+                            <option value="MT">Montana</option>
+                            <option value="NC">NorthCarolina</option>
+                            <option value="ND">NorthDakota</option>
+                            <option value="NE">Nebraska</option>
+                            <option value="NH">NewHampshire</option>
+                            <option value="NJ">NewJersey</option>
+                            <option value="NM">NewMexico</option>
+                            <option value="NV">Nevada</option>
+                            <option value="NY">NewYork</option>
+                            <option value="OH">Ohio</option>
+                            <option value="OK">Oklahoma</option>
+                            <option value="OR">Oregon</option>
+                            <option value="PA">Pennsylvania</option>
+                            <option value="RI">RhodeIsland</option>
+                            <option value="SC">SouthCarolina</option>
+                            <option value="SD">SouthDakota</option>
+                            <option value="TN">Tennessee</option>
+                            <option value="TX">Texas</option>
+                            <option value="UT">Utah</option>
+                            <option value="VA">Virginia</option>
+                            <option value="VT">Vermont</option>
+                            <option value="WA">Washington</option>
+                            <option value="WI">Wisconsin</option>
+                            <option value="WV">WestVirginia</option>
+                            <option value="WY">Wyoming</option>
+                            </select>
+                            </span>
+                            </div>
+                            </div>
+                            <div class="form-group">
+                            <label for="Address.city" class="control-label">City</label>
+                            <input id="credBillCity" type="text" placeholder="City" maxlength="255" value="" name="Address.city" class="form-control">
+                            </div>
+                            <div class="form-group">
+                            <label for="Address.postalCode" class="control-label">Postal Code</label>
+                            <input id="credBillPostal" type="text" placeholder="Postal Code" maxlength="10" value="" name="Address.postalCode" class="form-control">
+                            <input type="hidden" name="Address.addressType" value="Billing">
+                            </div>
+                            </form>
+                            <div class="modal-footer">
+                            <input type="button" class="btn btn-default btn-sm" onclick="CredBillCreateclose()" value="Cancel">
+                            <input type="button" class="btn btn-default btn-sm" onclick="CredBillCreate()" value="Save">
+                            </div>
+                            </div>
+                            </div>
+                            </div>
+                            <!-- Cred Bill Address end -->
+                            
+                            
+                            </div>
+                            
+                            </div>
+                            <br/>
+                            <!-- Payment section end -->
+                            
+                            <!-- Order Review section start -->
+                            <button type="button" class="btn-link" data-toggle="collapse" onclick="iconchg('#a3')" data-target="#collapse5" style="background-color: #f1f1f1;height:50px;border: 1px solid #b3b3b3;width: 80%;text-align: left;"> <h3 class="heading"><i id = "a3" class="arrow up"></i> &nbspReview Items</h3></button>
+                            <!--<a data-toggle="collapse" data-parent="#accordion" href="#collapse5"><h3 class="heading">Review Items</h3></a>-->
+                            
+                            <div id="collapse5" class="panel-collapse collapse in" style="left: 5%;width: 75%;">
+                            <div class="panel panel-default cc_panel cc_checkout_review">
+                            
+                            
+                            <div id="cart_items_container reviewSection" class="">
+                            <div class="cart_item_list">
+                        {{#each this.cartItems}}
+                            <div class="cart_item row normal">
+                        {{#ifNotEquals this.cartItemType 'Coupon'}}
+                            <div class="col-md-2">
+                        {{#if product.EProductMediasS.[0]}}
+                        {{displayImage this 'orderReview img-responsive'
+                            src=(displayEProductMedia this.product.EProductMediasS.[0])
+                                 alt=this.product.EProductMediasS.[0].altMessage
+                                 dataId=this.product.SKU}}
+                                 {{/if}}
+                                 </div>
+                                 <div class="col-md-6">
+                                 
+                                 <p class="cc_item_title normal">
+                                 <span class="normal">{{this.mockProduct.name}}</span>
+                                 </p>
+                                 
+                                 {{#ifContains this.pricingModifierTypes 'tiered'}}
+                                 <div class="cc_prt_tool_tip_div cc_prt_tool_tip_div_or" data-toggle="tooltip" title="{{pageLabelMap 'ProductPricingTiers_VolumeHover'}}">
+                                 <span class="cc_prt_tool_tip_text cc_prt_tool_tip_text_or">{{pageLabelMap 'ProductPricingTiers_VolumePricingApplied'}}</span>
+                                 </div>
+                                 {{/ifContains}}
+                                 </div>
+                                 <div class="col-md-4">
+                                 <div class="price cc_price">
+                                 {{#ifNotEquals this.cartItemType 'Coupon'}}
+                                     <p class="cc_order_quantity">
+                                         <!--<span class="cc_quantity_label normal">{{pageLabelMap 'Item_Available'}}&#58;&#160;</span>
+                                         {{#ifNotEquals this.itemStatus 'Available'}}
+                                            <label style="color:red;" class="normal">{{this.itemStatus}}</label>
+                                         {{else}}
+                                            <label style="color:green;" class="normal">{{this.itemStatus}}</label>
+                                         {{/ifNotEquals}}-->
+                                     
+                                         {{#ifNotEquals this.pricingType 'attrGroup'}}
+                                               <span class="cc_quantity_label">{{pageLabelMap 'Item_Available'}}&#58;&#160;</span>
+                                               <span id="{{this.sfdcName}}" style="color:green;" class="normal">{{this.itemStatus}}</span>
+                                              </p>
+                                         {{/ifNotEquals}}
+                                     
+                                         {{#ifEquals this.pricingType 'attrGroup'}}
+                                            <p class="cc_order_quantity availableMsg" style="display:block;">
+                                                <span class="cc_quantity_label">{{pageLabelMap 'Item_Available'}}&#58;&#160;</span>
+                                                <span id="{{this.itemID}}">Click on Attribute Items</span>
+                                            </p>
+                                         {{/ifEquals}}
+                                         
+                                     </p>
+                                     <p class="cc_order_quantity normal">
+                                         <span class="cc_quantity_label normal">{{pageLabelMap 'CartInc_Qty'}}&#58;&#160;</span>
+                                         <span class="cc_quantity normal">{{this.quantity}}</span>
+                                     </p>
+                                     <p class="cc_item_price">
+                                     {{#ifNotEquals this.pricingType 'attrGroup'}}
+                                         {{#if this.price}}
+                                            <span class="cc_price_label normal">{{pageLabelMap 'CartInc_Price'}}&#58;&#160;</span>
+                                            <span class="cc_price normal">{{price this.price}}</span>
+                                         {{/if}}
+                                     {{/ifNotEquals}}
+                                    {{#if this.absoluteDiscount}}
+                                        {{#ifGreater this.absoluteDiscount 0}}
+                                            <span class="cc_price_label normal">{{pageLabelMap 'Checkout_YouSave'}}&#58;&#160;</span>
+                                            <span class="cc_price normal">{{price this.absoluteDiscount}}</span>
+                                        {{/ifGreater}}
+                                        {{#ifLessThan this.absoluteDiscount 0}}
+                                            <span class="cc_price_label normal">{{pageLabelMap 'CartInc_Surcharge'}}&#58;&#160;</span>
+                                            <span class="cc_price normal">{{priceAbs this.absoluteDiscount}}</span>
+                                        {{/ifLessThan}}
+                                    {{/if}}
+                                     </p>
+                                 {{/ifNotEquals}}
+                                 <p class="cc_item_total">
+                                    <span class="cc_total_label normal">{{pageLabelMap 'CartInc_Total'}}&#58;&#160;</span>
+                                    <span class="cc_total normal">{{price this.SubAmount}}</span><!--itemTotal-->
+                                 </p>
+                                 <p class="cc_external">
+                                    <span class="cc_checkout_sku_label normal">{{pageLabelMap 'Checkout_SKU'}}&#58;&#160;</span>
+                                    <span class="cc_checkout_sku normal">{{this.mockProduct.sku}}</span>
+                                 </p>
+                                    {{#ifEquals this.pricingType 'attrGroup'}}
+                                          <p class="cc_est_del_date"><!-- IBA-3736-->
+                                                <span >Est. Delivery Date&#58;&#160;</span>
+                                                <span class="normal">Click on Attribute Items</span>
+                                          </p>
+                                    {{/ifEquals}}
+                                    {{#ifNotEquals this.pricingType 'attrGroup'}}
+                                         <p class="cc_est_del_date"><!-- IBA-3736-->
+                                                <span >Est. Delivery Date&#58;&#160;</span>
+                                                <span class="normal" id="{{this.sfdcName}}_dd"></span>
+                                         </p>
+                                    {{/ifNotEquals}}
+                                 
+                                 {{#if sellerName}}
+                                     <p class="cc_seller">
+                                        <span class="cc_soldby_label normal">{{pageLabelMap 'Prod_SoldBy'}}&#58;&#160;</span>
+                                        <span class="cc_soldby normal">{{sellerName}}</span>
+                                     </p>
+                                 {{/if}}
+                                 {{#if this.isSubscription}}
+                                     <p class="cc_subscription_summary normal">
+                                        {{subscriptionSummary 'Order_Subscription_' this.subscriptionFrequency mockProduct.sku itemTotal}}
+                                     </p>
+                                     <p class="cc_subscription_next_date normal">
+                                        {{pageLabelMap 'Order_Subscription_Next_Payment'}} {{this.nextSubscriptionDateStr}}
+                                     </p>
+                                    {{#if this.isLimitedSubscription}}
+                                        <p class="cc_subscription_summary normal">
+                                            {{pageLabelMap 'Order_Subscription_End_Date'}} {{this.subscriptionEndDateStr}}
+                                        </p>
+                                    {{/if}}
+                                 {{/if}}
+                                 {{#each minorLines}}
+                                    {{#if this.isSubscription}}
+                                        <p class="cc_subscription_summary normal">
+                                            {{subscriptionSummary 'Order_Subscription_' this.subscriptionFrequency mockProduct.sku itemTotal}}
+                                        </p>
+                                        <p class="cc_subscription_next_date normal">
+                                            {{pageLabelMap 'Order_Subscription_Next_Payment'}} {{this.nextSubscriptionDateStr}}
+                                        </p>
+                                        {{#if this.isLimitedSubscription}}
+                                            <p class="cc_subscription_end_date normal">
+                                                {{pageLabelMap 'Order_Subscription_End_Date'}} {{this.subscriptionEndDateStr}}
+                                            </p>
+                                        {{/if}}
+                                    {{/if}}
+                                 {{/each}}
+                                 {{#if this.minorLines}}
+                                    {{#ifNotEquals this.pricingType "attrGroup"}}
+                                        <p class="cc_included_items">
+                                            <a href="#included_items{{this.itemID}}" id="includedItemsLink" class="includedItemsLink cc_included_items_link" data-toggle="modal" data-id="{{this.itemID}}">{{pageLabelMap 'CheckOut_IncludedItems'}}</a>
+                                        </p>
+                                        <div id="included_items{{this.sfid}}" class="modal fade cc_modal cc_cart_included_items_modal" tabindex="-1" role="dialog" aria-hidden="true">
+                                            <div class="modal-dialog" role="document">
+                                                <div class="modal-content cc_modal_content">
+                                                    <div class="modal-header">
+                                                        <button type="button" class="close cc_close" data-dismiss="modal" aria-label="{{pageLabelMap 'Modal_Aria_Close'}}"><span aria-hidden="true">&#215;</span></button>
+                                                        {{#ifEquals this.pricingType 'external'}}
+                                                            {{#if extName}}
+                                                                <h3 id="myModalLabel">{{this.extName}}&#58;&#160;{{pageLabelMap 'CheckOut_IncludedItems'}}</h3>
+                                                            {{else}}
+                                                                <h3 id="myModalLabel">{{this.product.sfdcName}}&#58;&#160;{{pageLabelMap 'CheckOut_IncludedItems'}}</h3>
+                                                            {{/if}}
+                                                        {{else}}
+                                                        {{#if itemLabel}}
+                                                            <h3 id="myModalLabel">{{this.itemLabel}}&#58;&#160;{{pageLabelMap 'CheckOut_IncludedItems'}}</h3>
+                                                        {{else}}
+                                                            <h3 id="myModalLabel">{{this.product.sfdcName}}&#58;&#160;{{pageLabelMap 'CheckOut_IncludedItems'}}</h3>
+                                                        {{/if}}
+                                                        {{/ifEquals}}
+                                                    </div>
+                                                    <div class="modal-body cc_modal-body modal-body_included_items{{this.sfid}}" id="included_items_body{{sfid}}">
+                                                        <i class="fa fa-spinner fa-pulse fa-lg slds-m-top--medium"></i>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {{/ifNotEquals}}
+                                 {{/if}}
+                                 {{#if this.minorLines}}
+                                 {{#ifEquals this.pricingType "attrGroup" }}
+                                 <p class="cc_cart_attribute_items">
+                                 <a href="#order_attribute_items{{this.itemID}}" id="orderAttributeItemsLink" class="orderAttributeItemsLink cc_attribute_items_link" data-toggle="modal" data-id="{{this.itemID}}">{{pageLabelMap 'CheckOut_AttributeItems'}}</a>
+                                 </p>
+                                 <div id="order_attribute_items{{this.itemID}}" class="modal fade cc_modal cc_order_attribute_items_modal" tabindex="-1" role="dialog" aria-hidden="true">
+                                 <div class="modal-dialog modal-lg" role="document">
+                                 <div class="modal-content cc_modal_content">
+                                     <div class="modal-header">
+                                        <button type="button" class="close cc_close" data-dismiss="modal" aria-label="{{pageLabelMap 'Modal_Aria_Close'}}"><span aria-hidden="true">&#215;</span></button>
+                                        <h3 id="myModalLabel">{{this.mockProduct.name}}:&#160;{{pageLabelMap 'CheckOut_AttributeItems'}}</h3>
+                                     </div>
+                                 <div class="modal-body cc_modal-body modal-order_attribute_items{{this.sfid}}" id="modal-order_attribute_items{{sfid}}">
+                                        <div class="table-responsive">
+                                          <table class="cart_figures table table-striped table-condensed cc_table cc_included_items">
+                                              <thead class="cc_table_header">
+                                              <th class="cc_name">Operation</th><!--{{pageLabelMap 'CartInc_SKU'}}-->
+                                              <th>Material</th>
+                                              {{#each this.topAttributes}}
+                                                <th class="cc_attribute_name">{{{this.displayName}}}</th>
+                                              {{/each}}
+                                              <th>Brand</th>
+                                              <th>Generic Name</th>
+                                              <th>Manufacturer</th>
+                                              <th>Strength</th>
+                                              <th class="">{{pageLabelMap 'CartInc_AttributeQuantity'}}</th><!-- remove class cc_attribute_qty for CSS -->
+                                              <th class="cc_total">{{pageLabelMap 'CartInc_Price'}}</th>
+                                              <th class="cc_total">{{pageLabelMap 'CartInc_Total'}}</th>
+                                              <th class="">Availability</th>
+                                              <th class="">Est. Delivery Date</th><!-- IBA-3736 -->
+                                              <th class="cc_remove"></th>
+                                              </thead>
+                                              <tbody>
+                                              {{#each this.minorLines}}
+                                              <tr>
+                                                  <td class="text-nowrap">
+                                                      {{#if extSKU}}
+                                                      {{extSKU}}
+                                                      {{else}}
+                                                      {{mockProduct.sku}}
+                                                      {{/if}}
+                                                  </td>
+                                                  <td><span class="cc_attr_display">{{this.material}}</span></td>
+                                                  {{#if primaryAttr}}
+                                                  <td><span class="cc_attr_display">{{this.machinesR.machineName}}</span></td><!--{{{primaryAttr.displayName}}} -->
+                                                  {{/if}}
+                                                  {{#if secondaryAttr}}
+                                                  <td><span class="cc_attr_display">{{this.machineType}}</span></td><!--{{{secondaryAttr.displayName}}}-->
+                                                  {{/if}}
+                                                  {{#if tertiaryAttr}}
+                                                  <td><span class="cc_attr_display">{{this.drugCodesR.drugCodes}}</span></td><!--{{{tertiaryAttr.displayName}}} -->
+                                                  {{/if}}
+                                                  {{#if drugCodesR.brandName}}<td><span class="cc_attr_display">{{this.drugCodesR.brandName}}</span></td>{{/if}}
+                                                  {{#if drugCodesR.genericDrugName}}<td><span class="cc_attr_display">{{this.drugCodesR.genericDrugName}}</span></td>{{/if}}
+                                                  {{#if drugCodesR.manufacturerName}}<td><span class="cc_attr_display">{{this.drugCodesR.manufacturerName}}</span></td>{{/if}}
+                                                  <td><span class="cc_attr_display">{{this.drugCodesR.drugStrength}}</span></td>
+                                                  <td style="text-align:center">
+                                                      <span class="cc_quantity">{{quantity}}</span>
+                                                  </td>
+                                                  <td><span class="cc_attr_price">{{price this.price this.currencyCode}}</span></td>
+                                                  <td><span class="cc_attr_line_total">{{price this.itemTotal}}</span></td>
+                                                  <td><span class="cc_attr_line_total">{{price this.availabilityMessage}}</span></td>
+                                                  <td><span class="normal" id="{{this.sfdcName}}_dd"></span></td><!-- IBA-3736-->
+                                              </tr>
+                                              {{/each}}
+                                              </tbody>
+                                          </table>
+                                      </div>
+                                    <i class="fa fa-spinner fa-pulse fa-lg slds-m-top--medium"></i>
+                                 </div>
+                                 </div>
+                                 </div>
+                                 </div>
+                                 {{/ifEquals}}
+                                 {{/if}}
+                                 </div>
+                                 </div>
+                                 {{/ifNotEquals}}
+                                 {{#ifEquals this.cartItemType 'Coupon'}}
+                                 <div class="col-md-8">
+                                 <p class="item_title coupon_title cc_coupon_title">
+                                 <span class="cc_label">{{pageLabelMap 'CartInc_AppliedCoupon'}}</span>
+                                 <span class="cc_value">{{this.product.sfdcName}}</span>
+                                 </p>
+                                 </div>
+                                 <div class="col-md-4">
+                                 <div class="price cc_price">
+                                 <p class="cc_item_total">
+                                 <span class="cc_total_label normal">{{pageLabelMap 'CartInc_Total'}}&#58;&#160;</span>
+                                 <span class="cc_total normal">{{price this.SubAmount}}</span>
+                                 </p>
+                                 </div>
+                                 </div>
+                                 {{/ifEquals}}
+                                 </div>
+                                 <hr>
+                                 {{/each}}
+                                 </div>
+                                 
+                                 <div class="normal">
+                                 <table style="border-collapse: separate;border-spacing: 0 1em;">
+                                 <tr><td class="trPad" style="display:none">Items Subtotal: <span id="mincart_subtotal">{{this.subTotal}}</span></td></tr>
+                                 <tr><td class="trPad">Items Subtotal: &nbsp<span id="mincart_subtotall">{{price this.subTotal}}</span></td></tr>
+                                 <tr><td class="trPad">Estimated Tax: &nbsp<span id="mincartesttax1" ></span></td></tr>
+                                 <tr><td class="trPad">Est. Shipping: &nbsp<span id="mincartestship1" ></span></td></tr>
+                                 <tr><td class="trPad" style="font-weight: bold;">Grand Total: &nbsp<span id="mincart_grandtotal1" ></span></td></tr>                             
+                                 </table>
+                                 </div>
+                                 </br></br>
+                                 </div>
+                                 
+                                 {{#if this.terms}}
+                                 <h4 class="coso_footer_tc cc_coso_footer_tc normal">{{pageLabelMap 'Footer_TermsAndConditions'}}</h4>
+                                 <div class="shipping_payment cc_shipping_payment">
+                                 {{#each this.terms}}
+                                 <div class="checkbox shiping_payment_term">
+                                 <label for="terms cc_ship_terms_label">
+                                 {{#if this.isBlockedErrorExists}}
+                                 <input id="terms" disabled="disabled" type="checkbox" name="#" class="boxes terms cc_ship_terms" onclick="checkinfo()">
+                                 {{else}}
+                                 <input id="terms" type="checkbox" name="#" class="boxes terms cc_ship_terms" onclick="checkinfo()">
+                                 {{/if}}
+                                 <span class="cc_terms_title normal">{{this.title}}&#58;&#160;</span>
+                                 <p class="cc_terms_description normal">{{unescape this.description}}</p>
+                                 </label>
+                                 </div>
+                                 {{/each}}
+                                 
+                                 
+                                 </div>
+                                 {{/if}}
+                                 <input id="accptbtn" disabled ="true" class="btn btn-default btn-sm" onclick="checkacpt()" type="button" value="I Accept"/><!-- IBA-4135 -->
+                                 <input id="contBb" disabled ="true" class="btn btn-default btn-sm" type="button" value="Place Order" onclick="callsubmit();" title="Omnicell Terms and Conditions have to be accepted before proceed to payment"/> <!-- IBA-4135 -->
+                                 <button type="button" class="btn btn-default btn-sm remove cc_email_cart_link_button" data-toggle="modal" data-target="#myModal">Email Cart</button>
+                                 
+                                 <!--Stored PO modal start-->
+                                 <div id="myModal1" class="modal fade" tabindex="-1">
+                                 <div class="modal-dialog">
+                                 <div class="modal-content">
+                                 <div class="modal-header">
+                                 <h5 class="modal-title heading">Warning!</h5>
+                                 <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                 </div>
+                                 <div class="modal-body normal">
+                                 <p style="color:red;">Please note that this PO has already been used, do you want to continue?</p>
+                                 </div>
+                                 <div class="modal-footer">
+                                 <button type="button" class="btn btn-primary" data-dismiss="modal" name="yesId" id="yesId" onclick="changevalYes()">Yes</button>
+                                 <button type="button" class="btn btn-primary" data-dismiss="modal" name="noId" id="noId" onclick="changevalNo()">No</button>
+                                 </div>
+                                 </div>
+                                 </div>
+                                 </div>
+                                 <!--Stored PO modal end--> 
+                                 
+                                 <!-- Validation Error Modal start IBA-2287-->
+                                 <div id="valError" class="modal fade" tabindex="-1">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title heading" style="color:red;">Validation Error!</h5>
+                                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                            </div>
+                                            <div class="modal-body normal">
+                                                <p id="errorMsg" style="color:red;"></p>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-primary" data-dismiss="modal" name="okId" id="okId">Ok</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                 </div>
+                                 <!-- Validation Error Modal end IBA-2287--> 
+                                 
+                                 <!-- Email cart modal start -->
+                                 <div class="modal fade" id="myModal" role="dialog">
+                                 <div class="modal-dialog">
+                                 
+                                 
+                                 <div class="modal-content">
+                                 <div class="modal-header">
+                                 <button type="button" class="close cc_close" data-dismiss="modal" aria-label="{{pageLabelMap 'Modal_Aria_Close'}}"><span aria-hidden="true">&#215;</span></button>
+                                 <h4 class="modal-title">Email Cart</h4>
+                                 </div>
+                                 <div class="modal-body cc_modal_body">
+                                 <form id="emailForm" class="cc_cart_email_form">
+                                 <div class="form-group">
+                                 <label for="email_to">Email:To</label>
+                                 <input id="email_to" type="email" class="form-control cc_email_to" name="toEmailAddress">
+                                 </div>
+                                 <div class="form-group">
+                                 <label for="email_cc">Email:Cc</label>
+                                 <input id="email_cc" type="email" class="form-control cc_email_cc" name="ccEmailAddress">
+                                 </div>
+                                 <div class="form-group">
+                                 <label for="subject">Subject</label>
+                                 <input id="subject" type="text" class="form-control cc_subject" name="subject">
+                                 </div>
+                                 <div class="form-group">
+                                 <label for="description">Description</label>
+                                 <textarea id="description" rows="10" type="text" class="form-control cc_description" name="description"></textarea>
+                                 </div>
+                                 </form>
+                                 </div>
+                                 
+                                 <div class="modal-footer cc_modal_footer">
+                                 <input id="sendEmailBtnCustom" type="button" onclick="sendEmailcart();" class="btn btn-default btn-sm sendEmail" value="{{pageLabelMap 'Send'}}"/>
+                                 </div>
+                                 </div>
+                                 
+                                 </div>
+                                 </div>
+                                 
+                                 </div>
+                                 <!-- Email cart modal end -->
+                                 
+                                 
+                                 </div>  
+                                 
+                                 
+                                 <!-- Order Review section end -->
+                                 
+                                 </script>
+    
+    <script id="UserInfo-AddressEdit-Desktop" type="text/template">
+    <div class="{{classPrefix}}-messagingSection-Error" style="display: none"></div>
+    
+    
+    {{#ifEquals classPrefix 'billing'}}
+    
+    <!-- <a data-toggle="collapse" data-parent="#accordion" href="#collapse1"><h3 class="heading">{{pageLabelMap sectionLabel}}</h3></a> -->
+        <button type="button" class="btn-link" data-toggle="collapse" onclick="iconchg('#a4')" data-target="#collapse1" style="background-color: #f1f1f1;height:50px;border: 1px solid #b3b3b3;width: 80%;text-align: left;"><h3 class="heading"><i id = "a4" class="arrow up"></i> &nbsp{{pageLabelMap sectionLabel}}</h3></button>  
+        <div id="collapse1" class="panel-collapse collapse in" style="left: 5%;width: 75%;">
+            <div class="panel-body">
+                <a href="#modal_{{classPrefix}}" data-toggle="modal" class="cc_change_address_modal heading">{{pageLabelMap 'UserInfo_AddressBook'}}</a></br>
+                    <div class="normal">
+                        <span id="buyerName">{{this.buyerFirstName}} {{this.buyerLastName}}</span></br>
+                            <span id="billCompany1">{{{this.companyName}}}</span></br>
+                                {{#if this.companyName2}}<span id="billCompany2">{{this.companyName2}}</span></br>{{/if}}
+                                 <span id="billAddress1">{{this.address1}}</span><span id="billAddress2">{{this.address2}}</span><span id="billAddress3">{{this.address3}}</span></br>
+                                 
+                                 <span id="billCity">{{this.city}}</span>,
+                                 <span id="billstate">{{this.BillingState}}</span>
+                                 <span id="billPostal">{{this.postalCode}}</span></br>
+                                     <span id="billCountry" style="display: none">{{this.countryCode}}</span>
+                                     <span id="billCountrynew">{{this.BillingCountry}}</span>
+                                     </div>
+                                     </div>
+                                     </div>
+                                     {{/ifEquals}}
+                                     
+                                     {{#ifEquals classPrefix 'shipping'}}
+                                     <!--<a data-toggle="collapse" data-parent="#accordion" href="#collapse2"><h3 class="heading">{{pageLabelMap sectionLabel}}</h3></a>-->
+                                         <button type="button" id = "shipsecbtn" class="btn-link" data-toggle="collapse" onclick="iconchg('#a1')" data-target="#collapse2" style="background-color: #f1f1f1;height:50px;border: 1px solid #b3b3b3;width: 80%;text-align: left;"><h3 class="heading"><i id = "a1" class="arrow up"></i> &nbsp{{pageLabelMap sectionLabel}}</h3></button>  
+                                         <br/>  
+                                             <div id="collapse2" class="panel-collapse collapse in" style="left: 5%;width: 75%;">
+                                                 <div class="panel-body">
+                                                     
+                                                     <a href="#modal_{{classPrefix}}" data-toggle="modal" class="cc_change_address_modal heading">{{pageLabelMap 'UserInfo_AddressBook'}}</a></br>
+                                                         
+                                                         
+                                                         
+                                                         <div class="normal">
+                                                             <div class="shipsec-Error1" ></div>
+                                                                  <div class="shipsec-Error2" ></div>
+                                                                  <div class="shipsec-Error3" ></div>
+                                                             <span id="shipCompany1">{{{this.companyName}}}</span></br>
+                                                                 {{#if this.companyName2}}<span id="shipCompany2">{{this.companyName2}}</span></br>{{/if}}
+                                                                  
+                                                                  <table>
+                                                                  <tr>
+                                                                  <td class="trPad">
+                                                                  <label style="color:white;font-size: 18px;">*</label><input type="text" id="attn" style="width: 91%;" placeholder="Attn"/>
+                                                                  </td>
+                                                                  </tr>
+                                                                  <tr>
+                                                                  
+                                                                  <td class="trPad" colspan="2">
+                                                                  
+                                                                  <label style="color:red;font-size: 18px;">*</label><input class="normal" type="text" id="cfname" style="width: 44%;" value="" placeholder="First Name" onchange="shipsecfn(this.value)"/>
+                                                                  <label style="color:red;font-size: 18px;">*</label><input class="normal" type="text" id="clname" style="width: 44%;" placeholder="Last Name" onchange="shipsecln(this.value)"/>
+                                                                  </td>
+                                                                  </tr>
+                                                                  
+                                                                  <tr>
+                                                                  <td class="trPad">
+                                                                  <label style="color:red;font-size: 18px;">*</label><input class="normal" type="text" id="cphone" style="width: 91%;" placeholder="Phone Number" onchange="shipsecpn(this.value)"/>
+                                                                  </td>
+                                                                  </tr>
+                                                                  </table>
+                                                                  <span id="shipAddress1">{{this.address1}}</span>{{#if this.address2}}<span id="shipAddress2"></br>{{this.address2}}</span>{{/if}}{{#if this.address3}}<span id="shipAddress3"></br>{{this.address3}}</span>{{/if}}</br>
+                                                                  <span id="shipCity">{{this.city}}</span>,
+                                                                  <span id="shipstate">{{this.BillingState}}</span>
+                                                                  <span id="shipPostal">{{this.postalCode}}</span></br>
+                                                                      <span id="shipCountry" style="display: none">{{this.countryCode}}</span>
+                                                                      <span id="shipCountrynew">{{this.BillingCountry}}</span>
+                                                                      </div>
+                                                                      </div>
+                                                                      </div>
+                                                                      {{/ifEquals}}
+                                                                      <div style="display: none"> <!-- Hide  for SCP-835 style="display: none"-->
+                                                                      {{#modifyData this}}{{/modifyData}} 
+                                                                          <form id="{{classPrefix}}AddressForm" class="addressForm">
+                                                                          <div class="{{classPrefix}}-messagingSection-Error" style="display: none"></div>
+                                                                          
+                                                                      {{#ifDisplay 'SO.DsplAddrName'}}
+                                                                          
+                                                                      {{#ifEquals classPrefix 'billing'}}
+                                                                          <div class="form-group">
+                                                                          <label for="firstName">{{pageLabelMap 'CheckOut_FirstName'}}</label>
+                                                                          <input id="firstName" type="text" disabled="disabled" class="form-control {{classPrefix}}LoggedUserFirstName {{classPrefix}}Field LoggedUserFirstName"  maxlength=100 value="{{this.buyerFirstName}}" />
+                                                                          </div>
+                                                                      {{/ifEquals}}
+                                                                          
+                                                                      {{#ifEquals classPrefix 'billing'}}
+                                                                          <div class="form-group">
+                                                                          <label for="firstName">{{pageLabelMap 'CheckOut_LastName'}}</label>
+                                                                          <input id="firstName" type="text" disabled="disabled" class="form-control {{classPrefix}}LoggedUserLast {{classPrefix}}Field LoggedUserLastName"  maxlength=100 value="{{this.buyerLastName}}" />
+                                                                          </div>
+                                                                      {{/ifEquals}}
+                                                                          
+                                                                      {{/ifDisplay}}
+                                                                      {{#ifDisplay 'SO.DsplAddrCompany'}}
+                                                                          <div class="form-group">
+                                                                          <label for="companyName">{{pageLabelMap 'Profile_CompanyName'}}</label>
+                                                                          <input id="companyName" type="text" disabled="disabled" class="form-control {{classPrefix}}companyField {{classPrefix}}Field cc_contact_input_company" name="{{classPrefix}}Address.companyName" maxlength=100 value="{{this.companyName}}" />
+                                                                          </div>
+                                                                      {{/ifDisplay}}
+                                                                      {{#ifEquals classPrefix 'billing'}}
+                                                                          <div class="form-group">
+                                                                          <label for="billingcompanyName2">{{pageLabelMap 'Profile_CompanyName2'}}</label>
+                                                                          <input id="billingcompanyName2" disabled="disabled" type="text" class="form-control {{classPrefix}}companyField2 " maxlength=100 value="{{this.companyName2}}" />
+                                                                          </div>
+                                                                      {{/ifEquals}}
+                                                                      {{#ifEquals classPrefix 'shipping'}}
+                                                                          <div class="form-group">
+                                                                          <label for="shippingcompanyName2">{{pageLabelMap 'Profile_CompanyName2'}}</label>
+                                                                          <input id="shippingcompanyName2" disabled="disabled" type="text" class="form-control {{classPrefix}}companyField2 " maxlength=100 value="{{this.companyName2}}" />
+                                                                          </div>
+                                                                          <!-- SCP-763 start -->
+                                                                          <div class="form-group">
+                                                                          <label>Attn:</label>
+                                                                          <!--<input  type="text" class="form-control " value="{!companyattn}"/>-->
+                                                                          </div>
+                                                                          <!-- SCP-763 end -->
+                                                                          <div class="form-group">
+                                                                          <div id="error-msg" style="color:red;"></div> <!-- B2B-123 -->
+                                                                          <div> <!-- B2B-849 Start-->
+                                                                          <label>First Name</label><label for="contactList" style="color:red;">*&nbsp;&nbsp;&nbsp;</label><input  type="text" class="contactText"/>&nbsp;&nbsp;&nbsp;
+                                                                          <label>Last Name</label><label for="contactList" style="color:red;">*&nbsp;&nbsp;&nbsp;</label><input id="clname" type="text" class="contactText"/>
+                                                                          </div>
+                                                                          <div>
+                                                                          <label>Contact No</label><label for="contactList" style="color:red;">*&nbsp;&nbsp;</label><input  type="text" class="contactText"/>
+                                                                          </div><!-- B2B-849 End-->
+                                                                          
+                                                                          </div>
+                                                                      {{/ifEquals}}
+                                                                          <input type="hidden" class="{{classPrefix}}addrReadOnly {{classPrefix}}Field" name="{{classPrefix}}Address.addrReadOnly" maxlength=100 value="{{this.addrReadOnly}}" />
+                                                                          <input type="hidden" class="{{classPrefix}}acctIdField {{classPrefix}}Field" name="{{classPrefix}}Address.partnerId" maxlength=100 value="{{this.partnerId}}" />
+                                                                          <input type="hidden" class="{{classPrefix}}sfid {{classPrefix}}Field" name="{{classPrefix}}Address.sfid" maxlength=100 value="{{this.sfid}}" />
+                                                                          <div class="form-group">
+                                                                          <label for="address1">{{pageLabelMap 'Profile_Address'}}</label>
+                                                                          <input id="address1" disabled="disabled" type="text" class="form-control {{classPrefix}}Address1 {{classPrefix}}Field cc_contact_input_address" name="{{classPrefix}}Address.address1" value="{{this.address1}}" maxlength="40" />
+                                                                          <input id="address2" disabled="disabled" type="text" class="form-control {{classPrefix}}Address2 {{classPrefix}}Field cc_contact_input_address" name="{{classPrefix}}Address.address2" value="{{this.address2}}" maxlength="40" />
+                                                                          <input id="address3" disabled="disabled" type="text" class="form-control {{classPrefix}}Address3 {{classPrefix}}Field cc_contact_input_address" name="{{classPrefix}}Address.address3" value="{{this.address3}}" maxlength="40" />
+                                                                          </div>
+                                                                          <div class="form-group">
+                                                                          <label for="country">{{pageLabelMap 'CheckOut_Country'}}</label>
+                                                                      {{{selectGeo 'country' this.countryList this.countryCode 'countryListing form-control' this.classPrefix}}}
+                                                                          </div>
+                                                                          <div class="form-group">
+                                                                          <label for="state">{{pageLabelMap 'CheckOut_State'}}</label>
+                                                                          <div class="stateSection cc_state_section"></div>
+                                                                          </div>
+                                                                          <div class="form-group">
+                                                                          <label for="city">{{pageLabelMap 'CheckOut_City'}}</label>
+                                                                          <input id="city" disabled="disabled" type="text" class="form-control {{classPrefix}}City {{classPrefix}}Field cc_contact_input_city" name="{{classPrefix}}Address.city" maxlength=255 value="{{this.city}}" />
+                                                                          </div>
+                                                                          <div class="form-group">
+                                                                          <label for="postalCode">{{pageLabelMap 'CheckOut_PostalCode'}}</label>
+                                                                          <input id="postalCode" disabled="disabled" type="text" class="form-control {{classPrefix}}PostalCode {{classPrefix}}Field cc_contact_input_postal_code" name="{{classPrefix}}Address.postalCode" value="{{this.postalCode}}" maxlength=10/>
+                                                                          </div>
+                                                                          <div class="form-group" style="display:none;">
+                                                                          <label for="SAPCustomerNumber">SAPCustomerNumber</label>
+                                                                          <input id="SAPCustomerNumber" type="text" class="form-control {{classPrefix}}SAPCustomerNumber"  value="{{this.SAPCustomerNumber}}" maxlength=10/>
+                                                                          </div>
+                                                                          </form>
+                                                                          </div><!-- Hide div End --> 
+                                                                      {{#ifEquals classPrefix 'billing'}}
+                                                                          <div id="modal_{{classPrefix}}" class="modal fade cc_address_book_modal" tabindex="-1" role="dialog">
+                                                                          <div class="modal-dialog cc_modal-dialg" role="document">
+                                                                          <div class="modal-content cc_modal-content">
+                                                                          <div class="modal-header cc_modal-header">
+                                                                          <button type="button" class="close closeBilling" data-dismiss="modal" aria-label="{{pageLabelMap 'Modal_Aria_Close'}}"><span aria-hidden="true">&#215;</span></button>
+                                                                          <h4 class="modal-title cc_title">{{pageLabelMap 'UserInfo_AddressBookModal'}}</h4>
+                                                                          </div>
+                                                                          <div class="modal-body cc_modal-body">
+                                                                      {{#each this.accListArrayBilling}}
+                                                                          <div class="row cc_billing_shipping_info">
+                                                                          <div class="col-md-6 cc_personal_info">
+                                                                          <div class="address_selection_display normal">
+                                                                          <p class="normal">{{this.Name}}</p>
+                                                                          <span class="addr_line1 cc_addr_line">{{this.BillingStreet}}{{#if this.PO_BOX__c}}P.O. Box: {{this.PO_BOX__c}}{{/if}}</span><br/><!--Added PO Box for SCP-735 -->
+                                                                          <span class="cc_addr_city">{{this.BillingCity}}</span>
+                                                                          <span class="cc_addr_state">,&nbsp;{{this.BillingState}}</span>
+                                                                          <span class="cc_addr_postal">&nbsp;{{this.BillingPostalCode}}</span><br>
+                                                                          <span class="cc_addr_country">{{this.BillingCountry}}</span><br>
+                                                                          <span class="cc_addr_extId"></span><br/>
+                                                                          </div>
+                                                                          <br/>
+                                                                          </div>
+                                                                          	<div class="col-md-3 cc_select"><!-- IBA-4266 start -->
+                                                                          <input type="button" value="Select Address" class="btn btn-default btn-sm shippingField cc_select_address" data-id="{{this.Id}}" onclick="updateBillingAddress('{{this.Id}}')" readonly="readonly">
+                                                                          </div>
+                                                                          	<div class="col-md-3 cc_select" style="padding: 9px 15px 7px 15px;">
+                                                                          		<span style="font-weight: bold;font-size: 15px;" id = defaultbillTo{{this.Id}}></span>                                                                          		
+                                                                          	</div>							<!-- IBA-4266 End -->
+                                                                          </div>       
+                                                                          <hr>
+                                                                      {{/each}}
+                                                                          </div>
+                                                                          </div>
+                                                                          </div>
+                                                                          </div>
+                                                                      {{/ifEquals}}
+                                                                      {{#ifEquals classPrefix 'shipping'}}
+                                                                          <div id="modal_{{classPrefix}}" class="modal fade cc_address_book_modal" tabindex="-1" role="dialog">
+                                                                          <div class="modal-dialog cc_modal-dialg" role="document">
+                                                                          <div class="modal-content cc_modal-content">
+                                                                          <div class="modal-header cc_modal-header">
+                                                                          <button type="button" class="close closeShipping" data-dismiss="modal" aria-label="{{pageLabelMap 'Modal_Aria_Close'}}"><span aria-hidden="true">&#215;</span></button>
+                                                                          <h4 class="modal-title cc_title">{{pageLabelMap 'UserInfo_AddressBookModal'}}</h4>
+                                                                          </div>
+                                                                          <div class="modal-body cc_modal-body">
+                                                                      {{#each this.accListArray}}
+                                                                      {{#ifNotEquals this.Account_Role__c 'ZCSP'}}
+                                                                          <div class="row cc_billing_shipping_info">
+                                                                          <div class="col-md-6 cc_personal_info">
+                                                                          <div class="address_selection_display normal">
+                                                                          <p class="normal">{{this.Name}}</p>
+                                                                          <span class="addr_line1 cc_addr_line">{{this.BillingStreet}}{{#if this.PO_BOX__c}}P.O. Box: {{this.PO_BOX__c}}{{/if}}</span><br/><!--Added PO Box for SCP-735 -->
+                                                                          <span class="cc_addr_city">{{this.BillingCity}}</span>
+                                                                          <span class="cc_addr_state">,&nbsp;{{this.BillingState}}</span>
+                                                                          <span class="cc_addr_postal">&nbsp;{{this.BillingPostalCode}}</span><br>
+                                                                          <span class="cc_addr_country">{{this.BillingCountry}}</span><br>
+                                                                          <span class="cc_addr_extId"></span>
+                                                                          </div>
+                                                                          <br/>
+                                                                          </div>
+                                                                          	<div class="col-md-3 cc_select"><!-- IBA-4266 start -->
+                                                                          <input type="button" value="Select Address" class="btn btn-default btn-sm shippingField cc_select_address" data-id="{{this.Id}}" onclick="updateShippingAddress('{{this.Id}}')" readonly="readonly">
+                                                                          </div>
+                                                                          	<div class="col-md-3 cc_select" style="padding: 9px 15px 7px 15px;">
+                                                                          		<span style="font-weight: bold;font-size: 15px;" id = defaultshipTo{{this.Id}} ></span>                                                                          		
+                                                                          	</div>							<!-- IBA-4266 End -->
+                                                                          </div>       
+                                                                          <hr>
+                                                                      {{/ifNotEquals}}
+                                                                      {{/each}}
+                                                                          </div>
+                                                                          </div>
+                                                                          </div>
+                                                                          </div>
+                                                                      {{/ifEquals}}
+                                                                          
+                                                                          
+                                                                          </script>
+    
+    <div id="accListJSONData" style="display:none;">{!accListJSON}</div>
+    <div id="accListBillingJSONData" style="display:none;">{!accListBillingJSON}</div>
+    <div id="currentAccountJSONData" style="display:none;">{!currentAccountObj}</div>
+    <div id="cartshipJSONData" style="display:none;">{!cartshipAccountObj}</div>
+    <div id="cccontactaddjson" style="display:none;">{!cccartshipAccountObj}</div>
+    <div id="currentCartJSONData" style="display:none;">{!currentCart}</div> <!-- IBA-4134 -->
+    <div id="defaultRelJSONData" style="display:none;">{!defaultRelJSON}</div> <!-- IBA-4266 -->
+    <script>
+    var defaultRelJSON =  unescapedHtml($("#defaultRelJSONData").html());//IBA-4266
+    var defaultRelMap = JSON.parse(defaultRelJSON);//IBA-4266
+    var myMap;//IBA-3736 - Start
+    var shipMap;
+    var itemList;
+    var itemToUpdateMap = [];//IBA-3736 - End
+    var accountAddressMap = new Map();
+    var accountAddressMapBilling = new Map();
+    var selectedContactData = {};
+    var selectedContact = '';
+    var selectListHTML = '';
+    var defaultContactListHTML = '';
+    var accountCompanyName2 = '{!accountName2}';
+    var isViewRendered = false;
+    var isNewCart = {!newCart};
+    var selectCyberAddressListMap;
+    var currentAccountObjList =  unescapedHtml($("#currentAccountJSONData").html());
+    var shipAccountObjList =  unescapedHtml($("#cartshipJSONData").html());
+    var currentAccountObj = JSON.parse(currentAccountObjList);
+    var cartshipAccountObj = JSON.parse(shipAccountObjList);
+    var cccontactaddobj =  unescapedHtml($("#cccontactaddjson").html());
+    var cccartshipAccountObj = JSON.parse(cccontactaddobj);
+    var chval = '';
+    const skulist = [];
+    const avdtlist = [];
+    var billcsn = '';    
+    var orderattempt = {!attemptcheckout};
+    const minorItemMap = new Map();
+    var minorItemdata = [];
+    var currentCartObjList =  unescapedHtml($("#currentCartJSONData").html()); //IBA-4134
+    var currentCart = JSON.parse(currentCartObjList); //IBA-4134
+    
+    Handlebars.registerHelper("modifyData", function(currentObj,options) { 
+        this.buyerFirstName = CCRZ.currentUser.FirstName ? CCRZ.currentUser.FirstName : ''; 
+        this.buyerLastName = CCRZ.currentUser.LastName ? CCRZ.currentUser.LastName : '';
+        
+        this.countryCode =currentAccountObj.Transportation_Zone_Country__c;
+        this.BillingCountry=currentAccountObj.BillingCountry;
+        this.BillingState=currentAccountObj.BillingState;
+        if(this.classPrefix == "billing"){
+            this.firstName = CCRZ.currentUser.FirstName;
+            this.lastName = CCRZ.currentUser.LastName;
+            if(typeof selectedContactData.billingCustomerNumber === 'undefined'){
+                selectedContactData.billingCustomerNumber = this.SAPCustomerNumber;
+                billcsn = this.SAPCustomerNumber;
+                selectedContactData.billingcompanyName2 = this.companyName2;
+                this.address3 = currentAccountObj.PO_BOX__c ? currentAccountObj.PO_BOX__c : '';
+                this.address1 = currentAccountObj.BillingStreet ? currentAccountObj.BillingStreet : '';
+                this.city =currentAccountObj.BillingCity ? currentAccountObj.BillingCity : '';
+                this.postalCode =currentAccountObj.BillingPostalCode ? currentAccountObj.BillingPostalCode : '';
+                this.companyName = currentAccountObj.Name ? currentAccountObj.Name : '';
+                //document.getElementById('shipincountry').value = currentAccountObj.BillingCountry;
+                //this.countryCode =currentAccountObj.BillingCountry ? currentAccountObj.BillingCountry : '';
+                if(typeof this.companyName2 === 'undefined' || this.companyName2 === ''){
+                    this.companyName2 = accountCompanyName2;
+                }
+            }
+        }else if(this.classPrefix == "shipping"){
+            if(typeof selectedContactData.shippingCustomerNumber === 'undefined'){
+                selectedContactData.shippingCustomerNumber = this.SAPCustomerNumber;
+                selectedContactData.shippingcompanyName2 = this.companyName2;
+                this.address3 = currentAccountObj.PO_BOX__c ? currentAccountObj.PO_BOX__c : '';
+                this.address1 = currentAccountObj.BillingStreet ? currentAccountObj.BillingStreet : '';
+                this.postalCode =currentAccountObj.BillingPostalCode ? currentAccountObj.BillingPostalCode : '';
+                this.city =currentAccountObj.BillingCity ? currentAccountObj.BillingCity : '';
+                
+                this.companyName = currentAccountObj.Name ? currentAccountObj.Name : '';
+                this.BillingCountry=currentAccountObj.BillingCountry ? currentAccountObj.BillingCountry : '';
+                this.BillingState=currentAccountObj.BillingState ? currentAccountObj.BillingState : '';
+            }
+            
+            
+        }
+        
+        
+        
+        if(orderattempt === true){
+            if(this.classPrefix == "shipping"){
+                selectedContactData.shippingCustomerNumber = cartshipAccountObj.SAP_Account_Id__c;
+                selectedContactData.shippingcompanyName2 = cartshipAccountObj.Account_Name2__c ? cartshipAccountObj.Account_Name2__c : '';
+                this.address3 = cartshipAccountObj.PO_BOX__c ? cartshipAccountObj.PO_BOX__c : '';
+                this.address1 = cartshipAccountObj.BillingStreet ? cartshipAccountObj.BillingStreet : '';
+                this.postalCode =cartshipAccountObj.BillingPostalCode ? cartshipAccountObj.BillingPostalCode : '';
+                this.city =cartshipAccountObj.BillingCity ? cartshipAccountObj.BillingCity : '';
+                this.countryCode =cartshipAccountObj.Transportation_Zone_Country__c;
+                this.companyName = cartshipAccountObj.Name ? cartshipAccountObj.Name : '';
+            }
+            
+        }
+        
+        debugger;
+        
+        var accList = unescapedHtml($("#accListJSONData").html());
+        var accListArray = [];
+        if(accList  !== ""){
+            accListArray  = JSON.parse(accList);
+            for(i =0; i < accListArray.length; i++){
+                accountAddressMap.set(accListArray[i].Id,accListArray[i]);
+            }
+        }
+        var accListBilling =  unescapedHtml($("#accListBillingJSONData").html());
+        var accListArrayBilling = [];
+        if(accListBilling !== ""){
+            accListArrayBilling = JSON.parse(accListBilling);
+            for(i =0; i < accListArrayBilling.length; i++){
+                accountAddressMapBilling.set(accListArrayBilling[i].Id,accListArrayBilling[i]);
+            }
+        }
+        this.accListArrayBilling = accListArrayBilling;
+        this.accListArray  = accListArray;
+        if(typeof selectListHTML !== 'undefined'){
+            this.contactListHTML = selectListHTML ;
+        }
+        else{
+            this.contactListHTML = "<option value='' class=''>No Contact Found</option>";
+            selectListHTML = this.contactListHTML;
+        }
+        return options.fn(this);  
+    });
+    function updateShippingAddress(sfId){
+        $(".closeShipping").click();
+        var selectedAccount = accountAddressMap.get(sfId);
+        $(".shippingcompanyField").val(selectedAccount.Name);
+        $(".shippingcountry").val(selectedAccount.BillingCountryCode);
+        $(".shippingstate").val(selectedAccount.BillingStateCode);
+        $(".shippingCity").val(selectedAccount.BillingCity);
+        $(".shippingPostalCode").val(selectedAccount.BillingPostalCode);
+        $(".shippingAddress1").val(selectedAccount.BillingStreet);
+        $(".shippingAddress3").val(selectedAccount.PO_BOX__c ? 'P.O. Box: '+selectedAccount.PO_BOX__c : '');//Added for SCP-735
+        $("#shippingcompanyName2").val(selectedAccount.Account_Name2__c);
+        document.getElementById("shipCompany1").innerHTML = selectedAccount.Name;
+        
+        if(typeof selectedAccount.Account_Name2__c !== "undefined" && selectedAccount.Account_Name2__c !== '' && selectedAccount.Account_Name2__c !== null){
+            //document.getElementById("shipCompany2").innerHTML = selectedAccount.Account_Name2__c;
+            $("#shipCompany2").val(selectedAccount.Account_Name2__c);
+        }
+        document.getElementById("shipAddress1").innerHTML = selectedAccount.BillingStreet;
+        
+        document.getElementById("shipCity").innerHTML = selectedAccount.BillingCity;
+        document.getElementById("shipPostal").innerHTML = selectedAccount.BillingPostalCode;
+        document.getElementById("shipCountry").innerHTML = selectedAccount.BillingCountry;
+        document.getElementById("shipCountrynew").innerHTML = selectedAccount.BillingCountry;
+        document.getElementById("shipstate").innerHTML = selectedAccount.BillingState;
+        $(".shippingSAPCustomerNumber").val(selectedAccount.SAP_Customer_Number__c);
+        selectedContactData.shippingcompanyName2 = selectedAccount.Account_Name2__c;
+        selectListHTML = "<option value='' class=''>None</option>";
+        if(typeof selectedAccount.Contacts !== 'undefined'){
+            selectedAccount.Contacts.records.sort(function (x, y) {//Added for SCP-830 fix move this sort for SCP-860
+                let a = x.Name.toUpperCase(),
+                    b = y.Name.toUpperCase();
+                return a == b ? 0 : a > b ? 1 : -1;
+            });
+            for(i = 0; i < selectedAccount.Contacts.records.length; i++){
+                selectListHTML = selectListHTML + "<option class='"+selectedAccount.Id+"' value='"+selectedAccount.Contacts.records[i].SAP_Contact_Number__c+"'>"+selectedAccount.Contacts.records[i].Name+"</option>";
+            }
+        }else{
+            //selectListHTML = selectListHTML + "<option value='' class=''>No Contact Found</option>";
+            selectListHTML  = defaultContactListHTML ;
+        }
+        $("#contactList").html(selectListHTML);
+        selectedContact =$("#contactList").val();
+        selectedContactData.contactId = $("#contactList").val();
+        //selectedContactData.contactId = selectedAccount.Contacts.records[0].Id;
+        selectedContactData.contactName = $("#contactList").text();
+        selectedContactData.shippingCustomerNumber = selectedAccount.SAP_Account_ID__c;
+        var att = $("#attn").val();
+        billcsn = selectedAccount.SAP_Account_ID__c;
+        OmniCellBillingAddressController.updateCartCustomFields(
+            CCRZ.pagevars.remoteContext,JSON.stringify(selectedContactData),att,billcsn,JSON.stringify(itemToUpdateMap),  // IBA-3736
+            function (response) {
+                
+                if (response) {
+                    if(response.success) {
+                        
+                    }
+                    
+                    
+                } 
+            }
+        );
+        $('#shippingmethodList').find('option').remove().end();
+        OmniCellBillingAddressController.simulate(CCRZ.pagevars.remoteContext,function (response) {
+            
+            if (response) {
+                if(response.success) {
+                    
+                    selectListHTMLship = '';
+                    
+                    if(typeof response.data.shipList !== 'undefined'){
+                        
+                        $('<option value="">' + 'Shipping Method' + '</option>').appendTo('#shippingmethodList');
+                        for(i = 0; i < response.data.shipList.length; i++){
+                            $('<option value="'+ response.data.shipList[i].price+'*'+response.data.tax[i]+'*'+response.data.shipList[i].uniqueId+'*'+response.data.shipList[i].systemReference+'">' + response.data.shipList[i].uniqueId + '</option>').appendTo('#shippingmethodList');
+                            if(response.data.shipList[i].systemReference ==='HardBlock'){
+                                $("#terms").prop("disabled", true);
+                                $("#shippingmethodList").prop("disabled", true);
+                            }else if(response.data.shipList[i].systemReference === 'ERROR')
+                            {    
+                                $("#terms").prop("disabled", true);
+                                $(".cc_shipCharge_error").show();
+                            }else if(response.data.shipList[i].systemReference ==='SAP_Down'){
+                                $("#shippingmethodList").prop("disabled", true);
+                                $("#terms").prop("disabled", true);
+                                $(".cc_SAPDown_error").show();
+                            }else if(response.data.shipList[i].systemReference ==='DefaultSHIP'){
+                                $(".cc_tax_defaultError").show();
+                                $("#terms").prop("disabled", true);
+                            }
+                        }
+                    }
+                    //alert(selectListHTMLship);
+                    
+                }
+                
+                
+            } 
+        });
+    }
+    function contactListChanged(){
+        selectedContact = $("#contactList").val();
+        selectedContactData.contactId = $("#contactList").val();
+        selectedContactData.contactName = $("#contactList").text();
+    }
+    function updateBillingAddress(sfId){
+        $(".closeBilling").click();
+        var selectedAccount = accountAddressMapBilling.get(sfId);
+        $(".billingcompanyField").val(selectedAccount.Name);
+        $(".billingcountry").val(selectedAccount.BillingCountryCode);
+        $(".billingstate").val(selectedAccount.BillingStateCode);
+        $(".billingCity").val(selectedAccount.BillingCity);
+        $(".billingPostalCode").val(selectedAccount.BillingPostalCode);
+        $(".billingAddress1").val(selectedAccount.BillingStreet);
+        $(".billingAddress3").val(selectedAccount.PO_BOX__c ? 'P.O. Box: '+selectedAccount.PO_BOX__c : '');//Added for SCP-735
+        $("#billingcompanyName2").val(selectedAccount.Account_Name2__c);
+        $(".billingSAPCustomerNumber").val(selectedAccount.SAP_Customer_Number__c);
+        selectedContactData.billingCustomerNumber = selectedAccount.SAP_Account_ID__c;
+        selectedContactData.billingcompanyName2 = selectedAccount.Account_Name2__c;
+        document.getElementById("billstate").innerHTML = selectedAccount.BillingState;
+        document.getElementById("billCompany1").innerHTML = selectedAccount.Name;
+        document.getElementById("billCountrynew").innerHTML = selectedAccount.BillingCountry;
+        if(typeof selectedAccount.Account_Name2__c !== "undefined" && selectedAccount.Account_Name2__c !== '' && selectedAccount.Account_Name2__c !== null){
+            //document.getElementById("shipCompany2").innerHTML = selectedAccount.Account_Name2__c;
+            $("#billCompany2").val(selectedAccount.Account_Name2__c);
+        }
+        if(typeof selectedAccount.BillingStreet !== "undefined" && selectedAccount.BillingStreet !== '' && selectedAccount.BillingStreet !== null){
+            document.getElementById("billAddress1").innerHTML = selectedAccount.BillingStreet;
+        }else{
+            document.getElementById("billAddress1").innerHTML ='';
+        }
+        if(typeof selectedAccount.PO_BOX__c !== "undefined" && selectedAccount.PO_BOX__c !== '' && selectedAccount.PO_BOX__c !== null){
+            document.getElementById("billAddress3").innerHTML = selectedAccount.PO_BOX__c;
+        }else{
+            document.getElementById("billAddress3").innerHTML ='';
+        }
+        
+        
+        document.getElementById("billCity").innerHTML = selectedAccount.BillingCity;
+        document.getElementById("billPostal").innerHTML = selectedAccount.BillingPostalCode;
+        document.getElementById("billCountry").innerHTML = selectedAccount.BillingCountryCode;
+        var att = $("#attn").val();
+        if(typeof att === 'undefined'){
+            att = ' ';
+        }
+        billcsn = selectedAccount.SAP_Account_ID__c;
+        OmniCellBillingAddressController.updateCartCustomFields(
+            CCRZ.pagevars.remoteContext,JSON.stringify(selectedContactData),att,billcsn,JSON.stringify(itemToUpdateMap),  // IBA-3736
+            function (response) {
+            }
+        );
+        $('#credaddress').find('option').remove().end();
+        selectCyberAddressListMap = new Map();
+        SCP_CyberSourceController.getBillingAddressContactList(
+            CCRZ.pagevars.remoteContext,'',
+            function (response) {
+                debugger;
+                if (response) {
+                    if(response.success) {
+                        debugger;
+                        var cartObj = response.data.cartObjJSON;
+                        var addressListHTML = '<option value="">Select Address</option>';
+                        addressListHTML = addressListHTML + '<option value="'+cartObj.ccrz__BillTo__c+'">';
+                        var firstName =  cartObj.ccrz__BillTo__r.ccrz__FirstName__c ? cartObj.ccrz__BillTo__r.ccrz__FirstName__c : '';
+                        var lastName = cartObj.ccrz__BillTo__r.ccrz__LastName__c ? cartObj.ccrz__BillTo__r.ccrz__LastName__c  : '';
+                        var companyName = cartObj.ccrz__BillTo__r.ccrz__CompanyName__c ? cartObj.ccrz__BillTo__r.ccrz__CompanyName__c + ',': '';
+                        var addFirst = cartObj.ccrz__BillTo__r.ccrz__AddressFirstline__c ? cartObj.ccrz__BillTo__r.ccrz__AddressFirstline__c + ',' : '';
+                        var city = cartObj.ccrz__BillTo__r.ccrz__City__c ? cartObj.ccrz__BillTo__r.ccrz__City__c + ',': '';
+                        var state = cartObj.ccrz__BillTo__r.ccrz__StateISOCode__c ? cartObj.ccrz__BillTo__r.ccrz__StateISOCode__c+ ','  : '';
+                        var postal = cartObj.ccrz__BillTo__r.ccrz__PostalCode__c ? cartObj.ccrz__BillTo__r.ccrz__PostalCode__c + ',': '';
+                        var country = cartObj.ccrz__BillTo__r.ccrz__CountryISOCode__c ? cartObj.ccrz__BillTo__r.ccrz__CountryISOCode__c : '';
+                        addressListHTML = addressListHTML + firstName+lastName+companyName+addFirst+city+state+postal+country+'</option>';
+                        setTimeout(function(){ 
+                            $("#credaddress").html(addressListHTML);
+                            selectCyberAddressListMap.set(cartObj.ccrz__BillTo__c,$("option[value='"+cartObj.ccrz__BillTo__c+"']").text());
+                        }, 2000);
+                        
+                    }
+                } 
+            }
+        ); 
+        $('#shippingmethodList').find('option').remove().end();
+        OmniCellBillingAddressController.simulate(CCRZ.pagevars.remoteContext,function (response) {
+            
+            if (response) {
+                if(response.success) {
+                    
+                    selectListHTMLship = '';
+                    
+                    if(typeof response.data.shipList !== 'undefined'){
+                        
+                        $('<option value="">' + 'Shipping Method' + '</option>').appendTo('#shippingmethodList');
+                        for(i = 0; i < response.data.shipList.length; i++){
+                            $('<option value="'+ response.data.shipList[i].price+'*'+response.data.tax[i]+'*'+response.data.shipList[i].uniqueId+'*'+response.data.shipList[i].systemReference+'">' + response.data.shipList[i].uniqueId + '</option>').appendTo('#shippingmethodList');
+                            if(response.data.shipList[i].systemReference ==='HardBlock'){
+                                $("#terms").prop("disabled", true);
+                                $("#shippingmethodList").prop("disabled", true);
+                            }else if(response.data.shipList[i].systemReference === 'ERROR')
+                            {    
+                                $(".cc_shipCharge_error").show();
+                            }else if(response.data.shipList[i].systemReference ==='SAP_Down'){
+                                $("#terms").prop("disabled", true);
+                                $("#shippingmethodList").prop("disabled", true);
+                                $(".cc_SAPDown_error").show();
+                            }else if(response.data.shipList[i].systemReference ==='DefaultSHIP'){
+                                $(".cc_tax_defaultError").show();
+                                
+                            }
+                        }
+                    }
+                    //alert(selectListHTMLship);
+                    
+                }
+                
+                
+            } 
+        });
+    }
+    CCRZ.pubSub.on('view:AddressListing:refresh',function(){
+        debugger;
+        document.getElementById("mincart_grandtotal").innerHTML = '$'+parseFloat($("#mincart_subtotal").text()).toFixed(2);//IBA-3200
+        document.getElementById("mincart_grandtotal1").innerHTML = '$'+parseFloat($("#mincart_subtotal").text()).toFixed(2);//IBA-3200
+        document.getElementById("mincartesttax").innerHTML = '$'+'0.00';
+        document.getElementById("mincartesttax1").innerHTML = '$'+'0.00';
+        document.getElementById("mincartestship").innerHTML = '$'+'0.00';
+        document.getElementById("mincartestship1").innerHTML = '$'+'0.00';
+        //checkinfo(); // IBA-4135 
+        //IBA-4266 - Start
+        for(i =0; i < Object.keys(defaultRelMap).length; i++){
+            //Object.keys(defaultRelMap)
+            if(document.getElementById(Object.keys(defaultRelMap)[i]) != null){
+            	document.getElementById(Object.keys(defaultRelMap)[i]).innerHTML = defaultRelMap[Object.keys(defaultRelMap)[i]];
+            	console.log(document.getElementById(Object.keys(defaultRelMap)[i]));
+            }
+        }
+		//IBA-4266 - End
+        document.getElementById("deftab").click();
+        
+        $(".shippingstate").val(currentAccountObj.BillingStateCode);
+        if(orderattempt === true){
+            $("#cfname").val(cccartshipAccountObj.ccrz__FirstName__c);
+            $("#clname").val(cccartshipAccountObj.ccrz__LastName__c);
+            $("#cphone").val(cccartshipAccountObj.ccrz__HomePhone__c);
+            $(".shippingstate").val(cartshipAccountObj.BillingStateCode);
+        }
+        $(".countryListing").prop( "disabled", true);
+        $(".billingstate").prop( "disabled", true);
+        $(".shippingstate").prop( "disabled", true);
+        if(typeof CCRZ.cartCheckoutModel.attributes.shippingAddress.sfid === 'undefined' || isNewCart ){
+            
+            $(".billingcompanyField").val(currentAccountObj.Name);
+            $(".billingAddress1").val(currentAccountObj.BillingStreet);
+            $(".billingcountry").val(currentAccountObj.BillingCountryCode);
+            $(".billingstate").val(currentAccountObj.BillingStateCode);
+            $(".billingCity").val(currentAccountObj.BillingCity);
+            $(".billingPostalCode").val(currentAccountObj.BillingPostalCode);
+            $(".billingSAPCustomerNumber").val(currentAccountObj.SAP_Customer_Number__c);
+            $(".shippingSAPCustomerNumber").val(currentAccountObj.SAP_Customer_Number__c);
+            if(orderattempt === true){
+                $(".shippingSAPCustomerNumber").val(cartshipAccountObj.SAP_Customer_Number__c);
+            }
+            $(".cc_copy_address").click();
+        }
+        selectedContactData.billingCustomerNumber = $(".billingSAPCustomerNumber").val();
+        selectedContactData.billingcompanyName2 = $("#billingcompanyName2").val();
+        selectedContactData.shippingCustomerNumber = $(".shippingSAPCustomerNumber").val();
+        selectedContactData.shippingcompanyName2 = $("#shippingcompanyName2").val();
+        billcsn = currentAccountObj.SAP_Customer_Number__c;
+        
+        if(!isViewRendered){
+            isViewRendered = true;
+            var att = $("#attn").val();
+            if(typeof att === 'undefined'){
+                att = ' ';
+            }
+            
+            OmniCellBillingAddressController.updateCartCustomFields(
+                CCRZ.pagevars.remoteContext,JSON.stringify(selectedContactData),att,billcsn,JSON.stringify(itemToUpdateMap), // IBA-3736
+                function (response) {
+                }
+            );
+            $('#shippingmethodList').find('option').remove().end();
+            OmniCellBillingAddressController.simulate(CCRZ.pagevars.remoteContext,function (response) {
+                
+                if (response) {
+                    if(response.success) {
+                        myMap = new Map();//IBA-3736 - Start
+                        shipMap = new Map();
+                        itemList = [];//IBA-3736 - End
+                        selectListHTMLship = '';
+                        
+                        if(typeof response.data.shipList !== 'undefined'){
+                            
+                            $('<option value="">' + 'Shipping Method' + '</option>').appendTo('#shippingmethodList');
+                            for(i = 0; i < response.data.shipList.length; i++){
+                                $('<option value="'+ response.data.shipList[i].price+'*'+response.data.tax[i]+'*'+response.data.shipList[i].uniqueId+'*'+response.data.shipList[i].systemReference+'">' + response.data.shipList[i].uniqueId + '</option>').appendTo('#shippingmethodList');
+                                if(response.data.shipList[i].systemReference ==='HardBlock'){
+                                    $("#terms").prop("disabled", true);
+                                    $("#shippingmethodList").prop("disabled", true);
+                                }else if(response.data.shipList[i].systemReference === 'ERROR')
+                                {    
+                                    $(".cc_shipCharge_error").show();
+                                }else if(response.data.shipList[i].systemReference ==='SAP_Down'){
+                                    $("#terms").prop("disabled", true);
+                                    $("#shippingmethodList").prop("disabled", true);
+                                    $(".cc_SAPDown_error").show();
+                                }else if(response.data.shipList[i].systemReference ==='DefaultSHIP'){
+                                    $(".cc_tax_defaultError").show();
+                                    
+                                }
+                            }
+                            
+                        }
+                        if(typeof response.data.ITEMLIST !== 'undefined'){
+                            //  console.log(response.data.ITEMLIST);
+                            for(i = 0; i < response.data.ITEMLIST.length; i++){
+                                skulist[i]=response.data.ITEMLIST[i].ITM_NUMBER;
+                                avdtlist[i]=response.data.ITEMLIST[i].AVL_DATE;
+                            }
+                        }
+                        if(typeof response.data.ET_ITEM_DELIVERY_DATES !== 'undefined'){//IBA-3736
+                             for(i = 0; i < response.data.ET_ITEM_DELIVERY_DATES.length; i++){
+                                 itemList[i] = response.data.ET_ITEM_DELIVERY_DATES[i].item_sku;
+                                 myMap.set(response.data.ET_ITEM_DELIVERY_DATES[i].keyId,response.data.ET_ITEM_DELIVERY_DATES[i].deldate);
+                            }
+                        }
+                        if(typeof response.data.ShipMethodMap !== 'undefined'){//IBA-3736
+                             for(i = 0; i < response.data.ShipMethodMap.length; i++){
+                                 shipMap.set(response.data.ShipMethodMap[i].ship_desc,response.data.ShipMethodMap[i].ship_code);
+                            }
+                        }
+                    }
+                    
+                    
+                } 
+            });
+            
+            $('#paycard').find('option').remove().end();
+            OmniCellBillingAddressController.getPayment(CCRZ.pagevars.remoteContext,function (response) {
+                
+                if (response) {
+                    if(response.success) {
+                        
+                        
+                        if(typeof response.data.paymethod !== 'undefined'){
+                            
+                            $('<option value="">' + 'Payment Type' + '</option>').appendTo('#paycard');
+                            for(i = 0; i < response.data.paymethod.length; i++){
+                                $('<option value="'+ response.data.paymethod[i].ccpgcs__Type__c +'*'+response.data.paymethod[i].Id+'*'+response.data.paymethod[i].Name+'">' + response.data.paymethod[i].Name + '</option>').appendTo('#paycard');
+                            }
+                        }
+                        
+                        if(typeof response.data.payPO !== 'undefined'){
+                            
+                            
+                            for(i = 0; i < response.data.payPO.length; i++){
+                                $('<input type="radio" class="normal" name="storedpo" onclick="hideerr()" id="'+ response.data.payPO[i].Id+'" value="' + response.data.payPO[i].Id +'*'+response.data.payPO[i].ccrz__AccountNumber__c+ '"/><label class="normal" for="'+ response.data.payPO[i].ccrz__AccountNumber__c +'">&nbsp Purchase Order: '+ response.data.payPO[i].ccrz__AccountNumber__c +'</label><br>').appendTo('#stpo');
+                            }
+                        }
+                    }
+                    
+                    
+                } 
+            });
+            selectedContactData.billingCustomerNumber = $(".billingSAPCustomerNumber").val();
+            selectedContactData.billingcompanyName2 = $("#billingcompanyName2").val();
+            selectedContactData.shippingCustomerNumber = $(".shippingSAPCustomerNumber").val();
+            selectedContactData.shippingcompanyName2 = $("#shippingcompanyName2").val();
+            OmniCellBillingAddressController.getContactAddressContactList(
+                CCRZ.pagevars.remoteContext,CCRZ.cartCheckoutModel.attributes.shippingAddress.SAPContactID ? CCRZ.cartCheckoutModel.attributes.shippingAddress.SAPContactID : '',
+                function (response) {
+                    debugger;
+                    $(".shippingstate").prop( "disabled", true);
+                    if (response) {
+                        if(response.success) {
+                            debugger;
+                            selectListHTML = '';
+                            defaultContactListHTML = '';
+                            if(typeof response.data.contactList !== 'undefined'){
+                                selectListHTML = selectListHTML + "<option value='' class='' disabled selected value> </option>"; //B2B-123
+                                for(i = 0; i < response.data.contactList.length; i++){
+                                    selectListHTML = selectListHTML + "<option class='"+response.data.contactList[i].AccountId+"' value='"+response.data.contactList[i].SAP_Contact_Number__c+"'>"+response.data.contactList[i].Name+"</option>";
+                                }
+                            }else{
+                                selectListHTML = selectListHTML + "<option value='' class=''>No Contact Found</option>";
+                            }
+                            if(typeof response.data.defaultContactList !== 'undefined'){
+                                for(i = 0; i < response.data.defaultContactList.length; i++){
+                                    defaultContactListHTML = defaultContactListHTML + "<option class='"+response.data.defaultContactList[i].AccountId+"' value='"+response.data.defaultContactList[i].SAP_Contact_Number__c+"'>"+response.data.defaultContactList[i].Name+"</option>";
+                                }
+                            }
+                            $("#contactList").html(selectListHTML);
+                            if(typeof CCRZ.cartCheckoutModel.attributes.shippingAddress.SAPContactID != 'undefined' && CCRZ.cartCheckoutModel.attributes.shippingAddress.SAPContactID !== ''){
+                                $("#contactList").val(CCRZ.cartCheckoutModel.attributes.shippingAddress.SAPContactID);
+                            }
+                            if(typeof $("#contactList").val() === 'undefined' || $("#contactList").val() === '' || $("#contactList").val() === null){
+                                $("#contactList").val($("#contactList option:first").val());
+                            }
+                            selectedContact =$("#contactList").val();
+                            selectedContactData.contactId = $("#contactList").val();
+                            selectedContactData.contactName = $("#contactList").text();
+                            
+                        }
+                        
+                        
+                    } 
+                }
+            );
+            
+            $('#credaddress').find('option').remove().end();
+            selectCyberAddressListMap = new Map();
+            SCP_CyberSourceController.getBillingAddressContactList(
+                CCRZ.pagevars.remoteContext,'',
+                function (response) {
+                    debugger;
+                    if (response) {
+                        if(response.success) {
+                            debugger;
+                            var cartObj = response.data.cartObjJSON;
+                            var addressListHTML = '<option value="">Select Address</option>';
+                            addressListHTML = addressListHTML + '<option value="'+cartObj.ccrz__BillTo__c+'">';
+                            var firstName =  cartObj.ccrz__BillTo__r.ccrz__FirstName__c ? cartObj.ccrz__BillTo__r.ccrz__FirstName__c : '';
+                            var lastName = cartObj.ccrz__BillTo__r.ccrz__LastName__c ? cartObj.ccrz__BillTo__r.ccrz__LastName__c  : '';
+                            var companyName = cartObj.ccrz__BillTo__r.ccrz__CompanyName__c ? cartObj.ccrz__BillTo__r.ccrz__CompanyName__c + ',': '';
+                            var addFirst = cartObj.ccrz__BillTo__r.ccrz__AddressFirstline__c ? cartObj.ccrz__BillTo__r.ccrz__AddressFirstline__c + ',' : '';
+                            var city = cartObj.ccrz__BillTo__r.ccrz__City__c ? cartObj.ccrz__BillTo__r.ccrz__City__c + ',': '';
+                            var state = cartObj.ccrz__BillTo__r.ccrz__StateISOCode__c ? cartObj.ccrz__BillTo__r.ccrz__StateISOCode__c+ ','  : '';
+                            var postal = cartObj.ccrz__BillTo__r.ccrz__PostalCode__c ? cartObj.ccrz__BillTo__r.ccrz__PostalCode__c + ',': '';
+                            var country = cartObj.ccrz__BillTo__r.ccrz__CountryISOCode__c ? cartObj.ccrz__BillTo__r.ccrz__CountryISOCode__c : '';
+                            addressListHTML = addressListHTML + firstName+lastName+companyName+addFirst+city+state+postal+country+'</option>';
+                            setTimeout(function(){ 
+                                $("#credaddress").html(addressListHTML);
+                                selectCyberAddressListMap.set(cartObj.ccrz__BillTo__c,$("option[value='"+cartObj.ccrz__BillTo__c+"']").text());
+                            }, 2000);
+                            
+                        }
+                    } 
+                }
+            ); 
+        }
+        
+    });
+    CCRZ.pubSub.on('view:cartCheckoutView:refresh',function(){
+        //IBA-3827
+        button = document.getElementById("creditC");
+        if(button != null){
+            button.disabled = true;
+            OmniCellBillingAddressController.checkCC(
+                CCRZ.pagevars.remoteContext, 
+                function (response) {
+                    if(response.success) {                   
+                        if(response.data.disabled === false){
+                            button.disabled = false;
+                        }        
+                    }
+                }
+            );
+        }
+        
+        
+        for(i=0; i< CCRZ.cartCheckoutModel.attributes.cartItems.length;i++){//New Added
+             var minorItems = CCRZ.cartCheckoutModel.attributes.cartItems[i].minorLines;
+             if(minorItems != null){
+                  for(var j = 0;j < minorItems.length; j++){
+                       minorItemMap.set(minorItems[j].sfid,minorItems[j]);
+                       minorItemdata.push(minorItems[j]);
+                   }
+                   
+              }
+        }    
+        
+        console.log( minorItemdata);
+               
+    });
+    CCRZ.pubSub.once("view:AddressListing:refresh", function (view) {
+                
+        var viewPrototype = Object.getPrototypeOf(view);       
+        if (viewPrototype != null) {
+            var _view = view;
+            viewPrototype.events = _.extend(viewPrototype.events, {
+                "click .updateCartCustomFields": "updateCartCustomFields"
+            });
+            viewPrototype.updateCartCustomFields = function (event) {
+                var att = $("#attn").val(); // SCP-763
+                if(typeof att === 'undefined'){
+                    att = ' ';
+                }
+                var cfName = $("#cfname").val();//SCP-850
+                var clName = $("#clname").val();//SCP-850
+                var cPhone = $("#cphone").val();//SCP-850
+                var ContComName1 = $(".shippingcompanyField").val();//SCP-850
+                var ContComName2 = $(".shippingcompanyField2").val();//SCP-850
+                var selectedshipmethod =$("#shippingmethodList").val();
+                var shipArr = selectedshipmethod.split("*");
+                var shippingmh = shipArr[2];
+                var shippingdt = shipArr[3];
+                
+                var errorHTML = '<div class="alert alert-danger">Field Validation Errors</div>';
+                var isErrorExists = false;
+                
+                if(slectedPayment === '' || slectedPayment === null || typeof slectedPayment === 'undefined'){
+                    isErrorExists = true;
+                    errorHTML = errorHTML + '<div class="alert alert-danger">Please select payment method</div>';
+                }else{
+                    if(slectedPayment === 'spo'){
+                        if(typeof $("input[name='storedpo']:checked").val() === 'undefined' || $("input[name='storedpo']:checked").val() === '' || $("input[name='storedpo']:checked").val() === null){
+                            isErrorExists = true;
+                            errorHTML = errorHTML + '<div class="alert alert-danger">Select one radio button</div>';
+                        }
+                    }
+                    
+                    if(slectedPayment === 'po'){
+                        if(typeof $("#ponum").val() === 'undefined' || $("#ponum").val() === '' || $("#ponum").val() === null){
+                            isErrorExists = true;
+                            errorHTML = errorHTML + '<div class="alert alert-danger">Purchaser Order</div>';
+                            
+                        }
+                    }
+                    
+                    if(slectedPayment === 'cc'){
+                        if(typeof $("#creditFname").val() === 'undefined' || $("#creditFname").val() === ''){
+                            isErrorExists = true;
+                            var errorHTML1 = '<div class="alert alert-danger">First Name</div>';
+                        }
+                        if(typeof $("#creditLname").val() === 'undefined' || $("#creditLname").val() === ''){
+                            isErrorExists = true;
+                            var errorHTML2 = '<div class="alert alert-danger">Required: Last Name</div>';
+                        } 
+                        if(typeof $("#paycard" ).val() === 'undefined' || $("#paycard" ).val() === ''){
+                            isErrorExists = true;
+                            var errorHTML3 = '<div class="alert alert-danger">Payment Type</div>';
+                        }
+                        if(typeof $("#creditNum").val() === 'undefined' || $("#creditNum").val() === ''){
+                            isErrorExists = true;
+                            var errorHTML4 = '<div class="alert alert-danger">Required: Card Number</div>';
+                        }
+                        if(typeof $("#expm").val() === 'undefined' || $("#expm").val() === ''){
+                            isErrorExists = true;
+                            var errorHTML5 = '<div class="alert alert-danger">Required: MM</div>';
+                        }
+                        if(typeof $("#expy").val() === 'undefined' || $("#expy").val() === ''){
+                            isErrorExists = true;
+                            var errorHTML6 = '<div class="alert alert-danger">Required: YYYY</div>';
+                        }
+                        if(typeof $("#creditCVN").val() === 'undefined' || $("#creditCVN").val() === ''){
+                            isErrorExists = true;
+                            var errorHTML7 = '<div class="alert alert-danger">Required: CVV</div>';
+                        }
+                        if(typeof $("#credaddress").val() === 'undefined' || $("#credaddress").val() === ''){ 
+                            isErrorExists = true;
+                            var errorHTML8 = '<div class="alert alert-danger">Required: Select Address</div>';
+                        }
+                    }
+                }
+                
+                var ShipsecerrorHTML = '<div class="alert alert-danger">Field Validation Errors</div>';
+                var isShipsecErrorExists = false;
+                if(typeof $("#cfname").val() === 'undefined' || $("#cfname").val() === '' || $("#cfname").val() === null){
+                    isShipsecErrorExists = true;
+                  var  ShipsecerrorHTML1 = '<div class="alert alert-danger">Please Enter Contact First Name</div>';
+                }
+                if(typeof $("#clname").val() === 'undefined' || $("#clname").val() === '' || $("#clname").val() === null){
+                    isShipsecErrorExists = true;
+                   var ShipsecerrorHTML2 =  '<div class="alert alert-danger">Please Enter Contact Last Name</div>';
+                }
+                if(typeof $("#cphone").val() === 'undefined' || $("#cphone").val() === '' || $("#cphone").val() === null){
+                    isShipsecErrorExists = true;
+                    var ShipsecerrorHTML3 = '<div class="alert alert-danger">Please Enter Phone Number</div>';
+                }
+                else{  //Added for IBA-2154
+                    if ( $("#cphone").val().length > 20){
+                        isShipsecErrorExists = true;
+                        var ShipsecerrorHTML3 = '<div class="alert alert-danger">Contact Number should be 20 characters, including the country code and area code</div>';
+                    }
+                }
+                
+                if(typeof $("#shippingmethodList").val() === 'undefined' || $("#shippingmethodList").val() === '' || $("#shippingmethodList").val() === null){
+                    var ShiperrorHTML = '<div class="alert alert-danger">Please Select Shipping Method</div>';
+                    document.getElementById("errorMsg").innerHTML = ShiperrorHTML;// Added for IBA-2287
+                    $(".shiperror-msg").html(ShiperrorHTML);
+                    $(".shiperror-msg").show();
+                    $("#shipbtn").css("background-color","#F2DEDE");
+                    $("#valError").modal('show');//Added for IBA-2287
+                }else{
+                    if(isShipsecErrorExists){
+                        var shiperrorMsg = '';//IBA-2287
+                        $(".shipsec-Error1").html(ShipsecerrorHTML1);
+                        $(".shipsec-Error2").html(ShipsecerrorHTML2);
+                        $(".shipsec-Error3").html(ShipsecerrorHTML3);
+                        if(ShipsecerrorHTML1 != null){ // Added for IBA-2287 Start
+                             shiperrorMsg = shiperrorMsg+ShipsecerrorHTML1
+                        }
+                        if(ShipsecerrorHTML2 != null){
+                             shiperrorMsg = shiperrorMsg+ShipsecerrorHTML2
+                        }
+                        if(ShipsecerrorHTML3 != null){
+                             shiperrorMsg = shiperrorMsg+ShipsecerrorHTML3
+                        }  
+                        document.getElementById("errorMsg").innerHTML = shiperrorMsg;// Added for IBA-2287 End
+                        $(".shipsec-Error1").show();
+                        $(".shipsec-Error2").show();
+                        $(".shipsec-Error3").show();
+                        $("#valError").modal('show');//Added for IBA-2287
+                        $("#shipsecbtn").css("background-color","#F2DEDE");
+                    }
+                    else{
+                        
+                        if(isErrorExists){
+                            $("#paybtn").css("background-color","#F2DEDE");
+                            if(slectedPayment === '' || slectedPayment === null || typeof slectedPayment === 'undefined'){
+                                document.getElementById("errorMsg").innerHTML = errorHTML;// Added for IBA-2287 start
+                                $("#valError").modal('show');//Added for IBA-2287 end
+                                $(".pay-Error").html(errorHTML);
+                                $(".pay-Error").show();
+                                
+                            }else{
+                                if(slectedPayment === 'spo'){
+                                    document.getElementById("errorMsg").innerHTML = errorHTML;// Added for IBA-2287 start
+                                    $("#valError").modal('show');//Added for IBA-2287 end
+                                    $(".spo-Error").html(errorHTML);
+                                    $(".spo-Error").show(); 
+                                }
+                                if(slectedPayment === 'po'){
+                                    document.getElementById("errorMsg").innerHTML = errorHTML;// Added for IBA-2287 start
+                                    $("#valError").modal('show');//Added for IBA-2287 end
+                                    $(".po-Error").html(errorHTML);
+                                    $(".po-Error").show(); 
+                                }
+                                if(slectedPayment === 'cc'){
+                                    var ccerrorMsg = '';
+                                    $(".crdit-Error1").html(errorHTML1);
+                                    $(".crdit-Error1").show();
+                                    $(".crdit-Error2").html(errorHTML2);
+                                    $(".crdit-Error2").show(); 
+                                    $(".crdit-Error3").html(errorHTML3);
+                                    $(".crdit-Error3").show(); 
+                                    $(".crdit-Error4").html(errorHTML4);
+                                    $(".crdit-Error4").show(); 
+                                    $(".crdit-Error5").html(errorHTML5);
+                                    $(".crdit-Error5").show(); 
+                                    $(".crdit-Error6").html(errorHTML6);
+                                    $(".crdit-Error6").show(); 
+                                    $(".crdit-Error7").html(errorHTML7);
+                                    $(".crdit-Error7").show(); 
+                                    if(errorHTML1 != null){ // Added for IBA-2287 Start
+                                        ccerrorMsg = ccerrorMsg+errorHTML1
+                                    }
+                                    if(errorHTML2 != null){
+                                        ccerrorMsg = ccerrorMsg+errorHTML2
+                                    }
+                                    if(errorHTML3 != null){
+                                        ccerrorMsg = ccerrorMsg+errorHTML3
+                                    }
+                                    if(errorHTML4 != null){
+                                        ccerrorMsg = ccerrorMsg+errorHTML4
+                                    }
+                                    if(errorHTML5 != null){
+                                        ccerrorMsg = ccerrorMsg+errorHTML5
+                                    }
+                                    if(errorHTML6 != null){
+                                        ccerrorMsg = ccerrorMsg+errorHTML6
+                                    }
+                                    if(errorHTML7 != null){
+                                        ccerrorMsg = ccerrorMsg+errorHTML7
+                                    }
+                                    if(errorHTML8 != null){
+                                        ccerrorMsg = ccerrorMsg+errorHTML8
+                                    }
+                                    
+                                    document.getElementById("errorMsg").innerHTML = ccerrorMsg;// Added for IBA-2287 End
+                                    $(".crdit-Error8").html(errorHTML8);
+                                    $(".crdit-Error8").show(); 
+                                    $("#valError").modal('show');//Added for IBA-2287
+                                }
+                            }
+                        }else{
+                            $('#contB').attr("disabled", true);
+                            $('#contBb').attr("disabled", true);
+                            selectedContactData.ConFname = cfName;
+                            selectedContactData.ConLname = clName;
+                            selectedContactData.ConPhone = cPhone;
+                            selectedContactData.ConComName1 = ContComName1;
+                            selectedContactData.ConComName2 = ContComName2;
+                            selectedContactData.contactId = $("#contactList").val();
+                            selectedContactData.shippingMh = shippingmh;
+                            
+                            var myArr = shippingdt.split("-");
+                            selectedContactData.shippingDt = myArr[1]+'/'+myArr[2]+'/'+myArr[0];
+                            selectedContactData.shnote = $("#shippingNotes").val();
+                            selectedContactData.refno = $("#referenceNumberField").val();
+                            selectedContactData.shipc = parseFloat(shipArr[0]);
+                            selectedContactData.tx = parseFloat(shipArr[1]);
+                            selectedContactData.buyerFname = $("#firstNameField").val();
+                            selectedContactData.buyerLname = $("#lastNameField").val();
+                            selectedContactData.buyerPhone = $("#homePhoneField").val();
+                            selectedContactData.buyerEmail = $("#emailField").val();
+                            
+                            selectedContactData.shipaddress1 = $("#shipAddress1").text();
+                            selectedContactData.shipaddress2 = $("#shipAddress2").text();
+                            selectedContactData.shipaddress3 = $("#shipAddress3").text();
+                            selectedContactData.shipCity = $("#shipCity").text();
+                            selectedContactData.shipPostal = $("#shipPostal").text();
+                            selectedContactData.shipCountry = $("#shipCountry").text();
+                            selectedContactData.shippingCountrycode = $("#shippingcountry").text();
+                            
+                            selectedContactData.billAddress1 = $("#billAddress1").text();
+                            selectedContactData.billAddress2 = $("#billAddress2").text();
+                            selectedContactData.billAddress3 = $("#billAddress3").text();
+                            selectedContactData.billCity = $("#billCity").text();
+                            selectedContactData.billPostal = $("#billPostal").text();
+                            selectedContactData.billCountry = $("#billCountry").text();
+                            selectedContactData.billingCountrycode = $("#billingcountry").text();
+                            //alert(selectedContactData.billAddress1+ ' ' +$("#billAddress1").text());
+                            //payment
+                            
+                            selectedContactData.slectedPayment = slectedPayment;
+                            selectedContactData.creditBillId = CreditBillingAddId;
+                            if(selectedContactData.slectedPayment === 'po'){
+                                selectedContactData.ponum = $("#ponum").val();
+                                selectedContactData.poname = $("#poname").val();
+                                selectedContactData.chkpo = document.getElementById("chkpo").checked;
+                                attachfile();
+                                OmniCellBillingAddressController.updateCartCustomFields(
+                                    CCRZ.pagevars.remoteContext,JSON.stringify(selectedContactData),att,billcsn,JSON.stringify(itemToUpdateMap), // IBA-3736
+                                    function (response) {
+                                        $('#contB').attr("disabled", false);
+                                         $('#contBb').attr("disabled", false);
+                                        debugger;
+                                        //isNewCart = false;  
+                                        if (response) {
+                                            if(response.success) {
+                                                
+                                                  $(".updateCartCustomFields").addClass("processUserInfo");
+                                                  $(".processUserInfo").removeClass("updateCartCustomFields");
+                                                  $(".processUserInfo").click();
+                                            }
+                                            
+                                            
+                                        } 
+                                    }
+                                );
+                            }
+                            
+                            if(selectedContactData.slectedPayment === 'cc'){
+                                selectedContactData.creditFname = $("#creditFname").val();
+                                selectedContactData.creditLname = $("#creditLname").val();
+                                
+                                selectedContactData.creditNum = $("#creditNum").val();
+                                selectedContactData.expm = $("#expm").val();
+                                selectedContactData.expy = $("#expy").val();
+                                selectedContactData.creditCVN = $("#creditCVN").val();
+                                selectedContactData.credaddress = $("#credaddress").val();
+                                selectedContactData.creditBillId = $("#credaddress").val();
+                                var paym =$("#paycard").val();
+                                var pArr = paym.split("*");
+                                selectedContactData.paycard = pArr[0];
+                                selectedContactData.paycardid = pArr[1];
+                                selectedContactData.paycardname = pArr[2];
+                                OmniCellBillingAddressController.updateCartCustomFields(
+                                    CCRZ.pagevars.remoteContext,JSON.stringify(selectedContactData),att,billcsn,JSON.stringify(itemToUpdateMap), // IBA-3736
+                                    function (response) {
+                                        $('#contB').attr("disabled", false);
+                                        $('#contBb').attr("disabled", false);
+                                        debugger;
+                                        //isNewCart = false;  
+                                        if (response) {
+                                            if(response.success) {
+                                                
+                                                //CCRZ.cartCheckoutModel.attributes.referenceNumber = $("#referenceNumberField").val();
+                                                 $(".updateCartCustomFields").addClass("processUserInfo");
+                                                 $(".processUserInfo").removeClass("updateCartCustomFields");
+                                                $(".processUserInfo").click();
+                                            }
+                                            
+                                            
+                                        } 
+                                    }
+                                );
+                            }
+                            
+                            
+                            if(selectedContactData.slectedPayment === 'spo'){
+                                var spArr = $("input[name='storedpo']:checked").val();
+                                var spoarr =  spArr.split("*");
+                                selectedContactData.storedpoid = spoarr[0];
+                                var ponum = spoarr[1];
+                                OmniCellBillingAddressController.getpo(CCRZ.pagevars.remoteContext,ponum,
+                                                                       function (response) {
+                                                                           
+                                                                           if (response) {
+                                                                               if(response.success) {
+                                                                                   if(response.data.isUpdated === true){
+                                                                                       $("#myModal1").modal('show');
+                                                                                       $("#myModal1").on('hidden.bs.modal', function(){
+                                                                                           
+                                                                                           if(chval === 'Yes'){
+                                                                                               
+                                                                                               
+                                                                                               OmniCellBillingAddressController.updateCartCustomFields(
+                                                                                                   CCRZ.pagevars.remoteContext,JSON.stringify(selectedContactData),att,billcsn,JSON.stringify(itemToUpdateMap), // IBA-3736
+                                                                                                   function (response) {
+                                                                                                       $('#contB').attr("disabled", false);
+                                                                                                       $('#contBb').attr("disabled", false);
+                                                                                                       debugger;
+                                                                                                       //isNewCart = false;  
+                                                                                                       if (response) {
+                                                                                                           if(response.success) {
+                                                                                                               
+                                                                                                               //CCRZ.cartCheckoutModel.attributes.referenceNumber = $("#referenceNumberField").val();
+                                                                                                                 $(".updateCartCustomFields").addClass("processUserInfo");
+                                                                                                                 $(".processUserInfo").removeClass("updateCartCustomFields");
+                                                                                                                $(".processUserInfo").click();
+                                                                                                           }
+                                                                                                           
+                                                                                                           
+                                                                                                       } 
+                                                                                                   }
+                                                                                               );
+                                                                                           }
+                                                                                           
+                                                                                       });
+                                                                                   }else{
+                                                                                       
+                                                                                       OmniCellBillingAddressController.updateCartCustomFields(
+                                                                                           CCRZ.pagevars.remoteContext,JSON.stringify(selectedContactData),att,billcsn,JSON.stringify(itemToUpdateMap), // IBA-3736
+                                                                                           function (response) {
+                                                                                               $('#contB').attr("disabled", false);
+                                                                                               $('#contBb').attr("disabled", false);
+                                                                                               debugger;
+                                                                                               //isNewCart = false;  
+                                                                                               if (response) {
+                                                                                                   if(response.success) {
+                                                                                                       
+                                                                                                       //CCRZ.cartCheckoutModel.attributes.referenceNumber = $("#referenceNumberField").val();
+                                                                                                        $(".updateCartCustomFields").addClass("processUserInfo");
+                                                                                                        $(".processUserInfo").removeClass("updateCartCustomFields");
+                                                                                                       $(".processUserInfo").click();
+                                                                                                   }
+                                                                                                   
+                                                                                                   
+                                                                                               } 
+                                                                                           }
+                                                                                       );
+                                                                                   }
+                                                                               }    
+                                                                           } 
+                                                                       }
+                                                                      );
+                            }
+                            
+                        }
+                    };
+                }
+            } 
+            view.delegateEvents();
+            view.render();
+        }         
+        $(".shipnotes").val(currentCart.ccrz__Note__c); //IBA-4134
+    });
+    
+    function changevalNo() {
+        chval='No';
+    }
+    function changevalYes() {
+        chval='Yes';
+    }
+    
+    function shipChange(){
+        itemToUpdateMap = [];// IBA-3736
+        var selectedshipmethod =$("#shippingmethodList").val();
+        var myArr = selectedshipmethod.split("*");
+        if(myArr.length == 1){ //IBA-3200
+            myArr = ["0.00","0.00","","0000-00-00"];
+        }
+        var ship_condKey = shipMap.get(myArr[2]);//IBA-3736 -- Start
+        for(var j = 0; j < itemList.length; j++){
+            var selectedCartItemData = {};
+            selectedCartItemData.ItemNumber = itemList[j];
+            selectedCartItemData.Date = myMap.get(ship_condKey+'__'+itemList[j]);
+            itemToUpdateMap.push(selectedCartItemData);
+            document.getElementById(itemList[j]+'_dd').innerHTML = myMap.get(ship_condKey+'__'+itemList[j]);
+        }                                                               //IBA-3736 -- End
+        document.getElementById("mincartestship").innerHTML = '$'+parseFloat(myArr[0]).toFixed(2);
+        document.getElementById("mincartesttax").innerHTML = '$'+parseFloat(myArr[1]).toFixed(2);
+        $("#estShipping").html(' $'+parseFloat(myArr[0]).toFixed(2));
+        var gdtotal = parseFloat($("#mincart_subtotal").text())+parseFloat(myArr[0])+parseFloat(myArr[1]);
+        document.getElementById("mincart_grandtotal").innerHTML = '$'+gdtotal.toFixed(2);
+        
+        var dtArr = myArr[3].split("-");
+        
+        $("#mincartestship1").html(' $'+parseFloat(myArr[0]).toFixed(2));
+        $("#mincartesttax1").html(' $'+parseFloat(myArr[1]).toFixed(2));
+        $("#requestedDateStr").val(dtArr[1]+'/'+dtArr[2]+'/'+dtArr[0]);
+        $("#reqDeliveryDate").html(dtArr[1]+'/'+dtArr[2]+'/'+dtArr[0]);
+        $("#mincart_grandtotal1").html(' $'+gdtotal.toFixed(2));
+        
+        if(typeof selectedshipmethod !== 'undefined' || selectedshipmethod !== '' || selectedshipmethod !== null){
+            $(".shiperror-msg").hide();
+            $("#shipbtn").css("background-color","#f1f1f1");
+            }
+        for(i = 0; i < skulist.length; i++){
+            var req = new Date(myArr[3]);
+            var avl = new Date(avdtlist[i]);
+            var shulistItem = document.getElementById("00"+skulist[i]);
+            if(req < avl){
+                if(shulistItem!= null){
+                    document.getElementById("00"+skulist[i]).innerHTML="Backorder"; 
+                    document.getElementById("00"+skulist[i]).style.color = "red";
+                }
+            }
+            if(req >= avl ){
+                
+                if(shulistItem!= null){
+                    document.getElementById("00"+skulist[i]).innerHTML="Available"; //error at this line 
+                    document.getElementById("00"+skulist[i]).style.color = "green";
+                }
+            }
+            
+          }
+    }
+    function shippingStateChanged(){
+        
+        setTimeout(function () {
+            $(".shippingstate").prop( "disabled", true);
+        }, 300)
+    }
+    function unescapedHtml(){
+        return jQuery("<span />", { html: arguments[0] }).text();
+    }
+    
+    function checkinfo(){
+        
+        var checkBox = document.getElementById("terms");
+        
+        if (checkBox.checked == true){
+            document.getElementById("accptbtn").disabled = false;
+        } else {
+            document.getElementById("accptbtn").disabled = true;
+            document.getElementById("contB").disabled = true;
+            document.getElementById("contBb").disabled = true;
+        }
+        
+    }
+    function checkacpt(){
+        
+        
+        document.getElementById("contB").disabled = false;
+        document.getElementById("contBb").disabled = false;
+        
+    }
+    
+    function iconchg(x){
+        
+        var className=$(x).attr('class');
+        
+        /*if(className === 'fa fa-plus'){
+            $(x).addClass("fa-minus");
+            $(x).removeClass("fa-plus");
+            
+        }
+        if(className === 'fa fa-minus'){
+            $(x).addClass("fa-plus");
+            $(x).removeClass("fa-minus");
+            
+        }*/
+        if(className === 'arrow up'){
+            $(x).addClass("down");
+            $(x).removeClass("up");
+            
+        }
+        if(className === 'arrow down'){
+            $(x).addClass("up");
+            $(x).removeClass("down");
+            
+        }
+    }
+    
+    function callsubmit(){
+         OmniCellBillingAddressController.reCheckSingleCheckout(
+                    CCRZ.pagevars.remoteContext,
+                    function(response) {
+                       if (response) {
+                            if(response.success) {
+                                $( "#contB" ).trigger( "click" );
+                            }
+                        }
+                    }
+        );
+    }
+    var slectedPayment;
+    function opentab(evt, tabName) {
+        var i, tabcontent, tablinks;
+        tabcontent = document.getElementsByClassName("tabcontent");
+        for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].style.display = "none";
+        }
+        tablinks = document.getElementsByClassName("tablinks");
+        for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].className = tablinks[i].className.replace(" active", "");
+        }
+        document.getElementById(tabName).style.display = "block";
+        evt.currentTarget.className += " active";
+        slectedPayment = tabName;
+        
+    }
+    var CreditBillingAddId;
+    function CredBillCreate(){
+        $('#CredBillAddress').modal('hide');
+        var CredBillToJson = {};
+        CredBillToJson.creditfname = $("#credBillFname").val();
+        CredBillToJson.creditlname = $("#credBillLname").val();
+        CredBillToJson.creditcompname = $("#credBillCompname").val();
+        CredBillToJson.creditaddress1 = $("#credBillAddress1").val();
+        CredBillToJson.creditaddress2 = $("#credBillAddress2").val();
+        CredBillToJson.creditcountry = $("#credBillCountry").val();
+        CredBillToJson.creditstate = $("#credBillState").val();
+        CredBillToJson.creditcity = $("#credBillCity").val();
+        CredBillToJson.creditpostal = $("#credBillPostal").val();
+        
+        //alert($("#credBillFname").val());
+        OmniCellBillingAddressController.createCreditBillTo(
+            CCRZ.pagevars.remoteContext,JSON.stringify(CredBillToJson),//cred Bill to
+            function (response) { 
+                if (response) {
+                    if(response.success) {
+                        if(typeof response.data.newbillId !== 'undefined'){
+                            CreditBillingAddId = response.data.newbillId;
+                            var addressListHTML = '<option value="'+CreditBillingAddId+'">';
+                            var firstName =  CredBillToJson.creditfname;
+                            var lastName = CredBillToJson.creditlname;
+                            var companyName = CredBillToJson.creditcompname;
+                            var addFirst = CredBillToJson.creditaddress1;
+                            var city = CredBillToJson.creditcity;
+                            var state = CredBillToJson.creditstate;
+                            var postal = CredBillToJson.creditpostal;
+                            var country = CredBillToJson.creditcountry;
+                            addressListHTML = addressListHTML + firstName+lastName+companyName+','+addFirst+','+city+','+state+','+postal+','+country+'</option>';
+                            //$("#credaddress").html(addressListHTML);
+                            $(addressListHTML).appendTo('#credaddress');
+                        }
+                    }
+                    
+                    
+                } 
+            }
+        );
+        
+    }
+    function CredBillCreateclose(){
+        $('#CredBillAddress').modal('hide');
+    }
+    
+    function sendEmailcart(){
+        var emailForm = {};
+        emailForm.email_to = $("#email_to").val();
+        emailForm.email_cc = $("#email_cc").val() ? $("#email_cc").val() : '';
+        emailForm.subject = $("#subject").val() ? $("#subject").val() : '';
+        emailForm.description = $("#description").val() ? $("#description").val()  : '';
+        SCP_ShippingOptionsController.sendEmail(
+            CCRZ.pagevars.remoteContext,JSON.stringify(emailForm),
+            function (response) {
+                debugger;
+                //doneLoading($(event.currentTarget));
+                $(".cc_close").click();
+                if (response) {
+                    if(response.success) {
+                    }
+                    
+                } 
+            }
+        );
+    }
+    
+    // SCP-769 start
+    var maxStringSize = 6000000;    //Maximum String size is 6,000,000 characters
+    var maxFileSize = 4350000;      //After Base64 Encoding, this is the max file size
+    var chunkSize = 950000;         //Maximum Javascript Remoting message size is 1,000,000 characters
+    var attachment;
+    var attachmentName;
+    var fileSize;
+    var positionIndex;
+    var doneUploading;
+    function attachfile(){
+        var file = document.getElementById('fileupload').files[0];
+        console.log(file);
+        if(file != undefined) {
+            if(file.size <= maxFileSize) {
+                attachmentName = file.name;
+                var fileReader = new FileReader();
+                fileReader.onloadend = function(e) {
+                    attachment = window.btoa(this.result);  //Base 64 encode the file before sending it
+                    positionIndex=0;
+                    fileSize = attachment.length;
+                    console.log("Total Attachment Length: " + fileSize);
+                    doneUploading = false;
+                    if(fileSize < maxStringSize) {
+                        uploadAttachment(null);
+                    } else {
+                        alert("Base 64 Encoded file is too large.  Maximum size is " + maxStringSize + " your file is " + fileSize + ".");
+                    }
+                    
+                }
+                fileReader.onerror = function(e) {
+                    alert("There was an error reading the file.  Please try again.");
+                }
+                fileReader.onabort = function(e) {
+                    alert("There was an error reading the file.  Please try again.");
+                }
+                
+                fileReader.readAsBinaryString(file);  //Read the body of the file
+                
+            } else {
+                alert("File must be under 4 MB in size.  Your file is too large.  Please try again.");
+            }
+        } else {
+            deleteAttachment();
+        }
+    }
+    function uploadAttachment(fileId) {
+        var attachmentBody = "";
+        if(fileSize <= positionIndex + chunkSize) {
+            attachmentBody = attachment.substring(positionIndex);
+            doneUploading = true;
+        } else {
+            attachmentBody = attachment.substring(positionIndex, positionIndex + chunkSize);
+        }
+        console.log("Uploading " + attachmentBody.length + " chars of " + fileSize);
+        SCP_CyberSourceController.doUploadAttachment(
+            CCRZ.pagevars.remoteContext, attachmentBody, attachmentName, fileId, 
+            function (response) {
+                if(response.success) {                   
+                    console.log("File Upload Successful!");            
+                }
+            }
+        );
+    }
+    function deleteAttachment(){
+        SCP_CyberSourceController.dAttachment(
+            CCRZ.pagevars.remoteContext, 
+            function (response) {
+                if(response.success) {                   
+                    console.log("File deletion Successful!");            
+                }
+            }
+        );
+    }
+    // SCP-769 end
+    function shipsecfn(val){
+        if(typeof val !== 'undefined' || val !== '' || val !== null){
+            $(".shipsec-Error1").hide();
+            $("#shipsecbtn").css("background-color","#f1f1f1");
+            }
+        }
+    function shipsecln(val){
+        if(typeof val !== 'undefined' || val !== '' || val !== null){
+            $(".shipsec-Error2").hide();
+            $("#shipsecbtn").css("background-color","#f1f1f1");
+            }
+        }
+    function shipsecpn(val){
+        if(typeof val !== 'undefined' || val !== '' || val !== null){
+            $(".shipsec-Error3").hide();
+            $("#shipsecbtn").css("background-color","#f1f1f1");
+            }
+        }
+    
+    function ponumchk(val){
+        if(typeof val !== 'undefined' || val !== '' || val !== null){
+            $(".po-Error").hide();
+            $("#paybtn").css("background-color","#f1f1f1");
+            }
+        }
+    function hideerr(){
+        if(slectedPayment !== '' || slectedPayment !== null || typeof slectedPayment !== 'undefined'){
+                                $("#paybtn").css("background-color","#f1f1f1");
+                                $(".spo-Error").hide();
+                            }
+        }
+    
+    function credfn1(val){
+        if(typeof val !== 'undefined' || val !== '' || val !== null){
+            $(".crdit-Error1").hide();
+            $("#paybtn").css("background-color","#f1f1f1");
+            }
+        }
+    function credfn2(val){
+        if(typeof val !== 'undefined' || val !== '' || val !== null){
+            $(".crdit-Error2").hide();
+            $("#paybtn").css("background-color","#f1f1f1");
+            }
+        }
+    function credfn3(val){
+        if(typeof val !== 'undefined' || val !== '' || val !== null){
+            $(".crdit-Error3").hide();
+            $("#paybtn").css("background-color","#f1f1f1");
+            }
+        }
+    function credfn4(val){
+        if(typeof val !== 'undefined' || val !== '' || val !== null){
+            $(".crdit-Error4").hide();
+            $("#paybtn").css("background-color","#f1f1f1");
+            }
+        }
+    function credfn5(val){
+        if(typeof val !== 'undefined' || val !== '' || val !== null){
+            $(".crdit-Error5").hide();
+            $("#paybtn").css("background-color","#f1f1f1");
+            }
+        }
+    function credfn6(val){
+        if(typeof val !== 'undefined' || val !== '' || val !== null){
+            $(".crdit-Error6").hide();
+            $("#paybtn").css("background-color","#f1f1f1");
+            }
+        }
+    function credfn7(val){
+        if(typeof val !== 'undefined' || val !== '' || val !== null){
+            $(".crdit-Error7").hide();
+            $("#paybtn").css("background-color","#f1f1f1");
+            }
+        }
+    function credfn8(val){
+        if(typeof val !== 'undefined' || val !== '' || val !== null){
+            $(".crdit-Error8").hide();
+            $("#paybtn").css("background-color","#f1f1f1");
+            }
+        }
+    </script>
+    
+    <c:SCP_ShippingOptions ></c:SCP_ShippingOptions>
+    <c:SCP_CyberSourceComponent />
+    
+</apex:page>

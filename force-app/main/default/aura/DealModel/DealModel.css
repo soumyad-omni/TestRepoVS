@@ -1,0 +1,16 @@
+.THIS .s-btn{
+    padding: 0px 10px;line-height: 1.75;
+}
+.THIS .sWrap{
+	max-height:400px;
+}
+.THIS.outerScroller {
+	border-radius: 11px;
+}
+.THIS.innerScroller {
+	border-radius: 10px;
+}
+.THIS .slds-modal__container{
+    overflow :visible!important;
+   	overflow-y:visible!important;
+}

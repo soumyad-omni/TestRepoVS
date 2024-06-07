@@ -1,0 +1,77 @@
+<apex:page id="cc_tmpl_SingleColHomePage" docType="html-5.0" sidebar="false" showHeader="false" standardStylesheets="false" applyHtmlTag="false">
+    
+    <style>
+        .contentBody.cc_content_body {
+        padding-top: 5px;
+        padding-bottom: 5px;
+        }
+        .container.cc_main_container {
+        margin-top: 25px;
+        }
+        .container {
+        width: auto;
+        }
+        .navbar-default .cc_navbar-nav {
+        float: none;
+        display: flex;
+        margin-top: 10px;
+        margin-left: 321px;
+        
+        }
+        .carousel-inner>.item>img, .carousel-inner>.item>a>img {
+        /* max-width: none; */
+        height: 200px;
+        width: 100%;
+        } 
+        
+    </style>
+    <apex:define name="htmlbody">
+        <div class="container cc_main_container">
+            
+            <div class="row cc_main_row">
+                <div class="cc_left_col">
+                    <div class="search-box-LeftNav"></div>
+                    <apex:insert name="WidgetBoxL" />
+                    <apex:insert name="ProductSearch" />
+                    <apex:insert name="PhoneSplash"/>
+                    <div id="categories-left-nav"></div> 
+                    <div class="filterContainer"></div>
+                    <apex:insert name="ContactUs" />
+                    <div class="promotion-box-LeftNav"></div>
+                    <apex:insert name="ReOrderBox" />
+                    <apex:insert name="LeftNavX" />
+                </div>
+                <div class="cc_main_content_col">
+                    <div class="row cc_main_content_row">
+                        <apex:insert name="WidgetBoxC" />
+                        <apex:insert name="Banner" />
+                        <div class="promotion-box-Banner"></div>
+                        <div class="effwig"></div>
+                        <apex:insert name="ProductSpotlight" />
+                        <apex:insert name="body" />
+                        <apex:insert name="PromosCenter" />
+                        <apex:insert name="FeaturedProducts" />
+                        <apex:insert name="GuideProducts" />
+                        <apex:insert name="UpsellProducts" />
+                        <apex:insert name="ProductReviews" />
+                        <apex:insert name="CenterX" />
+                    </div>
+                </div>
+                <div class="cc_right_col right_column">
+                    <div class="effright"></div>
+                    <div class="search-box-RightNav"></div>
+                    <div id="MyAccount_navSection"></div>
+                    <apex:insert name="WidgetBoxR" />
+                    <apex:insert name="MiniCartBox" />
+                    <apex:insert name="SellerLocatorBox"/>
+                    <div id="categories-right-nav"></div>
+                    <div class="widgetSection"></div>
+                    <apex:insert name="MiniQuickOrderBox" />
+                    <apex:insert name="MiniWishListBox" />
+                    <div class="promotion-box-RightNav"></div>
+                    <apex:insert name="RightNavX" />
+                </div>
+            </div>
+        </div>
+    </apex:define>
+</apex:page>

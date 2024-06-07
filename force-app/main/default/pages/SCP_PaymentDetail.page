@@ -1,0 +1,213 @@
+<apex:page id="SCP_PaymentDetail" applyHtmlTag="false" docType="html-5.0" sidebar="false" showHeader="false" standardStylesheets="false">
+  <script id="PaymentDetail-Desktop" type="text/template">
+  <div class="panel panel-default cc_panel cc_checkout_user_info">
+   <div class="panel-heading cc_heading">
+    <h3 class="panel-title cc_title">{{pageLabelMap 'MyPayment_HeaderDetailHdr'}}</h3>
+   </div>
+   <div class="panel-body cc_body">
+    <div class="messagingSection-payment-Error" style="display: none"></div>
+    <div class="messagingSection-payment-Warning" style="display: none"></div>
+    <div class="messagingSection-payment-Info" style="display: none"></div>
+    {{#if this.loaded}}
+     <div class="row">
+      <div class="col-md-6">
+       <p class="cc_payment_name">
+        <div class="row">
+         <span class="col-xs-5 cc_payment_name_label">{{pageLabelMap 'MyPayment_PaymentNameLabel'}}</span>
+         <span class="col-xs-7 cc_payment_name_value">{{this.name}}</span>
+        </div>
+       </p>
+       {{#if this.accountNumber}}
+        <p class="cc_payment_account">
+         <div class="row">
+          <span class="col-xs-5 cc_payment_account_label">{{pageLabelMap 'MyPayment_Account'}}</span>
+          <span class="col-xs-7 cc_payment_account_value">{{pageLabelMapMultiString 'PaymentDisplay_' this.accountType this.accountType this.accountNumber this.subAccountNumber (pageLabelMapMultiString 'PaymentType_' this.paymentType) (pageLabelMapMultiString 'PaymentExpMonth_' this.expirationMonth) (pageLabelMap this.expirationYear)}}</span>
+         </div>
+        </p>
+       {{/if}}
+       {{#if this.sourceTransactionPayment}}
+        <p class="cc_payment_transaction">
+         <div class="row">
+          <div class="col-xs-5 cc_payment_transaction_label">{{pageLabelMap 'MyPayment_SourcedTransactionPaymentLabel'}}</div>
+          <div class="col-xs-7 cc_payment_transaction_value"><a href="javascript:void(0);" data-id="{{this.sourceTransactionPayment.sfid}}" class="gotoPaymentDetails cc_goto_payment_details">{{this.sourceTransactionPayment.name}}</a></div>
+         </div>
+        </p>
+       {{/if}}
+       {{#if this.parent}}
+        <div class="cc_payment_parent">
+         <div class="row">
+          <div class="col-xs-5 cc_payment_parent_label">{{pageLabelMap 'MyPayment_ParentPaymentLabel'}}</div>
+          <div class="col-xs-7 cc_payment_parent_value"><a href="javascript:void(0);" data-id="{{this.parent.sfid}}" class="gotoPaymentDetails cc_goto_payment_details">{{this.parent.name}}</a></div>
+         </div>
+        </div>
+       {{/if}}
+       {{#if this.transactionPaymentId}}
+        <div class="cc_payment_transaction_id">
+         <div class="row">
+          <div class="col-xs-5 cc_payment_transaction_id_label">{{pageLabelMap 'MyPayment_TransactionPaymentIdLabel'}}</div>
+          <div class="col-xs-7 cc_payment_transaction_id_value">{{this.transactionPaymentId}}</div>
+         </div>
+        </div>
+       {{/if}}
+       {{#if this.paymentTSStr}}
+        <div class="cc_payment_tsstr">
+         <div class="row">
+          <div class="col-xs-5 cc_payment_tsstr_label">{{pageLabelMap 'MyPayment_PaymentTimestampLabel'}}</div>
+          <div class="col-xs-7 cc_payment_tsstr_value">{{this.paymentTSStr}}</div>
+         </div>
+        </div>
+       {{/if}}
+       {{#if this.amount}}
+        <div class="cc_payment_amount {{this.currencyIsoCode}}">
+         <div class="row">
+          <div class="col-xs-5 cc_payment_amount_label {{this.currencyIsoCode}}">{{pageLabelMap 'MyPayment_AmountLabel'}}</div>
+          <div class="col-xs-7 cc_payment_amount_value {{this.currencyIsoCode}}">{{price this.amount this.currencyIsoCode}}</div>
+         </div>
+        </div>
+       {{/if}}
+      </div>
+      <div class="col-md-6">
+       {{#if this.ccOrder}}
+        <div class="cc_payment_ccorder">
+         <div class="row">
+          <div class="col-xs-5 cc_payment_ccorder_label">{{pageLabelMap 'MyPayment_OrderLabel'}}</div>
+          {{#if this.ccOrder.SAPOrderNumber}}
+           <td class="cc_table_col" >
+            <div class="col-xs-7 cc_payment_ccorder_value"><a href="javascript:void(0);" data-id="{{this.ccOrder.encryptedId}}" class="gotoOrderDetails cc_goto_order_details">{{this.ccOrder.SAPOrderNumber}}</a></div>
+           </td>
+          {{else}}
+           <div class="col-xs-7 cc_payment_ccorder_value"><a href="javascript:void(0);" data-id="{{this.ccOrder.encryptedId}}" class="gotoOrderDetails cc_goto_order_details">{{this.ccOrder.name}}</a></div>
+          {{/if}}
+         </div>
+        </div>
+       {{/if}}
+       {{#if this.invoiceAppliedFor}}
+        <div class="cc_payment_invoice_applied_for">
+         <div class="row">
+          <div class="col-xs-5 cc_payment_invoice_applied_for_label">{{pageLabelMap 'MyPayment_InvoiceForLabel'}}</div>
+          {{#if this.invoiceAppliedFor.invoiceID}}
+              <div class="col-xs-7 cc_payment_invoice_applied_for_value"><a href="javascript:void(0);" data-id="{{this.invoiceAppliedFor.sfid}}" class="gotoInvoiceDetails cc_goto_invoice_details">{{this.invoiceAppliedFor.invoiceID}}</a></div>
+          {{else}}
+          <div class="col-xs-7 cc_payment_invoice_applied_for_value"><a href="javascript:void(0);" data-id="{{this.invoiceAppliedFor.sfid}}" class="gotoInvoiceDetails cc_goto_invoice_details">{{this.invoiceAppliedFor.name}}</a></div>
+          {{/if}} 
+        </div>
+        </div>
+       {{/if}}
+       {{#if this.invoiceAppliedTo}}
+       <div class="cc_payment_invoice_applied_to">
+        <div class="row">
+         <div class="col-xs-5 cc_payment_invoice_applied_to_label">{{pageLabelMap 'MyPayment_InvoiceToLabel'}}</div>
+         {{#if this.invoiceAppliedTo.invoiceID}}
+         <div class="col-xs-7 cc_payment_invoice_applied_to_value"><a href="javascript:void(0);" data-id="{{this.invoiceAppliedTo.sfid}}" class="gotoInvoiceDetails cc_goto_invoice_details">{{this.invoiceAppliedTo.invoiceID}}</a></div>
+         {{else}}
+         <div class="col-xs-7 cc_payment_invoice_applied_to_value"><a href="javascript:void(0);" data-id="{{this.invoiceAppliedTo.sfid}}" class="gotoInvoiceDetails cc_goto_invoice_details">{{this.invoiceAppliedTo.name}}</a></div>
+         {{/if}} 
+        </div>
+       </div>
+       {{/if}}
+       {{#if this.billTo}}
+        <div class="cc_payment_bill_to">
+         <div class="row">
+          <div class="col-xs-5 cc_payment_bill_to_label">{{pageLabelMap 'MyPayment_BillToLabel'}}</div>
+          <div class="col-xs-7 cc_payment_bill_to_value">{{this.billTo.name}}</div>
+         </div>
+        </div>
+       {{/if}}
+       {{#if this.soldTo}}
+        <div class="cc_payment_sold_to">
+         <div class="row">
+          <div class="col-xs-5 cc_payment_sold_to_label">{{pageLabelMap 'MyPayment_SoldToLabel'}}</div>
+          <div class="col-xs-7 cc_payment_sold_to_value">{{this.soldTo.name}}</div>
+         </div>
+        </div>
+       {{/if}}
+      </div>
+     </div>
+     {{#if this.childPayments}}
+      <div class="row cc_child_payments">
+       <div class="col-xs-12">
+        <h3 class="cc_title">{{pageLabelMap 'MyPayment_ChildPaymentsHdr'}}</h3>
+        <div class="table-responsive">
+         <table id="childPaymentTable" class="table table-hover cc_table cc_child_payments_table">
+          <tr class="cc_table_header_row">
+           <th class="cc_table_header">
+            <span class="cc_table_header_child_payment_name">{{pageLabelMap 'MyPayment_PaymentName'}}</span>
+           </th>
+           <th class="cc_table_header">
+            <span class="cc_table_header_child_payment_account_number">{{pageLabelMap 'MyPayment_PaymentAccount'}}</span>
+           </th>
+           <th class="cc_table_header">
+            <span class="cc_table_header_child_payment_amount">{{pageLabelMap 'MyPayment_PaymentAmount'}}</span>
+           </th>
+           <th class="cc_table_header">
+            <span class="cc_table_header_child_payment_ts">{{pageLabelMap 'MyPayment_PaymentTS'}}</span>
+           </th>
+          </tr>
+          {{#each this.childPayments}}
+           <tr class="cc_table_row {{this.sfid}}">
+            <td class="cc_table_col">
+             <span class="cc_col_child_payment_name"><a href="javascript:void(0);" data-id="{{this.sfid}}" class="gotoPaymentDetails cc_goto_payment_details">{{this.name}}</a></span>
+            </td>
+            <td class="cc_table_col">
+             <span class="cc_col_child_payment_account_number">{{pageLabelMapMultiString 'PaymentDisplay_' this.accountType this.accountType this.accountNumber this.subAccountNumber (pageLabelMapMultiString 'PaymentType_' this.paymentType) (pageLabelMapMultiString 'PaymentExpMonth_' this.expirationMonth) (pageLabelMap this.expirationYear)}}</span>
+            </td>
+            <td class="cc_table_col">
+             <span class="cc_col_child_payment_amount">{{price this.amount this.currencyIsoCode}}</span>
+            </td>
+            <td class="cc_table_col">
+             <span class="cc_col_child_payment_ts">{{this.paymentTSStr}}</span>
+            </td>
+           </tr>
+          {{/each}}
+         </table>
+        </div>
+       </div>
+      </div>
+     {{/if}}
+     {{#if this.sourcedPayments}}
+      <div class="row cc_sourced_payments">
+       <div class="col-xs-12">
+        <h3 class="cc_title">{{pageLabelMap 'MyPayment_SourcedPaymentsHdr'}}</h3>
+        <div class="table-responsive">
+         <table id="sourcedPaymentTable" class="table table-hover cc_table cc_sourced_payments_table">
+          <tr class="cc_table_header_row">
+           <th class="cc_table_header">
+            <span class="cc_table_header_sourced_payment_name">{{pageLabelMap 'MyPayment_PaymentName'}}</span>
+           </th>
+           <th class="cc_table_header">
+            <span class="cc_table_header_sourced_payment_account_number">{{pageLabelMap 'MyPayment_PaymentAccount'}}</span>
+           </th>
+           <th class="cc_table_header">
+            <span class="cc_table_header_sourced_payment_amount">{{pageLabelMap 'MyPayment_PaymentAmount'}}</span>
+           </th>
+           <th class="cc_table_header">
+            <span class="cc_table_header_sourced_payment_ts">{{pageLabelMap 'MyPayment_PaymentTS'}}</span>
+           </th>
+          </tr>
+          
+          {{#each this.sourcedPayments}}
+           <tr class="cc_table_row {{this.sfid}}">
+            <td class="cc_table_col">
+             <span class="cc_col_sourced_payment_name"><a href="javascript:void(0);" data-id="{{this.sfid}}" class="gotoPaymentDetails cc_goto_payment_details">{{this.name}}</a></span>
+            </td>
+            <td class="cc_table_col">
+             <span class="cc_col_sourced_payment_account_number">{{pageLabelMapMultiString 'PaymentDisplay_' this.accountType this.accountType this.accountNumber this.subAccountNumber (pageLabelMapMultiString 'PaymentType_' this.paymentType) (pageLabelMapMultiString 'PaymentExpMonth_' this.expirationMonth) (pageLabelMap this.expirationYear)}}</span>
+            </td>
+            <td class="cc_table_col">
+             <span class="cc_col_sourced_payment_amount">{{price this.amount this.currencyIsoCode}}</span>
+            </td>
+            <td class="cc_table_col">
+             <span class="cc_col_sourced_payment_ts">{{this.paymentTSStr}}</span>
+            </td>
+           </tr>
+          {{/each}}
+         </table>
+        </div>
+       </div>
+      </div>
+     {{/if}}
+    {{/if}}
+   </div>
+  </div>
+ </script>
+</apex:page>

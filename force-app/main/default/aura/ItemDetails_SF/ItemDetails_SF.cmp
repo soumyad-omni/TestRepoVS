@@ -1,0 +1,112 @@
+<aura:component implements="lightning:isUrlAddressable,force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" controller="DealModelingController_SF">
+    <aura:attribute name="dealModelWrapper" type="Object" />
+    <!--Added by sravan for SF-BUG-590 START-->
+    <aura:attribute name="ordertype" type="String"/>
+    <aura:attribute name="recordid" type="Id"/>
+    <!--Added by sravan for SF-BUG-590 END-->
+    <aura:attribute name="lstItemDetails" type="List" />
+    <aura:attribute name="lstItemDetails1" type="List" />
+    <!--Added by sravan for SF-BUG-590 START-->
+    <aura:attribute name="Details" type="String[]" />
+    <aura:attribute name="myNumber" type="Integer[]" />
+    <!--Added by sravan for SF-BUG-590 END-->
+    <aura:attribute name="columns" type="List"/>
+    <aura:attribute name="reset" type="Boolean" default="false"/>
+    <aura:attribute name="itemdetailscomponent" type="Boolean" default="false"/><!--Added by Sravan for SF-BUG-590 -->
+    <aura:handler name="change" value="{!v.reset}" action="{!c.doInit}"/>
+    
+    <aura:registerEvent name="resetEvent" type="c:resetParentEvent"/>
+    <aura:registerEvent name="calculateDiscountEvent" type="c:calculateDiscountEvent"/>
+    <aura:method name="callReset" action="{!c.callChildReset}" />
+
+    <aura:renderIf isTrue="{!v.itemdetailscomponent}"><!--Added by Sravan for SF-BUG-590 -->
+        <lightning:accordion aura:id="accordion" activeSectionName="A">
+            <aura:iteration items="{!v.lstItemDetails1}" var="item">
+                <lightning:accordionSection name="A" label="{!item.title}"><br/>
+                    <!--<lightning:datatable keyField="PRODUCT_ID" data="{!item.lstProduct}" columns="{! v.columns }" hideCheckboxColumn="true"/> -->
+                    
+                    <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+                        <thead>
+                            <tr class="slds-line-height_reset">
+                                <th class="slds-text-title_caps" scope="col"><div class="slds-truncate" >Product ID</div></th>
+                                <th class="slds-text-title_caps" scope="col"><div class="slds-truncate" >Product Name </div></th>
+                                <th class="slds-text-title_caps" scope="col"><div class="slds-truncate" >Non Disc </div></th>
+                                <th class="slds-text-title_caps" scope="col"><div class="slds-truncate" >QTY </div></th>
+                                <th class="slds-text-title_caps" scope="col"><div class="slds-truncate" >Margin % </div></th>
+                                <th class="slds-text-title_caps" scope="col"><div class="slds-truncate" >Discount </div></th>
+                                <th class="slds-text-title_caps" scope="col"><div class="slds-truncate" >Booking Value Omnicell</div></th>
+                                <th class="slds-text-title_caps" scope="col"><div class="slds-truncate" >USA%</div></th>
+                                <th class="slds-text-title_caps" scope="col"><div class="slds-truncate" >Con%</div></th>
+                                <!--<th class="slds-text-title_caps" scope="col"><div class="slds-truncate" >Billing Val Cust</div></th>-->
+                                <!--<th class="slds-text-title_caps" scope="col"><div class="slds-truncate" >Value to Customer</div></th>-->
+                            </tr>
+                        </thead>
+                        <aura:iteration items="{!item.lstProduct}" var="product">
+                            <tbody>
+                                <tr class="slds-hint-parent">
+                                    <th scope="row">
+                                        <div class="slds-truncate"><a href="javascript:void(0);" tabindex="-1">{!product.PRODUCT_ID}</a></div>
+                                    </th>
+                                    <td ><div class="slds-truncate">{!product.PRODUCT_NAME}</div></td>  
+                                    <td ><div class="slds-truncate">{!product.NON_DISCOUNTABLE}</div></td> 
+                                    <td ><div class="slds-truncate">{!product.QUANTITY}</div></td> 
+                                    <td ><div class="slds-truncate"><ui:outputNumber value ="{!product.NEW_MARGIN_PERC}" format="##0.00"/></div></td> 
+                                    <td ><div class="slds-truncate"><ui:outputNumber value ="{!product.NEW_DISCOUNT}" format="###,###,###,##0.00"/></div></td> 
+                                    <td ><div class="slds-truncate"><ui:outputNumber value ="{!product.NEW_BOOK_VAL_OMNICELL}" format="###,###,###,##0.00"/></div></td> 
+                                    <td ><div class="slds-truncate"><ui:outputNumber value ="{!product.NEW_USA_LIST_PERCENT}" format="###,###,###,##0.00"/></div></td> 
+                                    <td ><div class="slds-truncate"><ui:outputNumber value ="{!product.NEW_CONTRACT_LIST_PERCENT}" format="###,###,###,##0.00"/></div></td> 
+                                    <!--<td ><div class="slds-truncate"><ui:outputNumber value ="{!product.NEW_BILL_VAL_CUST}" format="###,###,###,##0.00"/></div></td>--> 
+                                    <!--<td ><div class="slds-truncate"><ui:outputNumber value ="{!product.VALUE_TO_CUSTOMER}" format="###,###,###,##0.00"/></div></td>--> 
+                                </tr>
+                            </tbody>
+                        </aura:iteration>
+                    </table>
+                </lightning:accordionSection>
+            </aura:iteration>
+        </lightning:accordion>
+    </aura:renderIf>
+    <!--Added by Sravan for SF-BUG-590 STARt-->
+    <aura:renderIf isTrue="{!!v.itemdetailscomponent}">
+        <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+            <thead>
+                <tr class="slds-line-height_reset">
+                    <th class="slds-text-title_caps" scope="col"><div class="slds-truncate" >Product Name </div></th>
+                    <th class="slds-text-title_caps" scope="col"><div class="slds-truncate" >Booking Value </div></th>
+                    <th class="slds-text-title_caps" scope="col"><div class="slds-truncate" >Non Disc</div></th>
+                    <th class="slds-text-title_caps" scope="col"><div class="slds-truncate" >Disc amount </div></th>
+                    <th class="slds-text-title_caps" scope="col"><div class="slds-truncate" >Disc % </div></th>
+                    <th class="slds-text-title_caps" scope="col"><div class="slds-truncate" >Disc $ </div></th>
+                    <th class="slds-text-title_caps" scope="col"><div class="slds-truncate" >Net Booking </div></th>
+                </tr>
+            </thead>
+            <aura:iteration items="{!v.Details}" var="product">
+                <tbody>
+                    <tr class="slds-hint-parent">
+                        <td ><div class="slds-truncate">{!product.name}</div></td>
+                        <td ><div class="slds-truncate"><ui:outputNumber value ="{!product.totalamount}" format="###,###,###,##0.00"/></div></td>  
+                        <td ><div class="slds-truncate"><ui:outputNumber value ="{!product.nondiscamount}" format="###,###,###,##0.00"/></div></td>
+                        <td ><div class="slds-truncate"><ui:outputNumber value ="{!product.discamount}" format="###,###,###,##0.00"/></div></td>
+                        
+                        <aura:renderIf isTrue="{!product.discamount == 0}"> 
+                            
+                            <td ><div class="slds-truncate"><ui:outputNumber value="{!product.discperc}" /></div></td>
+                            <td ><div class="slds-truncate"><ui:outputNumber value="{!product.discnum}" /></div></td>
+                            <aura:set attribute="else">
+                                <td ><div class="slds-truncate"><ui:inputNumber  value="{!product.discperc}" updateOn="keyup"/></div></td>
+                               <td ><div class="slds-truncate"><ui:inputNumber  value="{!product.discnum}" updateOn="keyup"/></div></td>
+                            </aura:set>
+                        </aura:renderIf>
+                       
+						<!--<td ><div class="slds-truncate"><lightning:input type="number" name="discamnt" value="{!product.discnum}"/></div></td>-->
+                        <td ><div class="slds-truncate"><ui:outputNumber value ="{!product.net}" format="###,###,###,##0.00"/></div></td>
+                    </tr>
+                </tbody>
+            </aura:iteration>
+        </table>
+        <div style="text-align:center;margin-top: 5px;">
+            <lightning:button class="s-btn" variant="brand" label="Calculate" title="Calculate" onclick="{!c.calculateProdDiscount}"/>
+            <lightning:button class="s-btn" variant="brand" label="Reset" title="Reset" onclick="{!c.reset}"/>
+        </div>
+    </aura:renderIf>
+    <!--Added by Sravan for SF-BUG-590 END -->
+</aura:component>

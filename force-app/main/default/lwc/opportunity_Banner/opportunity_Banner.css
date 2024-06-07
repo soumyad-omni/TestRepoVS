@@ -1,0 +1,24 @@
+/* recordDetailBanner.css */
+.OppCorebanner {
+    background-color: #46B555; /* Red background, customize as needed */
+    color: #000000; /* White text, customize as needed */
+    padding: 6px; /* Add padding for spacing */
+    text-align: center;
+    font-weight: bold;
+}
+
+.OppAdvsbanner {
+    background-color: #FF9E10; /* Red background, customize as needed */
+    color: #000000; /* White text, customize as needed */
+    padding: 6px; /* Add padding for spacing */
+    text-align: center;
+    font-weight: bold;
+}
+
+.OppSplbanner {
+    background-color: #05A2DC; /* Red background, customize as needed */
+    color: #000000; /* White text, customize as needed */    
+    text-align: center;
+    font-weight: bold;
+    padding: 6px;
+}

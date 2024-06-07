@@ -1,0 +1,90 @@
+<aura:component controller="SpecialityopportunityCreation_apex"
+                implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickActionWithoutHeader" 
+                access="global">
+    <aura:attribute name="mydata" type="List"/>
+    <aura:attribute name="StageOption" type="List"/>
+    <aura:attribute name="ForecastOption" type="List"/>
+    <aura:attribute name="ForecastProbabilityOption" type="List"/>
+    <aura:attribute name="legalResourceRequiredValueOption" type="List"/><!-- IBA-4200-->
+    <aura:attribute name="compellingEventValueOption" type="List"/><!-- IBA-4200-->
+    <aura:attribute name="seismicRestraintRequiredValueOption" type="List"/><!-- IBA-4200-->
+    <aura:attribute name="CADDrawingsObtainedValueOption" type="List"/><!-- IBA-4200-->
+    <aura:attribute name="recordId" type="String"/>
+    <aura:attribute name="defaultStage" type="String"/>
+    <aura:handler name="init" value="{!this}" action="{!c.init}" />
+    
+    <div class="slds-col modal-header slds-modal__header">
+        <h2 class="title slds-text-heading--medium">Create Yearly Specialty Opps</h2>
+    </div>
+    
+    <aura:handler event="aura:waiting" action="{!c.showSpinner}"/>
+    <aura:handler event="aura:doneWaiting" action="{!c.hideSpinner}"/>
+    <aura:attribute name="Spinner" type="boolean" default="false"/>
+    
+    <aura:if isTrue="{!v.Spinner}">
+        <div aura:id="spinnerId" class="slds-spinner_container">
+            <div class="slds-spinner--brand  slds-spinner slds-spinner--small slds-is-relative" role="alert">
+                <span class="slds-assistive-text">Loading Please Wait preparing data</span>
+                <div class="slds-spinner__dot-a"></div>
+                <div class="slds-spinner__dot-b"></div>
+            </div>
+        </div>
+    </aura:if>
+    
+    <lightning:accordion activeSectionName="Opportunity Year 2" allowMultipleSectionsOpen="true">
+        <aura:iteration items="{!v.mydata}" var="val" indexVar="idx">
+            <lightning:accordionSection label="{!val.dataAuraId}" name= "{!val.dataAuraId}" >
+                <aura:set attribute="body">
+                    <lightning:input aura:Id="OpportunityName" label="Opportunity Name " type="text" value="{!val.oppName}" />
+                    <lightning:input aura:Id="SpecialtyOpenDate" label="Specialty Open Date" type="date" value="{!val.specialtyOpenDateValue}" required="true" style="width: 200px !important;" />
+                    <lightning:input aura:Id="ExpectedCloseDate" label="Expected Close Date" type="date" value="{!val.expectedCloseDateValue}" required="true" style="width: 200px !important;" />
+                    <lightning:select name="Stage" label="Stage" required="true" value="{!val.stageNameValue}">
+                        <aura:iteration items="{!v.StageOption}" var="color">
+                            <option value="{!color}" text="{!color}" selected="{!v.defaultStage == color}"></option>
+                        </aura:iteration>
+                    </lightning:select>
+                    
+                    <lightning:select name="Forecast Category" label="Forecast Category" required="true" value="{!val.forecastCategoryValue}">
+                        <option value="">-- None --</option>
+                        <aura:iteration items="{!v.ForecastOption}" var="ForecastOption">
+                            <option value="{!ForecastOption}" text="{!ForecastOption}"></option>
+                        </aura:iteration>
+                    </lightning:select>
+                    
+                    <lightning:select name="Forecast Probability" label="Forecast Probability" required="true" value="{!val.forecastProbabilityValue}">
+                        <option value="">-- None --</option>
+                        <aura:iteration items="{!v.ForecastProbabilityOption}" var="ForecastProbabilityOption">
+                            <option value="{!ForecastProbabilityOption}" text="{!ForecastProbabilityOption}"></option>
+                        </aura:iteration>
+                    </lightning:select>
+                    <!-- IBA-4200 Start-->
+                    <lightning:select name="Legal Resource Required?" label="Legal Resource Required?" required="true" value="{!val.legalResourceRequiredValue}">
+                        <aura:iteration items="{!v.legalResourceRequiredValueOption}" var="legalResourceRequiredValueOption">
+                            <option value="{!legalResourceRequiredValueOption}" text="{!legalResourceRequiredValueOption}"></option>
+                        </aura:iteration>
+                    </lightning:select>
+                    <lightning:select name="Compelling Event" label="Compelling Event" required="true" value="{!val.compellingEventValue}">
+                        <aura:iteration items="{!v.compellingEventValueOption}" var="compellingEventValueOption">
+                            <option value="{!compellingEventValueOption}" text="{!compellingEventValueOption}"></option>
+                        </aura:iteration>
+                    </lightning:select>
+                    <lightning:select name="Seismic Restraint Required" label="Seismic Restraint Required" required="true" value="{!val.seismicRestraintRequiredValue}">
+                        <aura:iteration items="{!v.seismicRestraintRequiredValueOption}" var="seismicRestraintRequiredValueOption">
+                            <option value="{!seismicRestraintRequiredValueOption}" text="{!seismicRestraintRequiredValueOption}" ></option>
+                        </aura:iteration>
+                    </lightning:select>
+                    <lightning:select name="CAD Drawings Obtained (if Carousel/XR2)" label="CAD Drawings Obtained (if Carousel/XR2)" required="true" value="{!val.CADDrawingsObtainedValue}">
+                        <aura:iteration items="{!v.CADDrawingsObtainedValueOption}" var="CADDrawingsObtainedValueOption">
+                            <option value="{!CADDrawingsObtainedValueOption}" text="{!CADDrawingsObtainedValueOption}" ></option>
+                        </aura:iteration>
+                    </lightning:select>
+                    <!-- IBA-4200 End-->
+                </aura:set>
+            </lightning:accordionSection>
+        </aura:iteration>
+    </lightning:accordion>
+    <div class="slds-modal__footer">        
+        <lightning:button variant="neutral" label="Cancel" onclick="{! c.handleExit }" />      
+        <lightning:button variant="brand" label="Save" onclick="{! c.saveClick }" />
+    </div>  
+</aura:component>

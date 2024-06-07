@@ -1,0 +1,107 @@
+<apex:component controller="SalesforceUserAuditEmailVFController" access="global">
+    <apex:attribute name="salesforceuserauditId" type="Id" description="Id of the Salesforce User Audit" assignTo="{!suaId}" default="" access="global"/>
+    
+    <div style="text-align:center;margin-top:15px;font-size: 25px;font-weight:bold">
+        <apex:outputText value="Omnicell User Audit Manager's Report" />
+    </div>
+    <div>
+        <table width="100%" border="0" cellspacing="0" cellpadding="0">
+            <tbody>
+                <tr><td bgcolor="#FFFFFF" style="background-color:#FFFFFF;">&nbsp;</td></tr>
+                <tr>
+                    <td align="left" valign="top" bgcolor="#FFFFFF" style="background-color:#FFFFFF;">
+                        <table border="1" width="95%" cellpadding="0" cellspacing="0" class="container" style="width:95%;max-width:100%;color:#00000;font-family:Helvetica, Arial, sans-serif;font-size:16px;line-height:25px;text-align:center;">
+                            <tr style="vertical-align: top; text-align: center; padding: 0;" align="left">
+                                <th style="font-family: Arial, sans-serif; color: #FFFFFF; font-weight: normal; text-align: left; line-height: 14px; word-break: normal; font-size: 13px; margin: 0; padding: 5px 5px 5px; width:120px;max-width:120px;background-color:#73b504" align="left"><div><strong>Name</strong></div></th>
+                                <th style="font-family: Arial, sans-serif; color: #FFFFFF; font-weight: normal; text-align: left; line-height: 14px; word-break: normal; font-size: 13px; margin: 0; padding: 5px 5px 5px; width:200px;max-width:200px;background-color:#73b504" align="left"><div elq-edit="salutation" class=""><strong>Title</strong></div></th>
+                                <th style="font-family: Arial, sans-serif; color: #FFFFFF; font-weight: normal; text-align: center; line-height: 14px; word-break: normal; font-size: 13px; margin: 0; padding: 5px 5px 5px; width:120px;max-width:120px;background-color:#73b504" align="left"><div elq-edit="salutation" class=""><strong>Department</strong></div></th>
+                                <th style="font-family: Arial, sans-serif; color: #FFFFFF; font-weight: normal; text-align: center; line-height: 14px; word-break: normal; font-size: 13px; margin: 0; padding: 5px 5px 5px; width:65px;max-width:70px;background-color:#73b504" align="left"><div elq-edit="salutation" class=""><strong>Employee ID</strong></div></th>
+                                <th style="font-family: Arial, sans-serif; color: #FFFFFF; font-weight: normal; text-align: left; line-height: 14px; word-break: normal; font-size: 13px; margin: 0; padding: 5px 5px 5px; width:150px;max-width:160px;background-color:#73b504" align="left"><div elq-edit="salutation" class=""><strong>Email</strong></div></th>
+                                <th style="font-family: Arial, sans-serif; color: #FFFFFF; font-weight: normal; text-align: center; line-height: 14px; word-break: normal; font-size: 13px; margin: 0; padding: 5px 5px 5px; width:15%;max-width:18%;background-color:#73b504" align="left"><div elq-edit="salutation" class=""><strong>Manager</strong></div></th>
+                                <th style="font-family: Arial, sans-serif; color: #FFFFFF; font-weight: normal; text-align: center; line-height: 14px; word-break: normal; font-size: 13px; margin: 0; padding: 5px 5px 5px; width:150px;max-width:160px;background-color:#73b504" align="left"><div elq-edit="salutation" class=""><strong>Profile Name</strong></div></th>
+                                <th style="font-family: Arial, sans-serif; color: #FFFFFF; font-weight: normal; text-align: center; line-height: 14px; word-break: normal; font-size: 13px; margin: 0; padding: 5px 5px 5px; width:100px;max-width:120px;background-color:#73b504" align="center"><div elq-edit="salutation" class=""><strong>Last Login Date</strong></div></th>
+                            </tr>
+                            
+                            <tr style="vertical-align: middle; text-align: center; padding: 0;" align="empl">
+                                <td style="font-family: Arial, sans-serif; color: #000000; font-weight: normal; text-align: left; line-height: 14px; word-break: normal; font-size: 10px; margin: 0px; padding: 5px 5px 5px; width:120px;max-width:120px; background-color:#ffffff; border: 0.5px solid;" align="left"><div elq-edit="salutation" class="">{!sua.Manager__r.Name}</div></td>
+                                <td style="font-family: Arial, sans-serif; color: #000000; font-weight: normal; text-align: left; line-height: 14px; word-break: normal; font-size: 10px; margin: 0px; padding: 5px 5px 5px; width:120px;max-width:120px; background-color:#ffffff; border: 0.5px solid;" align="left"><div elq-edit="salutation" class="">{!sua.Manager__r.Title}</div></td>
+                                <td style="font-family: Arial, sans-serif; color: #000000; font-weight: normal; text-align: center; line-height: 14px; word-break: normal; font-size: 10px; margin: 0px; padding: 5px 5px 5px; width:40px;max-width:40px; background-color:#ffffff; border: 0.5px solid;" align="left"><div elq-edit="salutation" class="">{!sua.Manager__r.Department}</div></td>
+                                <td style="font-family: Arial, sans-serif; color: #000000; font-weight: normal; text-align: center; line-height: 14px; word-break: normal; font-size: 10px; margin: 0px; padding: 5px 5px 5px; width:120px;max-width:120px; background-color:#ffffff; border: 0.5px solid;" align="left"><div elq-edit="salutation" class="">{!sua.Manager__r.Omnicell_Employee_Number__c}</div></td>
+                                <td style="font-family: Arial, sans-serif; color: #000000; font-weight: normal; text-align: left; line-height: 14px; word-break: normal; font-size: 10px; margin: 0px; padding: 5px 5px 5px; width:150px;max-width:160px; background-color:#ffffff; border: 0.5px solid;" align="left"><div elq-edit="salutation" class="">{!sua.Manager__r.Email}</div></td>
+                                <td style="font-family: Arial, sans-serif; color: #000000; font-weight: normal; text-align: center; line-height: 14px; word-break: normal; font-size: 10px; margin: 0px; padding: 5px 5px 5px; width:120px;max-width:120px; background-color:#ffffff; border: 0.5px solid;" align="left"><div elq-edit="salutation" class="">{!sua.Manager__r.Manager.Name}</div></td>
+                                <td style="font-family: Arial, sans-serif; color: #000000; font-weight: normal; text-align: center; line-height: 14px; word-break: normal; font-size: 10px; margin: 0px; padding: 5px 5px 5px; width:120px;max-width:120px; background-color:#ffffff; border: 0.5px solid;" align="left"><div elq-edit="salutation" class="">{!sua.Manager__r.Profile.Name}</div></td>
+                                <td style="font-family: Arial, sans-serif; color: #000000; font-weight: normal; text-align: center; line-height: 14px; word-break: normal; font-size: 10px; margin: 0px; padding: 5px 5px 5px; width:120px;max-width:120px; background-color:#ffffff; border: 0.5px solid;" align="left"><div elq-edit="salutation" class=""></div>
+                                    <apex:outputText value="{0, date, MMMM d','  yyyy}">
+                                        <apex:param value="{!sua.Manager__r.LastLoginDate}" /> 
+                                    </apex:outputText>
+                                </td>
+                            </tr> 
+                        </table>
+                    </td>                
+                </tr>    
+            </tbody>
+        </table>        
+        <br/><br/>
+        <table width="100%" border="0" cellspacing="0" cellpadding="0">
+            <tbody>
+                <tr><td bgcolor="#FFFFFF" style="background-color:#FFFFFF;">&nbsp;</td></tr>
+                <tr>
+                    <td align="left" valign="top" bgcolor="#FFFFFF" style="background-color:#FFFFFF;">
+                        <table border="1" width="95%" cellpadding="0" cellspacing="0" class="container" style="width:95%;max-width:100%;color:#00000;font-family:Helvetica, Arial, sans-serif;font-size:16px;line-height:25px;text-align:center;">
+                            <tr style="vertical-align: top; text-align: center; padding: 0;" align="left">
+                                <th style="font-family: Arial, sans-serif; color: #FFFFFF; font-weight: normal; text-align: left; line-height: 14px; word-break: normal; font-size: 13px; margin: 0; padding: 5px 5px 5px; width:120px;max-width:120px;background-color:#73b504" align="left"><div><strong>Name</strong></div></th>
+                                <th style="font-family: Arial, sans-serif; color: #FFFFFF; font-weight: normal; text-align: left; line-height: 14px; word-break: normal; font-size: 13px; margin: 0; padding: 5px 5px 5px; width:200px;max-width:200px;background-color:#73b504" align="left"><div elq-edit="salutation" class=""><strong>Title</strong></div></th>
+                                <th style="font-family: Arial, sans-serif; color: #FFFFFF; font-weight: normal; text-align: center; line-height: 14px; word-break: normal; font-size: 13px; margin: 0; padding: 5px 5px 5px; width:120px;max-width:120px;background-color:#73b504" align="left"><div elq-edit="salutation" class=""><strong>Department</strong></div></th>
+                               <!-- <th style="font-family: Arial, sans-serif; color: #FFFFFF; font-weight: normal; text-align: center; line-height: 14px; word-break: normal; font-size: 13px; margin: 0; padding: 5px 5px 5px; width:120px;max-width:120px;background-color:#73b504" align="left"><div elq-edit="salutation" class=""><strong>Previous Department</strong></div></th> -->
+                                <th style="font-family: Arial, sans-serif; color: #FFFFFF; font-weight: normal; text-align: center; line-height: 14px; word-break: normal; font-size: 13px; margin: 0; padding: 5px 5px 5px; width:120px;max-width:120px;background-color:#73b504" align="left"><div elq-edit="salutation" class=""><strong>Costcenter</strong></div></th>
+                                <th style="font-family: Arial, sans-serif; color: #FFFFFF; font-weight: normal; text-align: center; line-height: 14px; word-break: normal; font-size: 13px; margin: 0; padding: 5px 5px 5px; width:120px;max-width:120px;background-color:#73b504" align="left"><div elq-edit="salutation" class=""><strong>Title</strong></div></th><!-- IBA-4410 -->
+                                <th style="font-family: Arial, sans-serif; color: #FFFFFF; font-weight: normal; text-align: center; line-height: 14px; word-break: normal; font-size: 13px; margin: 0; padding: 5px 5px 5px; width:65px;max-width:70px;background-color:#73b504" align="left"><div elq-edit="salutation" class=""><strong>Employee ID</strong></div></th>
+                                <th style="font-family: Arial, sans-serif; color: #FFFFFF; font-weight: normal; text-align: left; line-height: 14px; word-break: normal; font-size: 13px; margin: 0; padding: 5px 5px 5px; width:150px;max-width:160px;background-color:#73b504" align="left"><div elq-edit="salutation" class=""><strong>Email</strong></div></th>
+                                <th style="font-family: Arial, sans-serif; color: #FFFFFF; font-weight: normal; text-align: center; line-height: 14px; word-break: normal; font-size: 13px; margin: 0; padding: 5px 5px 5px; width:150px;max-width:160px;background-color:#73b504" align="left"><div elq-edit="salutation" class=""><strong>Profile Name</strong></div></th>
+                                <th style="font-family: Arial, sans-serif; color: #FFFFFF; font-weight: normal; text-align: center; line-height: 14px; word-break: normal; font-size: 13px; margin: 0; padding: 5px 5px 5px; width:150px;max-width:160px;background-color:#73b504" align="left"><div elq-edit="salutation" class=""><strong>User Status</strong></div></th>
+                                <th style="font-family: Arial, sans-serif; color: #FFFFFF; font-weight: normal; text-align: center; line-height: 14px; word-break: normal; font-size: 13px; margin: 0; padding: 5px 5px 5px; width:150px;max-width:160px;background-color:#73b504" align="left"><div elq-edit="salutation" class=""><strong>Contractor</strong></div></th>
+                                <th style="font-family: Arial, sans-serif; color: #FFFFFF; font-weight: normal; text-align: center; line-height: 14px; word-break: normal; font-size: 13px; margin: 0; padding: 5px 5px 5px; width:100px;max-width:120px;background-color:#73b504" align="center"><div elq-edit="salutation" class=""><strong>Last Login Date</strong></div></th>
+                            </tr>
+                            <apex:repeat value="{!employees}" var="emp"> 
+                                <tr style="vertical-align: middle; text-align: center; padding: 0;" align="empl">
+                                    <td style="font-family: Arial, sans-serif; color: #000000; font-weight: normal; text-align: left; line-height: 14px; word-break: normal; font-size: 10px; margin: 0px; padding: 5px 5px 5px; width:120px;max-width:120px; background-color:#ffffff; border: 0.5px solid;" align="left"><div elq-edit="salutation" class="">{!emp.Name}</div></td>
+                                    <td style="font-family: Arial, sans-serif; color: #000000; font-weight: normal; text-align: left; line-height: 14px; word-break: normal; font-size: 10px; margin: 0px; padding: 5px 5px 5px; width:120px;max-width:120px; background-color:#ffffff; border: 0.5px solid;" align="left"><div elq-edit="salutation" class="">{!emp.Title__c}</div></td>
+                                    <td style="font-family: Arial, sans-serif; color: #000000; font-weight: normal; text-align: center; line-height: 14px; word-break: normal; font-size: 10px; margin: 0px; padding: 5px 5px 5px; width:40px;max-width:40px; background-color:#ffffff; border: 0.5px solid;" align="left"><div elq-edit="salutation" class="">{!emp.Department__c}</div></td>
+                                   <!-- <td style="font-family: Arial, sans-serif; color: #000000; font-weight: normal; text-align: center; line-height: 14px; word-break: normal; font-size: 10px; margin: 0px; padding: 5px 5px 5px; width:40px;max-width:40px; background-color:#ffffff; border: 0.5px solid;" align="left"><div elq-edit="salutation" class="">{!emp.PreviousDepartment__c}</div></td> -->
+                                    <td style="font-family: Arial, sans-serif; color: #000000; font-weight: normal; text-align: center; line-height: 14px; word-break: normal; font-size: 10px; margin: 0px; padding: 5px 5px 5px; width:40px;max-width:40px; background-color:#ffffff; border: 0.5px solid;" align="left"><div elq-edit="salutation" class="">{!emp.CostCenter__c}</div></td>
+                                    <td style="font-family: Arial, sans-serif; color: #000000; font-weight: normal; text-align: center; line-height: 14px; word-break: normal; font-size: 10px; margin: 0px; padding: 5px 5px 5px; width:40px;max-width:40px; background-color:#ffffff; border: 0.5px solid;" align="left"><div elq-edit="salutation" class="">{!emp.Title__c}</div></td><!-- IBA-4410 -->
+                                    <td style="font-family: Arial, sans-serif; color: #000000; font-weight: normal; text-align: center; line-height: 14px; word-break: normal; font-size: 10px; margin: 0px; padding: 5px 5px 5px; width:120px;max-width:120px; background-color:#ffffff; border: 0.5px solid;" align="left"><div elq-edit="salutation" class="">{!emp.OmnicellEmployeeNumber__c}</div></td>
+                                    <td style="font-family: Arial, sans-serif; color: #000000; font-weight: normal; text-align: left; line-height: 14px; word-break: normal; font-size: 10px; margin: 0px; padding: 5px 5px 5px; width:150px;max-width:160px; background-color:#ffffff; border: 0.5px solid;" align="left"><div elq-edit="salutation" class="">{!emp.Email__c}</div></td>
+                                    <td style="font-family: Arial, sans-serif; color: #000000; font-weight: normal; text-align: center; line-height: 14px; word-break: normal; font-size: 10px; margin: 0px; padding: 5px 5px 5px; width:120px;max-width:120px; background-color:#ffffff; border: 0.5px solid;" align="left"><div elq-edit="salutation" class="">{!emp.CurrentProfile__c}</div></td>
+                                    <td style="font-family: Arial, sans-serif; color: #000000; font-weight: normal; text-align: center; line-height: 14px; word-break: normal; font-size: 10px; margin: 0px; padding: 5px 5px 5px; width:120px;max-width:120px; background-color:#ffffff; border: 0.5px solid;" align="left"><div elq-edit="salutation" class="">{!emp.CurrentUserStatus__c}</div></td>
+                                    <td style="font-family: Arial, sans-serif; color: #000000; font-weight: normal; text-align: center; line-height: 14px; word-break: normal; font-size: 10px; margin: 0px; padding: 5px 5px 5px; width:120px;max-width:120px; background-color:#ffffff; border: 0.5px solid;" align="left"><div elq-edit="salutation" class="">{!IF(emp.Contractor__c,"Yes","No")}</div></td>
+                                    <td style="font-family: Arial, sans-serif; color: #000000; font-weight: normal; text-align: center; line-height: 14px; word-break: normal; font-size: 10px; margin: 0px; padding: 5px 5px 5px; width:120px;max-width:120px; background-color:#ffffff; border: 0.5px solid;" align="left"><div elq-edit="salutation" class=""></div>
+                                        <apex:outputText value="{0, date, MMMM d','  yyyy}">
+                                            <apex:param value="{!emp.Employee__r.LastLoginDate}" /> 
+                                        </apex:outputText>
+                                        {!IF(emp.Employee__r.LastLoginDate <> null,',  '+TEXT(TODAY() - DATEVALUE(emp.Employee__r.LastLoginDate)) +' days ago',"NA")}
+                                    </td>
+                                </tr> 
+                            </apex:repeat>
+                        </table>
+                    </td>                
+                </tr>    
+            </tbody>
+        </table>    
+    </div>
+    
+    <div style="text-align:center;margin-top:35px;font-size: 25px;font-weight:bold">
+        <a href="mailto:{!$Label.SalesforceAuditEmailService}?cc={!$Label.SalesforceAuditEmailServiceCC}&subject=RE:Salesforce%20Quarterly%20User%20Audit%20-%20{!sua.Manager__r.Name}%20|%20{!sua.Name}%20|%20Status%20-%20{!sua.Status__c}%20|%20Due%20Date%20-%20{!completedDate}%20|%20APPROVED&body=Hi%2C%0A%0AI%20am%20Approving%20this%20request%20as%20per%20the%20below-outlined%20comments.%0A%0AComments%3A%20(Optional)%0A%0AThanks%2C%0A%0A{!sua.Manager__r.Name}%0A%0A{!sua.ThreadID__c}%0A%0A" style="color: green;">Approve</a>
+        &nbsp;&nbsp;
+        
+        <a href="mailto:{!$Label.SalesforceAuditEmailService}?cc={!$Label.SalesforceAuditEmailServiceCC}&subject=RE:Salesforce%20Quarterly%20User%20Audit%20-%20{!sua.Manager__r.Name}%20|%20{!sua.Name}%20|%20Status%20-%20{!sua.Status__c}%20|%20Due%20Date%20-%20{!completedDate}%20|%20REJECTED&body=Hi%2C%0A%0AI%20am%20Rejecting%20this%20request%20as%20per%20the%20below-outlined%20comments.%0A%0AComments%3A%20(Optional)%0A%0AThanks%2C%0A%0A{!sua.Manager__r.Name}%0A%0A{!sua.ThreadID__c}%0A%0A" style="color: red;">Reject</a>
+    </div>
+    
+    <div>        
+        <br> Note: Please use the approve/ reject button to complete the request via email.</br>
+    	<br> Please approve by the end of this quarter by replying to this email. If we don’t receive an approval we will assume that the access is not approved and user(s) need to be de-activated in Salesforce. The user(s) will be de-activated at the beginning of the next quarter.</br>
+      <!--  <ul> -->
+       <!--     <li>Please use the approve/ reject button to complete the request via email.</li> -->
+     <!--   </ul>    -->    
+    </div> 
+</apex:component>
