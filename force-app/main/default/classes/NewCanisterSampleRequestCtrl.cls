@@ -11,7 +11,7 @@ public class NewCanisterSampleRequestCtrl {
         ccrz__SubtotalAmount__c,ccrz__ShipAmount__c,ccrz__TaxAmount__c,ccrz__TotalAmount__c,ccrz__PaymentMethod__c,ccrz__RequestDate__c,SAP_Order_Number__c,ccrz__OrderStatus__c,ccrz__Order__c 
         from ccrz__E_Order__c WHERE Id =: OrderId];
         return ordList;
-        
+        //Test
     }
     
     public List<ccrz__E_OrderItem__c> getOrderItemsList()
@@ -36,5 +36,5 @@ public class NewCanisterSampleRequestCtrl {
                          AND ccrz__OrderLineType__c = 'Minor'
                          AND Material__c = 'CANISTER_VC'];
         return oredrltemList;
-    } 
+    }
 }
